@@ -55,7 +55,15 @@ export function useChat(conversationId: string | null, model: string) {
       };
       storage.addMessage(conversationId, userMsg);
 
-      // Add placeholder assistant message
+      // Build API messages BEFORE adding the assistant placeholder,
+      // so the placeholder's empty content isn't sent to the backend.
+      const conv = storage.getConversation(conversationId);
+      const apiMessages = (conv?.messages || []).map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
+      // Add placeholder assistant message (after building apiMessages)
       const assistantMsg: ChatMessage = {
         id: storage.generateMessageId(),
         role: 'assistant',
@@ -76,13 +84,6 @@ export function useChat(conversationId: string | null, model: string) {
         }));
       }, 100);
       timerRef.current = timer;
-
-      // Prepare request messages from conversation history
-      const conv = storage.getConversation(conversationId);
-      const apiMessages = (conv?.messages || []).map((m) => ({
-        role: m.role,
-        content: m.content,
-      }));
 
       const controller = new AbortController();
       abortRef.current = controller;
@@ -143,15 +144,6 @@ export function useChat(conversationId: string | null, model: string) {
                 activeToolCalls: [...toolCalls],
               }));
             } catch {}
-          } else if (eventName === 'done') {
-            // Extract usage from done event
-            try {
-              const data = JSON.parse(sseEvent.data);
-              if (data.usage) {
-                usage = data.usage;
-              }
-            } catch {}
-            break;
           } else {
             // Content chunk (no event name or event: content)
             try {
@@ -180,6 +172,7 @@ export function useChat(conversationId: string | null, model: string) {
                   return updated;
                 });
               }
+              if (data.choices?.[0]?.finish_reason === 'stop') break;
             } catch {}
           }
         }
@@ -188,6 +181,10 @@ export function useChat(conversationId: string | null, model: string) {
           accumulatedContent = accumulatedContent || 'Error: Failed to get response.';
         }
       } finally {
+        // Show a message if streaming completed with no content
+        if (!accumulatedContent) {
+          accumulatedContent = 'No response was generated. Please try again.';
+        }
         // Save final state
         storage.updateLastAssistantMessage(
           conversationId,

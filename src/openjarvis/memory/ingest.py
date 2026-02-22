@@ -155,6 +155,12 @@ def ingest_path(
         if child.name.startswith("."):
             continue
 
+        # Skip sensitive files (secrets, credentials, keys)
+        from openjarvis.security.file_policy import is_sensitive_file
+
+        if is_sensitive_file(child):
+            continue
+
         # Skip binary-looking files
         if child.suffix.lower() in {
             ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".ico",

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pathlib
+import time
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
@@ -10,6 +11,35 @@ from fastapi.staticfiles import StaticFiles
 
 from openjarvis.server.dashboard import dashboard_router
 from openjarvis.server.routes import router
+
+# No-cache headers applied to static file responses
+_NO_CACHE_HEADERS = {
+    "Cache-Control": "no-cache, no-store, must-revalidate",
+    "Pragma": "no-cache",
+    "Expires": "0",
+}
+
+
+class _NoCacheStaticFiles(StaticFiles):
+    """StaticFiles subclass that adds no-cache headers to every response."""
+
+    async def __call__(self, scope, receive, send):
+        async def _send_with_headers(message):
+            if message["type"] == "http.response.start":
+                headers = dict(message.get("headers", []))
+                extra = [
+                    (k.encode(), v.encode()) for k, v in _NO_CACHE_HEADERS.items()
+                ]
+                # Remove etag and last-modified
+                existing = [
+                    (k, v)
+                    for k, v in message.get("headers", [])
+                    if k.lower() not in (b"etag", b"last-modified")
+                ]
+                message = {**message, "headers": existing + extra}
+            await send(message)
+
+        await super().__call__(scope, receive, _send_with_headers)
 
 
 def create_app(
@@ -20,6 +50,8 @@ def create_app(
     bus=None,
     engine_name: str = "",
     agent_name: str = "",
+    channel_bridge=None,
+    config=None,
 ) -> FastAPI:
     """Create and configure the FastAPI application.
 
@@ -33,7 +65,41 @@ def create_app(
         Optional agent instance for agent-mode completions.
     bus:
         Optional event bus for telemetry.
+    channel_bridge:
+        Optional channel bridge for multi-platform messaging.
+    config:
+        Optional JarvisConfig for security guardrails and other settings.
     """
+    # Wrap engine with security guardrails if configured
+    security_enabled = (
+        config is not None
+        and getattr(config, "security", None)
+        and config.security.enabled
+    )
+    if security_enabled:
+        try:
+            from openjarvis.security.guardrails import GuardrailsEngine
+            from openjarvis.security.scanner import PIIScanner, SecretScanner
+            from openjarvis.security.types import RedactionMode
+
+            scanners = []
+            if config.security.secret_scanner:
+                scanners.append(SecretScanner())
+            if config.security.pii_scanner:
+                scanners.append(PIIScanner())
+            if scanners:
+                mode = RedactionMode(config.security.mode)
+                engine = GuardrailsEngine(
+                    engine,
+                    scanners=scanners,
+                    mode=mode,
+                    scan_input=config.security.scan_input,
+                    scan_output=config.security.scan_output,
+                    bus=bus,
+                )
+        except Exception:
+            pass  # security is best-effort
+
     app = FastAPI(
         title="OpenJarvis API",
         description="OpenAI-compatible API server for OpenJarvis",
@@ -47,6 +113,8 @@ def create_app(
     app.state.bus = bus
     app.state.engine_name = engine_name
     app.state.agent_name = agent_name or (getattr(agent, "agent_id", None) if agent else None)
+    app.state.channel_bridge = channel_bridge
+    app.state.session_start = time.time()
 
     app.include_router(router)
     app.include_router(dashboard_router)
@@ -56,16 +124,19 @@ def create_app(
     if static_dir.is_dir():
         assets_dir = static_dir / "assets"
         if assets_dir.is_dir():
-            app.mount("/assets", StaticFiles(directory=assets_dir), name="static-assets")
+            app.mount(
+                "/assets",
+                _NoCacheStaticFiles(directory=assets_dir),
+                name="static-assets",
+            )
 
         @app.get("/{full_path:path}")
         async def spa_catch_all(full_path: str):
             """Serve index.html for SPA routes not handled by API endpoints."""
-            # Let API and known routes pass through (handled by routers above)
-            api_prefixes = ("v1/", "health", "dashboard", "assets")
-            if full_path.startswith(api_prefixes):
-                return FileResponse(static_dir / "index.html")
-            return FileResponse(static_dir / "index.html")
+            return FileResponse(
+                static_dir / "index.html",
+                headers=_NO_CACHE_HEADERS,
+            )
 
     return app
 

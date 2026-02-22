@@ -104,6 +104,58 @@ BUILTIN_MODELS: List[ModelSpec] = [
         metadata={"architecture": "moe"},
     ),
     # -----------------------------------------------------------------------
+    # Local models — TeichAI Distilled
+    # -----------------------------------------------------------------------
+    ModelSpec(
+        model_id="teichai/glm-4.7-flash-opus-distill",
+        name="GLM 4.7 Flash Claude Opus 4.5 Distill",
+        parameter_count_b=30.0,
+        active_parameter_count_b=3.0,
+        context_length=131072,
+        min_vram_gb=8.0,
+        supported_engines=("vllm", "llamacpp"),
+        provider="teichai",
+        metadata={
+            "architecture": "moe",
+            "hf_repo": "TeichAI/GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-GGUF",
+            "teacher": "Claude Opus 4.5",
+            "quantization": "GGUF Q4_K_M / Q8_0",
+            "license": "apache-2.0",
+        },
+    ),
+    ModelSpec(
+        model_id="teichai/qwen3-14b-gpt5.2-distill",
+        name="Qwen3 14B GPT-5.2 Distill",
+        parameter_count_b=14.8,
+        context_length=32768,
+        min_vram_gb=10.0,
+        supported_engines=("vllm", "llamacpp"),
+        provider="teichai",
+        metadata={
+            "architecture": "dense",
+            "hf_repo": "TeichAI/Qwen3-14B-GPT-5.2-Distill-GGUF",
+            "teacher": "GPT-5.2",
+            "quantization": "GGUF Q4_K_M / Q8_0",
+            "license": "apache-2.0",
+        },
+    ),
+    ModelSpec(
+        model_id="teichai/nemotron-14b-opus-distill",
+        name="Nemotron Cascade 14B Claude Opus Distill",
+        parameter_count_b=14.8,
+        context_length=32768,
+        min_vram_gb=10.0,
+        supported_engines=("vllm", "llamacpp"),
+        provider="teichai",
+        metadata={
+            "architecture": "dense",
+            "hf_repo": "TeichAI/Nemotron-Cascade-14B-Claude-Opus-Distill-GGUF",
+            "teacher": "Claude 4.5 Opus",
+            "quantization": "GGUF Q4_K_M / Q8_0",
+            "license": "apache-2.0",
+        },
+    ),
+    # -----------------------------------------------------------------------
     # Cloud models — OpenAI
     # -----------------------------------------------------------------------
     ModelSpec(

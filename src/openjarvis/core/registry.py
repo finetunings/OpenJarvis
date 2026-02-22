@@ -125,9 +125,14 @@ class BenchmarkRegistry(RegistryBase[Any]):
     """Registry for benchmark implementations."""
 
 
+class ChannelRegistry(RegistryBase[Any]):
+    """Registry for channel implementations."""
+
+
 __all__ = [
     "AgentRegistry",
     "BenchmarkRegistry",
+    "ChannelRegistry",
     "EngineRegistry",
     "MemoryRegistry",
     "ModelRegistry",

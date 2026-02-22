@@ -72,6 +72,15 @@ class FileReadTool(BaseTool):
                 success=False,
             )
         path = Path(file_path)
+        # Block sensitive files (secrets, credentials, keys)
+        from openjarvis.security.file_policy import is_sensitive_file
+
+        if is_sensitive_file(path):
+            return ToolResult(
+                tool_name="file_read",
+                content=f"Access denied: {file_path} is a sensitive file.",
+                success=False,
+            )
         if not path.exists():
             return ToolResult(
                 tool_name="file_read",

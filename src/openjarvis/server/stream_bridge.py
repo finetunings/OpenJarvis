@@ -158,16 +158,39 @@ class AgentStreamBridge:
                         yield self._format_named_event(sse_name, item.data)
 
             # Agent is done -- retrieve result
-            agent_result = agent_task.result()
+            try:
+                agent_result = agent_task.result()
+            except Exception as exc:
+                # Engine or agent error — emit a user-friendly error chunk
+                # instead of crashing the SSE stream.
+                error_str = str(exc)
+                if "400" in error_str:
+                    error_content = (
+                        "The input is too long for the model's context window. "
+                        "Please try a shorter message."
+                    )
+                else:
+                    error_content = f"Sorry, an error occurred: {error_str}"
+                error_chunk = ChatCompletionChunk(
+                    id=self._chunk_id,
+                    model=self._model,
+                    choices=[StreamChoice(
+                        delta=DeltaMessage(content=error_content),
+                        finish_reason="stop",
+                    )],
+                )
+                yield f"data: {error_chunk.model_dump_json()}\n\n"
+                yield "data: [DONE]\n\n"
+                return
 
-            # Emit content chunk (standard data: format, no event: prefix)
+            # Emit single content chunk with finish_reason + usage
             tool_results_data = []
             for tr in agent_result.tool_results:
                 tool_results_data.append({
                     "tool_name": tr.tool_name,
                     "success": tr.success,
-                    "output": tr.output,
-                    "latency_ms": tr.latency_ms,
+                    "output": tr.content,
+                    "latency_ms": tr.latency_seconds * 1000,
                 })
 
             content_chunk = ChatCompletionChunk(
@@ -175,31 +198,20 @@ class AgentStreamBridge:
                 model=self._model,
                 choices=[StreamChoice(
                     delta=DeltaMessage(content=agent_result.content),
+                    finish_reason="stop",
                 )],
             )
             content_data = json.loads(content_chunk.model_dump_json())
             if tool_results_data:
                 content_data["tool_results"] = tool_results_data
-            yield f"data: {json.dumps(content_data)}\n\n"
-
-            # Emit done event (finish chunk with usage)
-            finish_chunk = ChatCompletionChunk(
-                id=self._chunk_id,
-                model=self._model,
-                choices=[StreamChoice(
-                    delta=DeltaMessage(),
-                    finish_reason="stop",
-                )],
-            )
-            finish_data = json.loads(finish_chunk.model_dump_json())
-            finish_data["usage"] = UsageInfo(
+            content_data["usage"] = UsageInfo(
                 prompt_tokens=agent_result.metadata.get("prompt_tokens", 0),
                 completion_tokens=agent_result.metadata.get(
                     "completion_tokens", 0,
                 ),
                 total_tokens=agent_result.metadata.get("total_tokens", 0),
             ).model_dump()
-            yield self._format_named_event("done", finish_data)
+            yield f"data: {json.dumps(content_data)}\n\n"
 
             yield "data: [DONE]\n\n"
 

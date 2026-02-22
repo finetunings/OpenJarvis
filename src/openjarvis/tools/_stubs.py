@@ -11,7 +11,7 @@ import json
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from openjarvis.core.events import EventBus, EventType
 from openjarvis.core.types import ToolCall, ToolResult
@@ -91,9 +91,14 @@ class ToolExecutor:
         self,
         tools: List[BaseTool],
         bus: Optional[EventBus] = None,
+        *,
+        interactive: bool = False,
+        confirm_callback: Optional[Callable[[str], bool]] = None,
     ) -> None:
         self._tools: Dict[str, BaseTool] = {t.spec.name: t for t in tools}
         self._bus = bus
+        self._interactive = interactive
+        self._confirm_callback = confirm_callback
 
     def execute(self, tool_call: ToolCall) -> ToolResult:
         """Parse arguments, dispatch to tool, measure latency, emit events."""
@@ -114,6 +119,29 @@ class ToolExecutor:
                 content=f"Invalid arguments JSON: {exc}",
                 success=False,
             )
+
+        # Confirmation check for sensitive tools
+        if tool.spec.requires_confirmation:
+            if not self._interactive or self._confirm_callback is None:
+                return ToolResult(
+                    tool_name=tool_call.name,
+                    content=(
+                        f"Tool '{tool_call.name}' requires"
+                        " confirmation but no confirmation"
+                        " callback is available."
+                    ),
+                    success=False,
+                )
+            prompt = (
+                f"Allow execution of tool"
+                f" '{tool_call.name}' with args {params}?"
+            )
+            if not self._confirm_callback(prompt):
+                return ToolResult(
+                    tool_name=tool_call.name,
+                    content=f"Tool '{tool_call.name}' execution denied by user.",
+                    success=False,
+                )
 
         # Emit start event
         if self._bus:

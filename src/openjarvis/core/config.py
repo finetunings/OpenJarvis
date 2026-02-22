@@ -236,7 +236,7 @@ class AgentConfig:
     """Agent defaults."""
 
     default_agent: str = "simple"
-    max_turns: int = 10
+    max_turns: int = 3
     default_tools: str = ""  # comma-separated tool names
     temperature: float = 0.7
     max_tokens: int = 1024
@@ -262,6 +262,30 @@ class TelemetryConfig:
 
 
 @dataclass(slots=True)
+class ChannelConfig:
+    """Channel messaging settings."""
+
+    enabled: bool = False
+    gateway_url: str = "ws://127.0.0.1:18789/ws"
+    default_agent: str = "simple"
+    reconnect_interval: float = 5.0
+
+
+@dataclass(slots=True)
+class SecurityConfig:
+    """Security guardrails settings."""
+
+    enabled: bool = True
+    scan_input: bool = True
+    scan_output: bool = True
+    mode: str = "warn"  # "redact" | "warn" | "block"
+    secret_scanner: bool = True
+    pii_scanner: bool = True
+    audit_log_path: str = str(DEFAULT_CONFIG_DIR / "audit.db")
+    enforce_tool_confirmation: bool = True
+
+
+@dataclass(slots=True)
 class JarvisConfig:
     """Top-level configuration for OpenJarvis."""
 
@@ -273,6 +297,8 @@ class JarvisConfig:
     agent: AgentConfig = field(default_factory=AgentConfig)
     server: ServerConfig = field(default_factory=ServerConfig)
     telemetry: TelemetryConfig = field(default_factory=TelemetryConfig)
+    channel: ChannelConfig = field(default_factory=ChannelConfig)
+    security: SecurityConfig = field(default_factory=SecurityConfig)
 
 
 # ---------------------------------------------------------------------------
@@ -305,7 +331,7 @@ def load_config(path: Optional[Path] = None) -> JarvisConfig:
             data = tomllib.load(fh)
         sections = (
             "engine", "intelligence", "learning", "memory",
-            "agent", "server", "telemetry",
+            "agent", "server", "telemetry", "channel", "security",
         )
         for section_name in sections:
             if section_name in data:
@@ -360,11 +386,27 @@ default_policy = "heuristic"
 
 [telemetry]
 enabled = true
+
+[channel]
+enabled = false
+gateway_url = "ws://127.0.0.1:18789/ws"
+default_agent = "simple"
+reconnect_interval = 5.0
+
+[security]
+enabled = true
+mode = "warn"
+scan_input = true
+scan_output = true
+secret_scanner = true
+pii_scanner = true
+enforce_tool_confirmation = true
 """
 
 
 __all__ = [
     "AgentConfig",
+    "ChannelConfig",
     "DEFAULT_CONFIG_DIR",
     "DEFAULT_CONFIG_PATH",
     "EngineConfig",
@@ -374,6 +416,7 @@ __all__ = [
     "JarvisConfig",
     "LearningConfig",
     "MemoryConfig",
+    "SecurityConfig",
     "ServerConfig",
     "TelemetryConfig",
     "detect_hardware",

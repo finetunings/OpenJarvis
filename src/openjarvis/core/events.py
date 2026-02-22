@@ -32,6 +32,11 @@ class EventType(str, Enum):
     TELEMETRY_RECORD = "telemetry_record"
     TRACE_STEP = "trace_step"
     TRACE_COMPLETE = "trace_complete"
+    CHANNEL_MESSAGE_RECEIVED = "channel_message_received"
+    CHANNEL_MESSAGE_SENT = "channel_message_sent"
+    SECURITY_SCAN = "security_scan"
+    SECURITY_ALERT = "security_alert"
+    SECURITY_BLOCK = "security_block"
 
 
 @dataclass(slots=True)

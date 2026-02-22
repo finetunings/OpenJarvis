@@ -213,7 +213,11 @@ async def list_models(request: Request) -> ModelListResponse:
 
 @router.get("/v1/savings")
 async def savings(request: Request):
-    """Return savings summary compared to cloud providers."""
+    """Return savings summary compared to cloud providers.
+
+    Only includes telemetry from the current server session so that
+    counters start at zero each time a new model + agent is launched.
+    """
     from openjarvis.core.config import DEFAULT_CONFIG_DIR
     from openjarvis.server.savings import compute_savings, savings_to_dict
     from openjarvis.telemetry.aggregator import TelemetryAggregator
@@ -223,9 +227,11 @@ async def savings(request: Request):
         empty = compute_savings(0, 0, 0)
         return savings_to_dict(empty)
 
+    session_start = getattr(request.app.state, "session_start", None)
+
     agg = TelemetryAggregator(db_path)
     try:
-        summary = agg.summary()
+        summary = agg.summary(since=session_start)
         result = compute_savings(
             prompt_tokens=sum(m.prompt_tokens for m in summary.per_model),
             completion_tokens=sum(m.completion_tokens for m in summary.per_model),
@@ -259,6 +265,53 @@ async def health(request: Request):
     if not healthy:
         raise HTTPException(status_code=503, detail="Engine unhealthy")
     return {"status": "ok"}
+
+
+# ---------------------------------------------------------------------------
+# Channel endpoints
+# ---------------------------------------------------------------------------
+
+
+@router.get("/v1/channels")
+async def list_channels(request: Request):
+    """List available messaging channels."""
+    bridge = getattr(request.app.state, "channel_bridge", None)
+    if bridge is None:
+        return {"channels": [], "message": "Channel bridge not configured"}
+    channels = bridge.list_channels()
+    return {"channels": channels, "status": bridge.status().value}
+
+
+@router.post("/v1/channels/send")
+async def channel_send(request: Request):
+    """Send a message to a channel."""
+    bridge = getattr(request.app.state, "channel_bridge", None)
+    if bridge is None:
+        raise HTTPException(status_code=503, detail="Channel bridge not configured")
+
+    body = await request.json()
+    channel_name = body.get("channel", "")
+    content = body.get("content", "")
+    conversation_id = body.get("conversation_id", "")
+
+    if not channel_name or not content:
+        raise HTTPException(
+            status_code=400, detail="'channel' and 'content' are required",
+        )
+
+    ok = bridge.send(channel_name, content, conversation_id=conversation_id)
+    if not ok:
+        raise HTTPException(status_code=502, detail="Failed to send message")
+    return {"status": "sent", "channel": channel_name}
+
+
+@router.get("/v1/channels/status")
+async def channel_status(request: Request):
+    """Return channel bridge connection status."""
+    bridge = getattr(request.app.state, "channel_bridge", None)
+    if bridge is None:
+        return {"status": "not_configured"}
+    return {"status": bridge.status().value}
 
 
 __all__ = ["router"]

@@ -15,7 +15,7 @@ class TestAgentConfig:
     def test_defaults(self):
         cfg = AgentConfig()
         assert cfg.default_agent == "simple"
-        assert cfg.max_turns == 10
+        assert cfg.max_turns == 3
         assert cfg.default_tools == ""
         assert cfg.temperature == 0.7
         assert cfg.max_tokens == 1024

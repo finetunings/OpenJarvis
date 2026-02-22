@@ -55,6 +55,7 @@ server = [
 agents = []
 learning = []
 openclaw = []
+channels = ["websockets>=12.0"]
 docs = [
     "mkdocs>=1.6",
     "mkdocs-material>=9.5",

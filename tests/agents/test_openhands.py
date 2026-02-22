@@ -354,3 +354,173 @@ class TestOpenHandsAgent:
         agent = OpenHandsAgent(engine, "test-model")
         result = agent.run("")
         assert result.content == "Empty input received."
+
+    def test_error_400_handling(self):
+        """Agent catches 400 errors and returns friendly message."""
+        engine = MagicMock()
+        engine.engine_id = "mock"
+        engine.generate.side_effect = RuntimeError("HTTP 400 Bad Request")
+        agent = OpenHandsAgent(engine, "test-model")
+        result = agent.run("Hello")
+        assert "too long" in result.content
+        assert result.metadata.get("error") is True
+
+    def test_xml_tool_call_extraction(self):
+        """Agent parses XML-style tool calls."""
+        engine = MagicMock()
+        engine.engine_id = "mock"
+        engine.generate.side_effect = [
+            _engine_response(
+                '<tool_call>calculator\n$expression=7*6</calculator>'
+            ),
+            _engine_response("The answer is 42."),
+        ]
+        agent = OpenHandsAgent(
+            engine, "test-model",
+            tools=[_CalculatorStub()],
+        )
+        result = agent.run("What is 7 times 6?")
+        assert result.content == "The answer is 42."
+        assert len(result.tool_results) == 1
+        assert result.tool_results[0].content == "42"
+
+    def test_observation_truncation(self):
+        """Long tool results are truncated in observations."""
+        engine = MagicMock()
+        engine.engine_id = "mock"
+        engine.generate.side_effect = [
+            _engine_response(
+                'Action: calculator\nAction Input: {"expression": "1+1"}'
+            ),
+            _engine_response("Done."),
+        ]
+        # Make calculator return very long output
+        long_calc = _CalculatorStub()
+        orig_execute = long_calc.execute
+
+        def _long_execute(**params):
+            r = orig_execute(**params)
+            return ToolResult(
+                tool_name=r.tool_name,
+                content="x" * 10000,
+                success=True,
+            )
+
+        long_calc.execute = _long_execute
+        agent = OpenHandsAgent(engine, "test-model", tools=[long_calc])
+        agent.run("Compute")
+        # Check the observation message sent to the engine
+        second_call = engine.generate.call_args_list[1]
+        messages = second_call[0][0]
+        last_msg = messages[-1]
+        assert len(last_msg.content) < 5000
+        assert "[Output truncated]" in last_msg.content
+
+
+# ---------------------------------------------------------------------------
+# Truncation tests
+# ---------------------------------------------------------------------------
+
+
+class TestTruncation:
+    def test_short_messages_unchanged(self):
+        """Messages under limit are not modified."""
+        engine = MagicMock()
+        engine.engine_id = "mock"
+        agent = OpenHandsAgent(engine, "test-model")
+        messages = [
+            Message(role=Role.SYSTEM, content="System prompt"),
+            Message(role=Role.USER, content="Short query"),
+        ]
+        result = agent._truncate_if_needed(messages, max_prompt_tokens=1000)
+        assert result[1].content == "Short query"
+
+    def test_long_messages_truncated(self):
+        """Messages over limit get the last user message truncated."""
+        engine = MagicMock()
+        engine.engine_id = "mock"
+        agent = OpenHandsAgent(engine, "test-model")
+        messages = [
+            Message(role=Role.SYSTEM, content="System prompt"),
+            Message(role=Role.USER, content="x" * 20000),
+        ]
+        result = agent._truncate_if_needed(messages, max_prompt_tokens=1000)
+        assert len(result[1].content) < 20000
+        assert "[Input truncated to fit context window]" in result[1].content
+
+    def test_truncation_preserves_system_prompt(self):
+        """Truncation only modifies user message, not system prompt."""
+        engine = MagicMock()
+        engine.engine_id = "mock"
+        agent = OpenHandsAgent(engine, "test-model")
+        system = "Important system prompt"
+        messages = [
+            Message(role=Role.SYSTEM, content=system),
+            Message(role=Role.USER, content="y" * 20000),
+        ]
+        result = agent._truncate_if_needed(messages, max_prompt_tokens=1000)
+        assert result[0].content == system
+
+
+# ---------------------------------------------------------------------------
+# URL expansion tests
+# ---------------------------------------------------------------------------
+
+
+class TestUrlExpansion:
+    def test_no_url_returns_false(self):
+        text, expanded = OpenHandsAgent._expand_urls("What is 2+2?")
+        assert text == "What is 2+2?"
+        assert expanded is False
+
+    def test_url_detected_returns_true(self, monkeypatch):
+        import httpx
+
+        mock_resp = MagicMock()
+        mock_resp.text = "<html><body>Page content</body></html>"
+        mock_resp.headers = {"content-type": "text/html"}
+        mock_resp.raise_for_status = MagicMock()
+        monkeypatch.setattr(httpx, "get", MagicMock(return_value=mock_resp))
+
+        text, expanded = OpenHandsAgent._expand_urls(
+            "Summarize: https://example.com/article"
+        )
+        assert expanded is True
+        assert "Page content" in text
+        assert "Content from" in text
+
+    def test_url_expansion_failure_returns_false(self, monkeypatch):
+        import httpx
+
+        monkeypatch.setattr(
+            httpx, "get",
+            MagicMock(side_effect=Exception("Connection error")),
+        )
+        text, expanded = OpenHandsAgent._expand_urls(
+            "Read https://example.com/broken"
+        )
+        assert expanded is False
+
+    def test_url_expanded_uses_direct_path(self, monkeypatch):
+        """When URL is expanded, agent bypasses tool loop."""
+        import httpx
+
+        mock_resp = MagicMock()
+        mock_resp.text = "<html><body>Article text here</body></html>"
+        mock_resp.headers = {"content-type": "text/html"}
+        mock_resp.raise_for_status = MagicMock()
+        monkeypatch.setattr(httpx, "get", MagicMock(return_value=mock_resp))
+
+        engine = MagicMock()
+        engine.engine_id = "mock"
+        engine.generate.return_value = _engine_response("Summary of article.")
+        agent = OpenHandsAgent(engine, "test-model")
+        result = agent.run("Summarize: https://example.com/article")
+        assert result.content == "Summary of article."
+        assert result.turns == 1
+        # Only one generate call (direct, no tool loop)
+        assert engine.generate.call_count == 1
+        # The message should contain the fetched content, not tool descriptions
+        call_messages = engine.generate.call_args[0][0]
+        system_msg = call_messages[0].content
+        assert "tool" not in system_msg.lower()

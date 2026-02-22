@@ -142,6 +142,7 @@ class Jarvis:
         self._resolved_engine_key: Optional[str] = None
         self._bus = EventBus()
         self._telem_store: Optional[TelemetryStore] = None
+        self._audit_logger: Any = None
         self.memory = MemoryHandle(self._config)
 
         # Set up telemetry
@@ -149,6 +150,18 @@ class Jarvis:
             try:
                 self._telem_store = TelemetryStore(self._config.telemetry.db_path)
                 self._telem_store.subscribe_to_bus(self._bus)
+            except Exception:
+                pass
+
+        # Set up security audit logger
+        if self._config.security.enabled:
+            try:
+                from openjarvis.security.audit import AuditLogger
+
+                self._audit_logger = AuditLogger(
+                    db_path=self._config.security.audit_log_path,
+                    bus=self._bus,
+                )
             except Exception:
                 pass
 
@@ -179,7 +192,34 @@ class Jarvis:
                 "No inference engine available. "
                 "Make sure an engine is running (e.g. ollama serve)."
             )
-        self._resolved_engine_key, self._engine = resolved
+        self._resolved_engine_key, engine = resolved
+
+        # Wrap engine with security guardrails if configured
+        if self._config.security.enabled:
+            try:
+                from openjarvis.security.guardrails import GuardrailsEngine
+                from openjarvis.security.scanner import PIIScanner, SecretScanner
+                from openjarvis.security.types import RedactionMode
+
+                scanners = []
+                if self._config.security.secret_scanner:
+                    scanners.append(SecretScanner())
+                if self._config.security.pii_scanner:
+                    scanners.append(PIIScanner())
+                if scanners:
+                    mode = RedactionMode(self._config.security.mode)
+                    engine = GuardrailsEngine(
+                        engine,
+                        scanners=scanners,
+                        mode=mode,
+                        scan_input=self._config.security.scan_input,
+                        scan_output=self._config.security.scan_output,
+                        bus=self._bus,
+                    )
+            except Exception:
+                pass  # security is best-effort
+
+        self._engine = engine
 
     def ask(
         self,
@@ -424,6 +464,12 @@ class Jarvis:
             except Exception:
                 pass
             self._telem_store = None
+        if self._audit_logger is not None:
+            try:
+                self._audit_logger.close()
+            except Exception:
+                pass
+            self._audit_logger = None
         self._engine = None
 
 

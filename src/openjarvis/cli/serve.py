@@ -119,12 +119,12 @@ def serve(
                 # Load tools for agents that support them
                 tools_agents = ("orchestrator", "react", "openhands")
                 if agent_key in tools_agents:
-                    from openjarvis.tools._stubs import BaseTool
-                    from openjarvis.core.registry import ToolRegistry
                     import openjarvis.tools  # noqa: F401  # trigger registration
+                    from openjarvis.core.registry import ToolRegistry
+                    from openjarvis.tools._stubs import BaseTool
 
                     tools = []
-                    for name in ToolRegistry.list_keys():
+                    for name in ToolRegistry.keys():
                         tool_cls = ToolRegistry.get(name)
                         if isinstance(tool_cls, type) and issubclass(tool_cls, BaseTool):
                             tools.append(tool_cls())
@@ -137,8 +137,29 @@ def serve(
                     agent_kwargs["max_turns"] = config.agent.max_turns
 
                 agent = agent_cls(engine, model_name, **agent_kwargs)
-        except Exception:
-            pass  # agent is optional for serve
+        except Exception as exc:
+            import traceback
+            console.print(f"[yellow]Agent '{agent_key}' failed to load: {exc}[/yellow]")
+            traceback.print_exc()
+
+    # Set up channel bridge if enabled
+    channel_bridge = None
+    if config.channel.enabled:
+        try:
+            from openjarvis.channels.openclaw_bridge import OpenClawChannelBridge
+
+            channel_bridge = OpenClawChannelBridge(
+                gateway_url=config.channel.gateway_url,
+                reconnect_interval=config.channel.reconnect_interval,
+                bus=bus,
+            )
+            channel_bridge.connect()
+            console.print(
+                f"  Channels: [cyan]{config.channel.gateway_url}[/cyan]"
+            )
+        except Exception as exc:
+            console.print(f"[yellow]Channel bridge failed to start: {exc}[/yellow]")
+            channel_bridge = None
 
     # Create app
     from openjarvis.server.app import create_app
@@ -146,6 +167,7 @@ def serve(
     app = create_app(
         engine, model_name, agent=agent, bus=bus,
         engine_name=engine_name, agent_name=agent_key or "",
+        channel_bridge=channel_bridge, config=config,
     )
 
     console.print(

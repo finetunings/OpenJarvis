@@ -12,6 +12,7 @@ from openjarvis.core.events import EventBus, reset_event_bus
 from openjarvis.core.registry import (
     AgentRegistry,
     BenchmarkRegistry,
+    ChannelRegistry,
     EngineRegistry,
     MemoryRegistry,
     ModelRegistry,
@@ -30,6 +31,7 @@ def _clean_registries() -> None:
     ToolRegistry.clear()
     RouterPolicyRegistry.clear()
     BenchmarkRegistry.clear()
+    ChannelRegistry.clear()
     reset_event_bus()
 
 

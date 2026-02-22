@@ -44,7 +44,7 @@ jarvis init --force
 
 ## Configuration Sections
 
-The config file is organized into nine TOML sections. Every field has a default value, so you only need to specify the values you want to change.
+The config file is organized into TOML sections. Every field has a default value, so you only need to specify the values you want to change.
 
 ---
 
@@ -95,28 +95,49 @@ When both fields are empty, OpenJarvis uses the configured router policy (see `[
 
 ---
 
-### `[learning]` -- Router Policy
+### `[learning]` -- Learning Policies
 
-Controls how the learning system selects models for incoming queries.
+Controls how the learning system selects models, advises agents, and tunes tool selection.
 
 ```toml
 [learning]
 default_policy = "heuristic"
 reward_weights = ""
+intelligence_policy = "heuristic"
+agent_policy = ""
+tools_policy = ""
+update_interval = 100
 ```
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `default_policy` | string | `"heuristic"` | Router policy to use for model selection. Available: `heuristic`, `learned` (trace-driven), `grpo` (reinforcement learning stub). |
+| `default_policy` | string | `"heuristic"` | Router policy to use for model selection. Available: `heuristic`, `learned` (trace-driven), `sft` (supervised fine-tuning), `grpo` (RL stub). |
 | `reward_weights` | string | `""` | Comma-separated key=value pairs for the reward function. Example: `"latency=0.4,cost=0.3,quality=0.3"`. |
+| `intelligence_policy` | string | `"heuristic"` | Intelligence learning policy (model routing). One of: `heuristic`, `learned`, `sft`, `grpo`. |
+| `agent_policy` | string | `""` | Agent learning policy (agent behavior advice). Available: `agent_advisor`. Empty means no agent learning. |
+| `tools_policy` | string | `""` | Tool learning policy (tool selection). Available: `icl_updater`. Empty means no tool learning. |
+| `update_interval` | int | `100` | Number of traces between automatic policy updates. |
 
-**Router policies:**
+**Router / Intelligence policies:**
 
 | Policy | Description |
 |--------|-------------|
 | `heuristic` | Rule-based selection using 6 priority rules. Considers model availability, parameter count, context length, and query characteristics. Default. |
 | `learned` | Trace-driven policy that learns from past interaction outcomes stored in the trace system. |
+| `sft` | Supervised fine-tuning policy that learns routing from labeled trace data. |
 | `grpo` | Group Relative Policy Optimization stub for future RL-based routing. |
+
+**Agent policies:**
+
+| Policy | Description |
+|--------|-------------|
+| `agent_advisor` | Advises on agent strategy (tool sets, turn limits) based on trace patterns. |
+
+**Tool policies:**
+
+| Policy | Description |
+|--------|-------------|
+| `icl_updater` | In-context learning updater for tool selection and configuration. |
 
 You can also override the router policy per-query via the CLI:
 
@@ -237,6 +258,62 @@ db_path = "~/.openjarvis/telemetry.db"
 
 !!! info "Telemetry is local-only"
     All telemetry data is stored locally in a SQLite database. No data is ever sent to external services.
+
+---
+
+### `[traces]` -- Trace Recording
+
+Controls the trace system that records full interaction sequences for the learning system.
+
+```toml
+[traces]
+enabled = true
+db_path = "~/.openjarvis/traces.db"
+```
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `enabled` | bool | `true` | Whether to record traces for each agent interaction. |
+| `db_path` | string | `~/.openjarvis/traces.db` | Path to the SQLite trace database. |
+
+---
+
+### `[tools.storage]` -- Storage Backend Configuration
+
+Controls the storage backend used by memory/storage tools. This section configures the same backends previously managed under `[memory]`, but with the canonical tools-based naming.
+
+```toml
+[tools.storage]
+default_backend = "sqlite"
+db_path = "~/.openjarvis/memory.db"
+```
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `default_backend` | string | `"sqlite"` | Storage backend to use. Available: `sqlite`, `faiss`, `colbert`, `bm25`, `hybrid`. |
+| `db_path` | string | `~/.openjarvis/memory.db` | Path to the SQLite storage database. |
+
+!!! note "Backward compatibility"
+    The `[memory]` TOML section is still supported and takes effect if `[tools.storage]` is not present. New configurations should prefer `[tools.storage]`.
+
+---
+
+### `[tools.mcp]` -- MCP (Model Context Protocol)
+
+Controls the MCP server and external MCP tool provider integration. The MCP adapter supports protocol version 2025-11-25.
+
+```toml
+[tools.mcp]
+enabled = false
+protocol_version = "2025-11-25"
+providers = []
+```
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `enabled` | bool | `false` | Whether to enable the MCP adapter for exposing and consuming tools via MCP. |
+| `protocol_version` | string | `"2025-11-25"` | MCP protocol version to use. |
+| `providers` | list | `[]` | List of external MCP tool provider URLs to connect to. |
 
 ---
 
@@ -564,7 +641,12 @@ from openjarvis.core.config import (
     EngineConfig,
     IntelligenceConfig,
     JarvisConfig,
+    LearningConfig,
     MemoryConfig,
+    StorageConfig,
+    MCPConfig,
+    ToolsConfig,
+    TracesConfig,
 )
 
 config = JarvisConfig(

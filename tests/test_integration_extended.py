@@ -147,7 +147,11 @@ class TestReActPipeline:
         assert result.turns == 1
 
     def test_react_event_chain(self):
-        """Verify complete event chain through ReAct run."""
+        """Verify agent-level event chain through ReAct run.
+
+        INFERENCE_START/END are now published by InstrumentedEngine,
+        not by agents directly.
+        """
         _register_all()
         from openjarvis.agents.react import ReActAgent
 
@@ -164,8 +168,6 @@ class TestReActPipeline:
 
         types = [e.event_type for e in bus.history]
         assert EventType.AGENT_TURN_START in types
-        assert EventType.INFERENCE_START in types
-        assert EventType.INFERENCE_END in types
         assert EventType.AGENT_TURN_END in types
 
 
@@ -314,7 +316,7 @@ class TestMCPIntegration:
 
         # 1. Initialize
         caps = client.initialize()
-        assert caps["protocolVersion"] == "2024-11-05"
+        assert caps["protocolVersion"] == "2025-11-25"
 
         # 2. Discover tools
         tools = client.list_tools()

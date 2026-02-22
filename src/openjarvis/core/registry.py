@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, Tuple, Type, Typ
 if TYPE_CHECKING:
     from openjarvis.agents._stubs import BaseAgent
     from openjarvis.engine._stubs import InferenceEngine
-    from openjarvis.memory._stubs import MemoryBackend
+    from openjarvis.tools.storage._stubs import MemoryBackend
 
 T = TypeVar("T")
 
@@ -129,11 +129,16 @@ class ChannelRegistry(RegistryBase[Any]):
     """Registry for channel implementations."""
 
 
+class LearningRegistry(RegistryBase[Any]):
+    """Registry for learning policies."""
+
+
 __all__ = [
     "AgentRegistry",
     "BenchmarkRegistry",
     "ChannelRegistry",
     "EngineRegistry",
+    "LearningRegistry",
     "MemoryRegistry",
     "ModelRegistry",
     "RegistryBase",

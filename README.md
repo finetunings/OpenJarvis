@@ -1,92 +1,100 @@
-# OpenJarvis
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/openjarvis-logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="assets/openjarvis-logo-light.svg">
+    <img alt="OpenJarvis" src="assets/openjarvis-logo-light.svg" width="400">
+  </picture>
+</p>
 
-**Programming abstractions for on-device AI.**
+<p align="center"><i>Programming abstractions for on-device AI.</i></p>
 
-OpenJarvis defines the abstractions needed to study and build AI systems that run entirely on local hardware. It provides four composable pillars — Intelligence, Engine, Agentic Logic, and Memory — with a trace-driven learning system that improves over time.
+---
 
-> **Status: v1.0+** — All pillars implemented. Trace system, trace-driven learning, SDK, benchmarks, and Docker deployment ready. 576 tests passing.
+OpenJarvis is a framework for building AI systems that run *entirely on local hardware*. Rather than treating intelligence as a cloud service, OpenJarvis provides composable abstractions for local model selection, inference, agentic reasoning, tool use, and learning — all aware of the hardware they run on.
 
-## What is this?
-
-Local AI is a new computing paradigm: intelligence as a *resource you own*, not a *service you rent*. Existing frameworks (LangChain, DSPy, CrewAI) assume cloud-class models and infinite compute. OpenJarvis provides the abstractions for building AI systems against local hardware constraints.
-
-**Four core abstractions:**
-
-- **Intelligence** — the local LM being run (Qwen3 8B, GPT OSS 120B, Kimi 2.5, etc.) with multi-model management and automatic routing
-- **Engine** — the local inference engine (Ollama, SGLang, vLLM, llama.cpp, MLX) with hardware-aware selection
-- **Agentic Logic** — pluggable logic for handling queries, making tool/API calls, managing memory. Can be static (rules, ReAct) or learned from traces
-- **Memory** — persistent, searchable storage with multiple backends (SQLite, FAISS, ColBERTv2, BM25, hybrid)
-
-**Cross-cutting: Learning** — every interaction generates a trace. The system learns better routing, tool selection, and memory strategies from accumulated trace data.
-
-## Quick Start — Python SDK
+You write Python programs that compose five pillars — **Intelligence** (which model), **Engine** (which runtime), **Agents** (which reasoning strategy), **Tools** (which capabilities, via MCP), and **Learning** (which adaptation policy) — and OpenJarvis handles hardware detection, model routing, telemetry, and trace-driven improvement automatically.
 
 ```python
 from openjarvis import Jarvis
 
-j = Jarvis()
-response = j.ask("What is the meaning of life?")
-print(response)
+j = Jarvis()                                      # auto-detect hardware + engine
+response = j.ask("Explain backpropagation")       # route to best local model
 
-# With a specific model and agent
-response = j.ask("Explain gravity", model="qwen3:8b", agent="orchestrator")
+j.ask("Solve x^2 - 5x + 6 = 0",                  # multi-turn agent with tools
+      agent="orchestrator",
+      tools=["calculator", "think"])
 
-# Memory operations
-j.memory.index("./docs/")
-results = j.memory.search("machine learning")
+j.memory.index("./papers/")                       # index documents into local storage
+results = j.memory.search("attention mechanism")  # semantic retrieval
 
 j.close()
 ```
 
-## Quick Start — CLI
-
 ```bash
+pip install openjarvis
 jarvis ask "Hello, what can you do?"
-jarvis ask --agent orchestrator --tools calculator,think "What is 2+2?"
-jarvis bench run -n 5 --json
-jarvis model list
-jarvis memory index ./docs/
-jarvis serve --port 8000
+jarvis serve --port 8000                           # OpenAI-compatible API
 ```
 
-## Docker
+## Installation
 
 ```bash
-docker compose up -d          # Starts Jarvis + Ollama
-curl http://localhost:8000/health
+pip install openjarvis            # core framework
+pip install openjarvis[server]    # + FastAPI server
+pip install openjarvis[openclaw]  # + OpenClaw agent (requires Node.js 22+)
 ```
+
+You also need a local inference backend: [Ollama](https://ollama.com), [vLLM](https://github.com/vllm-project/vllm), [SGLang](https://github.com/sgl-project/sglang), or [llama.cpp](https://github.com/ggerganov/llama.cpp).
+
+## The Five Pillars
+
+| Pillar | What it does | Key abstractions |
+|--------|-------------|-----------------|
+| **Intelligence** | Model management and routing | `RouterPolicy`, `QueryAnalyzer`, `ModelCatalog` |
+| **Engine** | Inference runtime abstraction | `InferenceEngine` ABC — Ollama, vLLM, SGLang, llama.cpp, MLX, cloud |
+| **Agents** | Pluggable reasoning strategies | `BaseAgent` ABC — Simple, Orchestrator, ReAct, OpenHands, OpenClaw |
+| **Tools** | Capabilities via MCP | `BaseTool` ABC — calculator, code interpreter, web search, memory, LLM sub-calls; external MCP servers auto-discovered |
+| **Learning** | Trace-driven adaptation | `LearningPolicy` ABC — SFT (model routing), AgentAdvisor (restructuring), ICL (tool usage) |
+
+Every interaction produces a **Trace** — a structured record of the full reasoning chain (routing decisions, tool calls, latencies, outcomes). Learning policies consume traces to improve model selection, agent behavior, and tool usage over time.
+
+## Config-Driven Composition
+
+OpenJarvis is fully configurable via `~/.openjarvis/config.toml` or programmatically via `SystemBuilder`:
+
+```python
+from openjarvis.system import SystemBuilder
+
+system = (SystemBuilder()
+          .engine("ollama")
+          .model("qwen3:8b")
+          .agent("orchestrator")
+          .tools(["calculator", "think", "memory_retrieve"])
+          .telemetry(True)
+          .build())
+
+result = system.ask("What is 2+2?")
+system.close()
+```
+
+Hardware auto-detection selects the best engine: Apple Silicon &rarr; Ollama, NVIDIA datacenter GPUs &rarr; vLLM, AMD &rarr; vLLM, CPU-only &rarr; llama.cpp.
+
+## MCP Interoperability
+
+All tools are managed via the [Model Context Protocol](https://modelcontextprotocol.io/) (MCP). The built-in MCP server exposes every OpenJarvis tool — including memory operations — to any MCP-compatible client (Claude, GPT, Gemini, etc.). External MCP servers are auto-discovered and their tools appear as native `BaseTool` instances inside OpenJarvis agents.
 
 ## Documentation
 
-- **[VISION.md](VISION.md)** — Project vision, architecture, design principles
-- **[ROADMAP.md](ROADMAP.md)** — Phased development plan with deliverables
-- **[CLAUDE.md](CLAUDE.md)** — Developer reference for working with the codebase
+Full docs at the [OpenJarvis documentation site](docs/) or in-repo:
 
-## Quick orientation
+- **[VISION.md](VISION.md)** — Project vision and design principles
+- **[CLAUDE.md](CLAUDE.md)** — Developer reference for the codebase
+- **[docs/](docs/)** — Architecture guides, API reference, tutorials
 
-```
-src/openjarvis/
-├── core/          # Registry, types, config, event bus
-├── intelligence/  # Model management, routing
-├── engine/        # Inference engine wrappers (Ollama, vLLM, SGLang, llama.cpp, MLX)
-├── agents/        # Pluggable agent implementations + tool system
-├── memory/        # Storage backends (SQLite, FAISS, ColBERT, BM25, hybrid)
-├── traces/        # Full interaction traces — store, collector, analyzer
-├── learning/      # Router policies (heuristic, trace-driven, GRPO stub)
-├── telemetry/     # Per-inference telemetry store + aggregator
-├── tools/         # Built-in tools (calculator, think, retrieval, LLM, file read)
-├── bench/         # Benchmarking framework (latency, throughput)
-├── server/        # OpenAI-compatible API server
-├── cli/           # CLI entry points
-└── sdk.py         # Python SDK (Jarvis class)
-```
+## About
 
-## Requirements
-
-- Python 3.10+
-- An inference backend: [Ollama](https://ollama.com), [vLLM](https://github.com/vllm-project/vllm), or [llama.cpp](https://github.com/ggerganov/llama.cpp)
-- Node.js 22+ (only if using OpenClaw agent)
+OpenJarvis is part of [Intelligence Per Watt](https://www.intelligence-per-watt.ai/), a research initiative studying the efficiency of on-device AI systems. The project is developed at [Hazy Research](https://hazyresearch.stanford.edu/) and the [Scaling Intelligence Lab](https://scalingintelligence.stanford.edu/) at [Stanford SAIL](https://ai.stanford.edu/).
 
 ## License
 
-TBD
+Apache 2.0

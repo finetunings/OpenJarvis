@@ -199,12 +199,26 @@ class Trace:
         self.total_tokens += step.output.get("tokens", 0)
 
 
+@dataclass(slots=True)
+class RoutingContext:
+    """Context describing a query for model routing decisions."""
+
+    query: str = ""
+    query_length: int = 0
+    has_code: bool = False
+    has_math: bool = False
+    language: str = "en"
+    urgency: float = 0.5
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
 __all__ = [
     "Conversation",
     "Message",
     "ModelSpec",
     "Quantization",
     "Role",
+    "RoutingContext",
     "StepType",
     "TelemetryRecord",
     "ToolCall",

@@ -76,13 +76,11 @@ class TestSimpleAgentPipeline:
         assert result.content == "The answer is 42."
         assert result.turns == 1
 
-        # Verify event chain
+        # Verify event chain — INFERENCE_START/END and TELEMETRY_RECORD
+        # are now published by InstrumentedEngine, not by agents directly
         event_types = [e.event_type for e in bus.history]
         assert EventType.AGENT_TURN_START in event_types
-        assert EventType.INFERENCE_START in event_types
-        assert EventType.INFERENCE_END in event_types
         assert EventType.AGENT_TURN_END in event_types
-        assert EventType.TELEMETRY_RECORD in event_types
 
     def test_with_context(self):
         _register_agents()
@@ -206,6 +204,8 @@ class TestEventBusFullFlow:
     """Verify the complete event chain through an agent run."""
 
     def test_all_events_recorded(self):
+        """Agent-level events are recorded; INFERENCE_START/END and
+        TELEMETRY_RECORD are now published by InstrumentedEngine."""
         _register_agents()
         bus = EventBus(record_history=True)
         engine = _make_engine()
@@ -215,9 +215,6 @@ class TestEventBusFullFlow:
         event_types = [e.event_type for e in bus.history]
         expected = [
             EventType.AGENT_TURN_START,
-            EventType.INFERENCE_START,
-            EventType.INFERENCE_END,
-            EventType.TELEMETRY_RECORD,
             EventType.AGENT_TURN_END,
         ]
         for et in expected:
@@ -238,12 +235,17 @@ class TestEventBusFullFlow:
 
 
 class TestTelemetryThroughAgent:
-    """Verify telemetry records are created through agent runs."""
+    """Verify telemetry records are created through InstrumentedEngine."""
 
     def test_telemetry_record_created(self):
+        """Telemetry records are now produced by InstrumentedEngine,
+        not by agents directly."""
+        from openjarvis.telemetry.instrumented_engine import InstrumentedEngine
+
         _register_agents()
         bus = EventBus(record_history=True)
-        engine = _make_engine()
+        raw_engine = _make_engine()
+        engine = InstrumentedEngine(raw_engine, bus)
         agent = AgentRegistry.get("simple")(engine, "test-model", bus=bus)
         agent.run("Hello")
 

@@ -213,11 +213,11 @@ The `generate` return dict must include at minimum:
 ## Adding a New Memory Backend
 
 Memory backends provide persistent, searchable storage. All backends implement
-the `MemoryBackend` ABC defined in `memory/_stubs.py`.
+the `MemoryBackend` ABC defined in `tools/storage/_stubs.py` (previously `memory/_stubs.py`).
 
 ### Complete Example
 
-Create `src/openjarvis/memory/my_backend.py`:
+Create `src/openjarvis/tools/storage/my_backend.py`:
 
 ```python
 """Custom memory backend example."""
@@ -227,7 +227,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from openjarvis.core.registry import MemoryRegistry
-from openjarvis.memory._stubs import MemoryBackend, RetrievalResult
+from openjarvis.tools.storage._stubs import MemoryBackend, RetrievalResult
 
 
 @MemoryRegistry.register("my_backend")
@@ -289,14 +289,17 @@ class MyMemoryBackend(MemoryBackend):
 
 ### Register in `__init__.py`
 
-Add to `src/openjarvis/memory/__init__.py`:
+Add to `src/openjarvis/tools/storage/__init__.py`:
 
 ```python
 try:
-    import openjarvis.memory.my_backend  # noqa: F401
+    import openjarvis.tools.storage.my_backend  # noqa: F401
 except ImportError:
     pass
 ```
+
+!!! note "Backward compatibility"
+    The old `from openjarvis.memory._stubs import MemoryBackend` import path still works via backward-compatibility shims, but new code should use `openjarvis.tools.storage._stubs`.
 
 ### Required ABC Methods
 
@@ -342,7 +345,6 @@ from openjarvis.core.events import EventBus, EventType
 from openjarvis.core.registry import AgentRegistry
 from openjarvis.core.types import Message, Role
 from openjarvis.engine._stubs import InferenceEngine
-from openjarvis.telemetry.wrapper import instrumented_generate
 
 
 @AgentRegistry.register("my_agent")
@@ -395,23 +397,14 @@ class MyAgent(BaseAgent):
 
         messages.append(Message(role=Role.USER, content=input))
 
-        # Generate via instrumented path for telemetry
-        if self._bus:
-            result = instrumented_generate(
-                self._engine,
-                messages,
-                model=self._model,
-                bus=self._bus,
-                temperature=self._temperature,
-                max_tokens=self._max_tokens,
-            )
-        else:
-            result = self._engine.generate(
-                messages,
-                model=self._model,
-                temperature=self._temperature,
-                max_tokens=self._max_tokens,
-            )
+        # Just call engine.generate() directly -- telemetry is opt-in
+        # via InstrumentedEngine (see telemetry/instrumented_engine.py)
+        result = self._engine.generate(
+            messages,
+            model=self._model,
+            temperature=self._temperature,
+            max_tokens=self._max_tokens,
+        )
 
         content = result.get("content", "")
 
@@ -718,7 +711,8 @@ class BenchmarkResult:
 ## Adding a New Router Policy
 
 Router policies determine which model handles a given query. All policies
-implement the `RouterPolicy` ABC from `learning/_stubs.py`.
+implement the `RouterPolicy` ABC from `intelligence/_stubs.py`. The
+`RoutingContext` dataclass is defined in `core/types.py`.
 
 ### Complete Example
 
@@ -732,7 +726,8 @@ from __future__ import annotations
 from typing import List, Optional
 
 from openjarvis.core.registry import RouterPolicyRegistry
-from openjarvis.learning._stubs import RouterPolicy, RoutingContext
+from openjarvis.core.types import RoutingContext
+from openjarvis.intelligence._stubs import RouterPolicy
 
 
 class QueryLengthPolicy(RouterPolicy):
@@ -838,11 +833,12 @@ this from a raw query string, detecting code and math patterns automatically.
 | Component | ABC | Registry | Key location |
 |---|---|---|---|
 | Inference Engine | `InferenceEngine` | `EngineRegistry` | `engine/_stubs.py` |
-| Memory Backend | `MemoryBackend` | `MemoryRegistry` | `memory/_stubs.py` |
+| Memory Backend | `MemoryBackend` | `MemoryRegistry` | `tools/storage/_stubs.py` |
 | Agent | `BaseAgent` | `AgentRegistry` | `agents/_stubs.py` |
 | Tool | `BaseTool` | `ToolRegistry` | `tools/_stubs.py` |
 | Benchmark | `BaseBenchmark` | `BenchmarkRegistry` | `bench/_stubs.py` |
-| Router Policy | `RouterPolicy` | `RouterPolicyRegistry` | `learning/_stubs.py` |
+| Router Policy | `RouterPolicy` | `RouterPolicyRegistry` | `intelligence/_stubs.py` |
+| Learning Policy | `LearningPolicy` | `LearningRegistry` | `learning/_stubs.py` |
 
 The general pattern for all extension points:
 

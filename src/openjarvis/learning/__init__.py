@@ -32,6 +32,21 @@ def ensure_registered() -> None:
 
     _reg_trace()
 
+    try:
+        import openjarvis.learning.sft_policy  # noqa: F401
+    except ImportError:
+        pass
+
+    try:
+        import openjarvis.learning.agent_advisor  # noqa: F401
+    except ImportError:
+        pass
+
+    try:
+        import openjarvis.learning.icl_updater  # noqa: F401
+    except ImportError:
+        pass
+
 
 __all__ = [
     "HeuristicRewardFunction",

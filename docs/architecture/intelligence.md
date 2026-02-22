@@ -153,11 +153,33 @@ model = router.select_model(ctx)  # Returns "deepseek-coder-v2:16b" (has "coder"
 
 ---
 
-## build_routing_context()
+## RouterPolicy and QueryAnalyzer ABCs
 
-The `build_routing_context()` function analyzes a raw query string and produces a `RoutingContext` dataclass:
+The Intelligence pillar now defines the `RouterPolicy` and `QueryAnalyzer` ABCs in `intelligence/_stubs.py`:
 
 ```python
+# intelligence/_stubs.py
+class RouterPolicy(ABC):
+    @abstractmethod
+    def select_model(self, context: RoutingContext) -> str:
+        """Return the model registry key best suited for *context*."""
+
+class QueryAnalyzer(ABC):
+    @abstractmethod
+    def analyze(self, query: str) -> RoutingContext:
+        """Analyze a raw query string and return a RoutingContext."""
+```
+
+The `HeuristicRouter` implements both of these ABCs.
+
+---
+
+## build_routing_context()
+
+The `build_routing_context()` function analyzes a raw query string and produces a `RoutingContext` dataclass (now defined in `core/types.py`):
+
+```python
+# core/types.py
 @dataclass(slots=True)
 class RoutingContext:
     query: str = ""
@@ -194,6 +216,6 @@ ctx = build_routing_context("```python\ndef hello():\n    pass\n```")
 
 ## Integration with Learning
 
-The `HeuristicRouter` implements the `RouterPolicy` ABC from the Learning pillar, which means it can be swapped out for a `TraceDrivenPolicy` or any other policy via the `RouterPolicyRegistry`. See the [Learning & Traces](learning.md) documentation for details on how trace-driven routing works.
+The `HeuristicRouter` implements the `RouterPolicy` ABC (now defined in `intelligence/_stubs.py`), which means it can be swapped out for a `TraceDrivenPolicy`, `SFTPolicy`, or any other policy via the `RouterPolicyRegistry`. See the [Learning & Traces](learning.md) documentation for details on how trace-driven routing and the broader `LearningPolicy` taxonomy work.
 
 The router is registered as `"heuristic"` in the `RouterPolicyRegistry` and is the default routing policy. Users can switch policies via the `--router` CLI flag or the `learning.default_policy` config setting.

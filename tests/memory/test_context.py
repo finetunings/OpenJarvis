@@ -165,7 +165,7 @@ def test_inject_context_publishes_event():
     backend = _FakeMemory(results)
     messages = [Message(role=Role.USER, content="hello")]
 
-    import openjarvis.memory.context as mod
+    import openjarvis.tools.storage.context as mod
     original = mod.get_event_bus
     mod.get_event_bus = lambda: bus
     try:

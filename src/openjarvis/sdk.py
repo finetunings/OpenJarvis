@@ -10,6 +10,7 @@ from openjarvis.core.config import JarvisConfig, load_config
 from openjarvis.core.events import EventBus
 from openjarvis.core.types import Message, Role
 from openjarvis.engine._discovery import get_engine
+from openjarvis.system import JarvisSystem, SystemBuilder
 from openjarvis.telemetry.store import TelemetryStore
 from openjarvis.telemetry.wrapper import instrumented_generate
 
@@ -473,4 +474,4 @@ class Jarvis:
         self._engine = None
 
 
-__all__ = ["Jarvis", "MemoryHandle"]
+__all__ = ["Jarvis", "JarvisSystem", "MemoryHandle", "SystemBuilder"]

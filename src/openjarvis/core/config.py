@@ -214,12 +214,16 @@ class LearningConfig:
     """Learning / router policy settings."""
 
     default_policy: str = "heuristic"
+    intelligence_policy: str = "none"  # "none" | "sft" — updates model routing
+    agent_policy: str = "none"  # "none" | "agent_advisor" — updates agent logic
+    tools_policy: str = "none"  # "none" | "icl_updater" — updates tool usage
     reward_weights: str = ""  # comma-separated key=value, e.g. "latency=0.4,cost=0.3"
+    update_interval: int = 10  # traces between learning updates
 
 
 @dataclass(slots=True)
-class MemoryConfig:
-    """Memory backend settings."""
+class StorageConfig:
+    """Storage (memory) backend settings."""
 
     default_backend: str = "sqlite"
     db_path: str = str(DEFAULT_CONFIG_DIR / "memory.db")
@@ -229,6 +233,29 @@ class MemoryConfig:
     context_max_tokens: int = 2048
     chunk_size: int = 512
     chunk_overlap: int = 64
+
+
+# Backward-compatibility alias
+MemoryConfig = StorageConfig
+
+
+@dataclass(slots=True)
+class MCPConfig:
+    """MCP (Model Context Protocol) settings."""
+
+    enabled: bool = True
+    servers: str = ""  # JSON list of MCP server configs
+    expose_storage: bool = True
+    expose_llm: bool = True
+
+
+@dataclass(slots=True)
+class ToolsConfig:
+    """Tools pillar settings — wraps storage and MCP configuration."""
+
+    storage: StorageConfig = field(default_factory=StorageConfig)
+    mcp: MCPConfig = field(default_factory=MCPConfig)
+    enabled: str = ""  # comma-separated default tools
 
 
 @dataclass(slots=True)
@@ -262,6 +289,14 @@ class TelemetryConfig:
 
 
 @dataclass(slots=True)
+class TracesConfig:
+    """Trace system settings."""
+
+    enabled: bool = False
+    db_path: str = str(DEFAULT_CONFIG_DIR / "traces.db")
+
+
+@dataclass(slots=True)
 class ChannelConfig:
     """Channel messaging settings."""
 
@@ -285,7 +320,7 @@ class SecurityConfig:
     enforce_tool_confirmation: bool = True
 
 
-@dataclass(slots=True)
+@dataclass
 class JarvisConfig:
     """Top-level configuration for OpenJarvis."""
 
@@ -293,12 +328,23 @@ class JarvisConfig:
     engine: EngineConfig = field(default_factory=EngineConfig)
     intelligence: IntelligenceConfig = field(default_factory=IntelligenceConfig)
     learning: LearningConfig = field(default_factory=LearningConfig)
-    memory: MemoryConfig = field(default_factory=MemoryConfig)
+    tools: ToolsConfig = field(default_factory=ToolsConfig)
     agent: AgentConfig = field(default_factory=AgentConfig)
     server: ServerConfig = field(default_factory=ServerConfig)
     telemetry: TelemetryConfig = field(default_factory=TelemetryConfig)
+    traces: TracesConfig = field(default_factory=TracesConfig)
     channel: ChannelConfig = field(default_factory=ChannelConfig)
     security: SecurityConfig = field(default_factory=SecurityConfig)
+
+    @property
+    def memory(self) -> StorageConfig:
+        """Backward-compatible accessor — canonical location is tools.storage."""
+        return self.tools.storage
+
+    @memory.setter
+    def memory(self, value: StorageConfig) -> None:
+        """Backward-compatible setter."""
+        self.tools.storage = value
 
 
 # ---------------------------------------------------------------------------
@@ -329,13 +375,33 @@ def load_config(path: Optional[Path] = None) -> JarvisConfig:
     if config_path.exists():
         with open(config_path, "rb") as fh:
             data = tomllib.load(fh)
-        sections = (
-            "engine", "intelligence", "learning", "memory",
-            "agent", "server", "telemetry", "channel", "security",
+
+        # Simple top-level sections
+        simple_sections = (
+            "engine", "intelligence", "learning",
+            "agent", "server", "telemetry", "traces", "channel", "security",
         )
-        for section_name in sections:
+        for section_name in simple_sections:
             if section_name in data:
                 _apply_toml_section(getattr(cfg, section_name), data[section_name])
+
+        # Memory: accept [memory] (old) → maps to tools.storage
+        if "memory" in data:
+            _apply_toml_section(cfg.tools.storage, data["memory"])
+
+        # Tools: accept [tools] and nested [tools.storage], [tools.mcp]
+        if "tools" in data:
+            tools_data = data["tools"]
+            # Top-level tools keys (e.g. enabled)
+            for key, value in tools_data.items():
+                if not isinstance(value, dict) and hasattr(cfg.tools, key):
+                    setattr(cfg.tools, key, value)
+            # [tools.storage]
+            if "storage" in tools_data:
+                _apply_toml_section(cfg.tools.storage, tools_data["storage"])
+            # [tools.mcp]
+            if "mcp" in tools_data:
+                _apply_toml_section(cfg.tools.mcp, tools_data["mcp"])
 
     return cfg
 
@@ -383,9 +449,16 @@ agent = "orchestrator"
 
 [learning]
 default_policy = "heuristic"
+# intelligence_policy = "none"   # "sft" to learn from traces
+# agent_policy = "none"          # "agent_advisor" for LM-guided restructuring
+# tools_policy = "none"          # "icl_updater" for ICL example + skill discovery
+# update_interval = 10
 
 [telemetry]
 enabled = true
+
+[traces]
+enabled = false
 
 [channel]
 enabled = false
@@ -415,10 +488,14 @@ __all__ = [
     "IntelligenceConfig",
     "JarvisConfig",
     "LearningConfig",
+    "MCPConfig",
     "MemoryConfig",
     "SecurityConfig",
     "ServerConfig",
+    "StorageConfig",
     "TelemetryConfig",
+    "ToolsConfig",
+    "TracesConfig",
     "detect_hardware",
     "generate_default_toml",
     "load_config",

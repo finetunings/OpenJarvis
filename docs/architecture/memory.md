@@ -116,9 +116,9 @@ $$\text{RRF}(d) = \sum_{i} \frac{w_i}{k + \text{rank}_i(d)}$$
 - **Configurable:** RRF constant `k` (default 60) and per-backend weights
 
 ```python
-from openjarvis.memory.sqlite import SQLiteMemory
-from openjarvis.memory.faiss_backend import FAISSMemory
-from openjarvis.memory.hybrid import HybridMemory
+from openjarvis.tools.storage.sqlite import SQLiteMemory
+from openjarvis.tools.storage.faiss_backend import FAISSMemory
+from openjarvis.tools.storage.hybrid import HybridMemory
 
 hybrid = HybridMemory(
     sparse=SQLiteMemory(db_path="memory.db"),
@@ -128,11 +128,14 @@ hybrid = HybridMemory(
 )
 ```
 
+!!! note "Backward compatibility"
+    The old imports (e.g., `from openjarvis.memory.sqlite import SQLiteMemory`) still work via backward-compatibility shims in the `memory/` package, but the canonical location is now `openjarvis.tools.storage.*`.
+
 ---
 
 ## Chunking Pipeline
 
-Large documents are split into manageable chunks before storage. The chunking pipeline is defined in `memory/chunking.py`.
+Large documents are split into manageable chunks before storage. The chunking pipeline is defined in `tools/storage/chunking.py` (previously `memory/chunking.py`).
 
 ### ChunkConfig
 
@@ -167,7 +170,7 @@ The `chunk_text()` function splits text using paragraph boundaries:
 5. Discard chunks smaller than `min_chunk_size`
 
 ```python
-from openjarvis.memory.chunking import chunk_text, ChunkConfig
+from openjarvis.tools.storage.chunking import chunk_text, ChunkConfig
 
 config = ChunkConfig(chunk_size=256, chunk_overlap=32)
 chunks = chunk_text(document_text, source="docs/guide.md", config=config)
@@ -177,7 +180,7 @@ chunks = chunk_text(document_text, source="docs/guide.md", config=config)
 
 ## Document Ingestion
 
-The `memory/ingest.py` module handles reading files and directories into chunks.
+The `tools/storage/ingest.py` module (previously `memory/ingest.py`) handles reading files and directories into chunks.
 
 ### File Type Detection
 
@@ -201,7 +204,7 @@ Ingests a file or directory into chunks:
 
 ```python
 from pathlib import Path
-from openjarvis.memory.ingest import ingest_path
+from openjarvis.tools.storage.ingest import ingest_path
 
 # Ingest a single file
 chunks = ingest_path(Path("docs/guide.md"))
@@ -222,7 +225,7 @@ pip install openjarvis[memory-pdf]
 
 ## Embeddings
 
-Dense retrieval backends (FAISS, ColBERT) require text embeddings. The `memory/embeddings.py` module provides the `Embedder` ABC and a default implementation.
+Dense retrieval backends (FAISS, ColBERT) require text embeddings. The `tools/storage/embeddings.py` module (previously `memory/embeddings.py`) provides the `Embedder` ABC and a default implementation.
 
 ### Embedder ABC
 
@@ -245,7 +248,7 @@ The default embedder wraps the `sentence-transformers` library:
 - **Output:** NumPy arrays of shape `(n, dim)`
 
 ```python
-from openjarvis.memory.embeddings import SentenceTransformerEmbedder
+from openjarvis.tools.storage.embeddings import SentenceTransformerEmbedder
 
 embedder = SentenceTransformerEmbedder(model_name="all-MiniLM-L6-v2")
 vectors = embedder.embed(["Hello world", "How are you?"])
@@ -256,7 +259,7 @@ vectors = embedder.embed(["Hello world", "How are you?"])
 
 ## Context Injection
 
-The context injection pipeline retrieves relevant documents and prepends them to the prompt with source attribution. This is defined in `memory/context.py`.
+The context injection pipeline retrieves relevant documents and prepends them to the prompt with source attribution. This is defined in `tools/storage/context.py` (previously `memory/context.py`).
 
 ### ContextConfig
 
@@ -293,7 +296,7 @@ How it works:
 6. Returns a **new** message list with the context message prepended
 
 ```python
-from openjarvis.memory.context import inject_context, ContextConfig
+from openjarvis.tools.storage.context import inject_context, ContextConfig
 
 config = ContextConfig(top_k=3, min_score=0.2)
 messages = inject_context("What is the API?", messages, backend, config=config)
@@ -320,7 +323,7 @@ Memory backends are registered via the `@MemoryRegistry.register("name")` decora
 
 ```python
 from openjarvis.core.registry import MemoryRegistry
-from openjarvis.memory._stubs import MemoryBackend
+from openjarvis.tools.storage._stubs import MemoryBackend
 
 @MemoryRegistry.register("my-backend")
 class MyMemoryBackend(MemoryBackend):

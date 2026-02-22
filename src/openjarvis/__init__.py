@@ -4,6 +4,6 @@ from __future__ import annotations
 
 __version__ = "1.0.0"
 
-from openjarvis.sdk import Jarvis, MemoryHandle
+from openjarvis.sdk import Jarvis, JarvisSystem, MemoryHandle, SystemBuilder
 
-__all__ = ["Jarvis", "MemoryHandle", "__version__"]
+__all__ = ["Jarvis", "JarvisSystem", "MemoryHandle", "SystemBuilder", "__version__"]

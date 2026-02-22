@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import Any, Dict, List, Optional
 
 from openjarvis.core.types import ToolCall
 from openjarvis.mcp.protocol import (
@@ -14,6 +14,21 @@ from openjarvis.mcp.protocol import (
 )
 from openjarvis.tools._stubs import BaseTool, ToolExecutor
 
+# Tool annotation hints per MCP spec 2025-11-25
+_TOOL_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
+    "memory_store": {"destructiveHint": True, "readOnlyHint": False},
+    "memory_retrieve": {"readOnlyHint": True, "destructiveHint": False},
+    "memory_search": {"readOnlyHint": True, "destructiveHint": False},
+    "memory_index": {"destructiveHint": True, "readOnlyHint": False},
+    "calculator": {"readOnlyHint": True, "destructiveHint": False},
+    "think": {"readOnlyHint": True, "destructiveHint": False},
+    "retrieval": {"readOnlyHint": True, "destructiveHint": False},
+    "llm": {"readOnlyHint": False, "destructiveHint": False},
+    "file_read": {"readOnlyHint": True, "destructiveHint": False},
+    "web_search": {"readOnlyHint": True, "destructiveHint": False},
+    "code_interpreter": {"destructiveHint": True, "readOnlyHint": False},
+}
+
 
 class MCPServer:
     """MCP server that exposes OpenJarvis tools via JSON-RPC.
@@ -21,16 +36,108 @@ class MCPServer:
     Parameters
     ----------
     tools:
-        List of ``BaseTool`` instances to expose.
+        List of ``BaseTool`` instances to expose.  If ``None``, auto-discovers
+        all registered tools from ``ToolRegistry``.
     """
 
     SERVER_NAME = "openjarvis"
     SERVER_VERSION = "1.0.0"
-    PROTOCOL_VERSION = "2024-11-05"
+    PROTOCOL_VERSION = "2025-11-25"
 
-    def __init__(self, tools: List[BaseTool]) -> None:
+    def __init__(self, tools: Optional[List[BaseTool]] = None) -> None:
+        if tools is None:
+            tools = self._auto_discover_tools()
         self._tools: Dict[str, BaseTool] = {t.spec.name: t for t in tools}
         self._executor = ToolExecutor(tools)
+
+    @staticmethod
+    def _auto_discover_tools() -> List[BaseTool]:
+        """Auto-discover all built-in tools by direct import.
+
+        Does not rely on ToolRegistry state — imports each tool class
+        directly and attempts instantiation with no arguments.
+        """
+        tools: List[BaseTool] = []
+        _tool_classes: List[type] = []
+
+        # Built-in API tools
+        try:
+            from openjarvis.tools.calculator import CalculatorTool
+            _tool_classes.append(CalculatorTool)
+        except ImportError:
+            pass
+        try:
+            from openjarvis.tools.think import ThinkTool
+            _tool_classes.append(ThinkTool)
+        except ImportError:
+            pass
+        try:
+            from openjarvis.tools.file_read import FileReadTool
+            _tool_classes.append(FileReadTool)
+        except ImportError:
+            pass
+        try:
+            from openjarvis.tools.web_search import WebSearchTool
+            _tool_classes.append(WebSearchTool)
+        except ImportError:
+            pass
+        try:
+            from openjarvis.tools.code_interpreter import CodeInterpreterTool
+            _tool_classes.append(CodeInterpreterTool)
+        except ImportError:
+            pass
+
+        # Storage MCP tools
+        try:
+            from openjarvis.tools.storage_tools import (
+                MemoryIndexTool,
+                MemoryRetrieveTool,
+                MemorySearchTool,
+                MemoryStoreTool,
+            )
+            _tool_classes.extend([
+                MemoryStoreTool, MemoryRetrieveTool,
+                MemorySearchTool, MemoryIndexTool,
+            ])
+        except ImportError:
+            pass
+
+        # LM tool (needs engine/model — instantiate with None)
+        try:
+            from openjarvis.tools.llm_tool import LLMTool
+            _tool_classes.append(LLMTool)
+        except ImportError:
+            pass
+
+        # Retrieval tool (needs backend — instantiate with None)
+        try:
+            from openjarvis.tools.retrieval import RetrievalTool
+            _tool_classes.append(RetrievalTool)
+        except ImportError:
+            pass
+
+        for cls in _tool_classes:
+            try:
+                tools.append(cls())
+            except Exception:
+                pass
+
+        # Also check ToolRegistry for any user-registered tools
+        try:
+            from openjarvis.core.registry import ToolRegistry
+            known_names = {t.spec.name for t in tools}
+            for key in ToolRegistry.keys():
+                if key not in known_names:
+                    try:
+                        tool = ToolRegistry.create(key)
+                        if isinstance(tool, BaseTool):
+                            tools.append(tool)
+                    except Exception:
+                        pass
+        except Exception:
+            pass
+
+        return tools
 
     def handle(self, request: MCPRequest) -> MCPResponse:
         """Dispatch an MCP request and return a response."""
@@ -53,11 +160,12 @@ class MCPServer:
             result={
                 "protocolVersion": self.PROTOCOL_VERSION,
                 "capabilities": {
-                    "tools": {"listChanged": False},
+                    "tools": {"listChanged": True},
                 },
                 "serverInfo": {
                     "name": self.SERVER_NAME,
                     "version": self.SERVER_VERSION,
+                    "title": "OpenJarvis Tool Server",
                 },
             },
             id=req.id,
@@ -68,13 +176,16 @@ class MCPServer:
         tool_list = []
         for tool in self._tools.values():
             s = tool.spec
-            tool_list.append(
-                {
-                    "name": s.name,
-                    "description": s.description,
-                    "inputSchema": s.parameters,
-                }
-            )
+            entry: Dict[str, Any] = {
+                "name": s.name,
+                "description": s.description,
+                "inputSchema": s.parameters,
+            }
+            # Add annotations if available (MCP spec 2025-11-25)
+            annotations = _TOOL_ANNOTATIONS.get(s.name)
+            if annotations:
+                entry["annotations"] = annotations
+            tool_list.append(entry)
         return MCPResponse(result={"tools": tool_list}, id=req.id)
 
     def _handle_tools_call(self, req: MCPRequest) -> MCPResponse:

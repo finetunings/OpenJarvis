@@ -73,3 +73,60 @@ with JSON argument parsing, latency tracking, and event bus integration.
     options:
       show_source: true
       members_order: source
+
+---
+
+## Storage Tools
+
+Tools that expose memory storage operations for use by agents via the tool
+system. These wrap the memory backend methods as `BaseTool` implementations.
+
+### MemoryStoreTool
+
+::: openjarvis.tools.storage_tools.MemoryStoreTool
+    options:
+      show_source: true
+      members_order: source
+
+### MemoryRetrieveTool
+
+::: openjarvis.tools.storage_tools.MemoryRetrieveTool
+    options:
+      show_source: true
+      members_order: source
+
+### MemorySearchTool
+
+::: openjarvis.tools.storage_tools.MemorySearchTool
+    options:
+      show_source: true
+      members_order: source
+
+### MemoryIndexTool
+
+::: openjarvis.tools.storage_tools.MemoryIndexTool
+    options:
+      show_source: true
+      members_order: source
+
+---
+
+## MCP Adapter
+
+Integration with the Model Context Protocol (MCP). The MCP adapter exposes
+OpenJarvis tools as MCP-compatible resources and allows consuming external
+MCP tool providers. Supports MCP protocol version 2025-11-25.
+
+### MCPToolAdapter
+
+::: openjarvis.tools.mcp_adapter.MCPToolAdapter
+    options:
+      show_source: true
+      members_order: source
+
+### MCPToolProvider
+
+::: openjarvis.tools.mcp_adapter.MCPToolProvider
+    options:
+      show_source: true
+      members_order: source

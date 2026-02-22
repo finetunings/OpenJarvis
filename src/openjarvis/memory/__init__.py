@@ -1,35 +1,34 @@
-"""Memory pillar — persistent searchable storage."""
+"""Backward-compatibility shim package — canonical location is openjarvis.tools.storage."""
 
 from __future__ import annotations
 
-# Always-available backend
-import openjarvis.memory.sqlite  # noqa: F401
+# Import from canonical location to trigger backend registration
+import openjarvis.tools.storage.sqlite  # noqa: F401
 
-# Optional backends — import to trigger registration
 try:
-    import openjarvis.memory.bm25  # noqa: F401
+    import openjarvis.tools.storage.bm25  # noqa: F401
 except ImportError:
     pass
 
 try:
-    import openjarvis.memory.faiss_backend  # noqa: F401
+    import openjarvis.tools.storage.faiss_backend  # noqa: F401
 except ImportError:
     pass
 
 try:
-    import openjarvis.memory.colbert_backend  # noqa: F401
+    import openjarvis.tools.storage.colbert_backend  # noqa: F401
 except ImportError:
     pass
 
 try:
-    import openjarvis.memory.hybrid  # noqa: F401
+    import openjarvis.tools.storage.hybrid  # noqa: F401
 except ImportError:
     pass
 
-from openjarvis.memory._stubs import MemoryBackend, RetrievalResult
-from openjarvis.memory.chunking import Chunk, ChunkConfig, chunk_text
-from openjarvis.memory.context import ContextConfig, inject_context
-from openjarvis.memory.ingest import ingest_path, read_document
+from openjarvis.tools.storage._stubs import MemoryBackend, RetrievalResult
+from openjarvis.tools.storage.chunking import Chunk, ChunkConfig, chunk_text
+from openjarvis.tools.storage.context import ContextConfig, inject_context
+from openjarvis.tools.storage.ingest import ingest_path, read_document
 
 __all__ = [
     "Chunk",

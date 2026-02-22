@@ -4,22 +4,44 @@ The Learning system is a **cross-cutting concern** that connects all four pillar
 
 ---
 
+## LearningPolicy ABC Taxonomy
+
+The learning system defines a hierarchy of learning policy ABCs. The base `LearningPolicy` ABC is specialized into three sub-ABCs corresponding to the three learnable concerns:
+
+| ABC | Concern | Description |
+|-----|---------|-------------|
+| `IntelligenceLearningPolicy` | Model routing | Determines which model handles a query (replaces the legacy `RouterPolicy`) |
+| `AgentLearningPolicy` | Agent behavior | Advises on agent strategy (e.g., tool selection, turn limits) |
+| `ToolLearningPolicy` | Tool selection | Recommends tool configurations based on query characteristics |
+
+All learning policies are registered in the `LearningRegistry` (in `core/registry.py`).
+
 ## RouterPolicy ABC
 
-All routing policies implement the `RouterPolicy` abstract base class:
+The `RouterPolicy` ABC and the `QueryAnalyzer` ABC are defined in `intelligence/_stubs.py`:
 
 ```python
+# intelligence/_stubs.py
 class RouterPolicy(ABC):
     @abstractmethod
     def select_model(self, context: RoutingContext) -> str:
         """Return the model registry key best suited for *context*."""
+
+class QueryAnalyzer(ABC):
+    @abstractmethod
+    def analyze(self, query: str) -> RoutingContext:
+        """Analyze a raw query string and return a RoutingContext."""
 ```
+
+!!! note "Backward compatibility"
+    The `RouterPolicy` and `RoutingContext` names are still importable from `openjarvis.learning._stubs` via backward-compatibility re-exports, but the canonical locations are now `openjarvis.intelligence._stubs` (for `RouterPolicy` and `QueryAnalyzer`) and `openjarvis.core.types` (for `RoutingContext`).
 
 ### RoutingContext
 
-The `RoutingContext` dataclass captures the characteristics of an incoming query:
+The `RoutingContext` dataclass is now defined in `core/types.py` (moved from `learning/_stubs.py`):
 
 ```python
+# core/types.py
 @dataclass(slots=True)
 class RoutingContext:
     query: str = ""            # The raw query text
@@ -33,15 +55,25 @@ class RoutingContext:
 
 ---
 
-## RouterPolicyRegistry
+## RouterPolicyRegistry & LearningRegistry
 
-Router policies are registered in the `RouterPolicyRegistry` and selected at runtime. The system ships with three policies:
+Router policies are registered in the `RouterPolicyRegistry` and selected at runtime. Additionally, the `LearningRegistry` (in `core/registry.py`) manages the broader set of learning policies across the taxonomy.
+
+The system ships with these router policies:
 
 | Registry Key | Policy Class | Status | Description |
 |-------------|-------------|--------|-------------|
 | `heuristic` | `HeuristicRouter` | Active | Rule-based routing with 6 priority rules |
 | `learned` | `TraceDrivenPolicy` | Active | Learns from trace outcomes |
 | `grpo` | `GRPORouterPolicy` | Stub | Placeholder for future RL training |
+| `sft` | `SFTPolicy` | Active | Supervised fine-tuning policy (learns from labeled traces) |
+
+And these additional learning policies (registered in `LearningRegistry`):
+
+| Registry Key | Policy Class | Taxonomy | Description |
+|-------------|-------------|----------|-------------|
+| `agent_advisor` | `AgentAdvisorPolicy` | `AgentLearningPolicy` | Advises on agent strategy based on trace patterns |
+| `icl_updater` | `ICLUpdaterPolicy` | `ToolLearningPolicy` | In-context learning updater for tool selection |
 
 Users select a policy via `config.toml` or the `--router` CLI flag:
 
@@ -161,6 +193,36 @@ The online update uses a conservative strategy: it only switches the preferred m
 
 ---
 
+## SFTPolicy (Supervised Fine-Tuning)
+
+The `SFTPolicy` (in `learning/sft_policy.py`) is an `IntelligenceLearningPolicy` that learns routing decisions from labeled trace data using supervised fine-tuning principles. Unlike `TraceDrivenPolicy` which uses online aggregation, `SFTPolicy` trains a mapping from query features to model choices based on curated, high-quality trace examples.
+
+```python
+from openjarvis.learning.sft_policy import SFTPolicy
+```
+
+---
+
+## AgentAdvisorPolicy
+
+The `AgentAdvisorPolicy` (in `learning/agent_advisor.py`) is an `AgentLearningPolicy` that advises on agent strategy -- for example, recommending tool sets, turn limits, or agent type -- based on patterns observed in historical traces.
+
+```python
+from openjarvis.learning.agent_advisor import AgentAdvisorPolicy
+```
+
+---
+
+## ICLUpdaterPolicy
+
+The `ICLUpdaterPolicy` (in `learning/icl_updater.py`) is a `ToolLearningPolicy` that uses in-context learning to update tool selection and configuration. It analyzes recent tool-call traces to recommend which tools should be enabled for different query types.
+
+```python
+from openjarvis.learning.icl_updater import ICLUpdaterPolicy
+```
+
+---
+
 ## GRPORouterPolicy (Stub)
 
 The `GRPORouterPolicy` is a placeholder for future reinforcement learning-based routing. Currently, calling `select_model()` raises `NotImplementedError`:
@@ -170,7 +232,7 @@ class GRPORouterPolicy(RouterPolicy):
     def select_model(self, context: RoutingContext) -> str:
         raise NotImplementedError(
             "GRPORouterPolicy is not yet implemented. "
-            "GRPO training will be available in Phase 5."
+            "GRPO training will be available in a future phase."
         )
 ```
 

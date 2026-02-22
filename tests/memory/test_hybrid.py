@@ -190,7 +190,7 @@ def test_clear_both():
 def test_event_bus_store():
     bus = EventBus(record_history=True)
     hybrid = _make_hybrid()
-    import openjarvis.memory.hybrid as mod
+    import openjarvis.tools.storage.hybrid as mod
     original = mod.get_event_bus
     mod.get_event_bus = lambda: bus
     try:
@@ -212,7 +212,7 @@ def test_event_bus_retrieve():
     bus = EventBus(record_history=True)
     hybrid = _make_hybrid()
     hybrid.store("retrievable content here")
-    import openjarvis.memory.hybrid as mod
+    import openjarvis.tools.storage.hybrid as mod
     original = mod.get_event_bus
     mod.get_event_bus = lambda: bus
     try:

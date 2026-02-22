@@ -6,7 +6,8 @@ import re
 from typing import List, Optional
 
 from openjarvis.core.registry import ModelRegistry
-from openjarvis.learning._stubs import RouterPolicy, RoutingContext
+from openjarvis.core.types import RoutingContext
+from openjarvis.intelligence._stubs import QueryAnalyzer, RouterPolicy
 
 # Detection patterns
 _CODE_PATTERNS = re.compile(
@@ -150,4 +151,14 @@ class HeuristicRouter(RouterPolicy):
         return available[0]
 
 
-__all__ = ["HeuristicRouter", "build_routing_context"]
+class DefaultQueryAnalyzer(QueryAnalyzer):
+    """Default query analyzer wrapping the heuristic build_routing_context function."""
+
+    def analyze(self, query: str, **kwargs: object) -> RoutingContext:
+        urgency = kwargs.get("urgency", 0.5)
+        if not isinstance(urgency, (int, float)):
+            urgency = 0.5
+        return build_routing_context(query, urgency=urgency)
+
+
+__all__ = ["DefaultQueryAnalyzer", "HeuristicRouter", "build_routing_context"]

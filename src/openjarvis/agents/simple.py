@@ -9,7 +9,6 @@ from openjarvis.core.events import EventBus, EventType
 from openjarvis.core.registry import AgentRegistry
 from openjarvis.core.types import Message, Role
 from openjarvis.engine._stubs import InferenceEngine
-from openjarvis.telemetry.wrapper import instrumented_generate
 
 
 @AgentRegistry.register("simple")
@@ -55,23 +54,13 @@ class SimpleAgent(BaseAgent):
             messages.extend(context.conversation.messages)
         messages.append(Message(role=Role.USER, content=input))
 
-        # Generate via instrumented path if bus available, else direct
-        if bus:
-            result = instrumented_generate(
-                self._engine,
-                messages,
-                model=self._model,
-                bus=bus,
-                temperature=self._temperature,
-                max_tokens=self._max_tokens,
-            )
-        else:
-            result = self._engine.generate(
-                messages,
-                model=self._model,
-                temperature=self._temperature,
-                max_tokens=self._max_tokens,
-            )
+        # Generate — telemetry is handled by InstrumentedEngine wrapper
+        result = self._engine.generate(
+            messages,
+            model=self._model,
+            temperature=self._temperature,
+            max_tokens=self._max_tokens,
+        )
 
         content = result.get("content", "")
 

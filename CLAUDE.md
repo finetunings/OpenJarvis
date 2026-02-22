@@ -4,13 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Status
 
-OpenJarvis is a research framework for studying on-device AI systems. Phase 5 (v1.0) complete, Phase 6 (trace system + learning) in progress. Core abstractions: Intelligence, Engine, Agentic Logic, Memory — with trace-driven learning as a cross-cutting concern. Python SDK (`Jarvis` class), OpenClaw agent infrastructure, benchmarking framework, Docker deployment all ready. ~576 tests pass (8 skipped for optional deps).
+OpenJarvis is a research framework for studying on-device AI systems. Phase 7 (5-pillar restructuring) complete. Five composable pillars: Intelligence, Engine, Agents, Tools (with storage + MCP), and Learning — with trace-driven learning as a cross-cutting concern. Python SDK (`Jarvis` class), composition layer (`SystemBuilder`/`JarvisSystem`), OpenClaw agent infrastructure, benchmarking framework, Docker deployment all ready. ~1391 tests pass (32 skipped for optional deps).
 
 ## Build & Development Commands
 
 ```bash
 uv sync --extra dev          # Install deps + dev tools
-uv run pytest tests/ -v      # Run ~576 tests (8 skipped if optional deps missing)
+uv run pytest tests/ -v      # Run ~1391 tests (32 skipped if optional deps missing)
 uv run ruff check src/ tests/ # Lint
 uv run jarvis --version      # 1.0.0
 uv run jarvis ask "Hello"    # Query via discovered engine (direct mode)
@@ -69,19 +69,31 @@ j.close()                             # Release resources
 
 ## Architecture
 
-OpenJarvis is a research framework for on-device AI organized around **four core abstractions** plus a cross-cutting learning system, each with a clear ABC interface and a decorator-based registry for runtime discovery.
+OpenJarvis is a research framework for on-device AI organized around **five composable pillars**, each with a clear ABC interface and a decorator-based registry for runtime discovery.
 
-### Four Core Abstractions
+### Five Pillars
 
-1. **Intelligence** (`src/openjarvis/intelligence/`) — The local LM. Model management and query routing. `ModelRegistry` maps model keys to `ModelSpec`. Heuristic router selects model based on query characteristics.
+1. **Intelligence** (`src/openjarvis/intelligence/`) — The local LM. Model management and query routing. `ModelRegistry` maps model keys to `ModelSpec`. `RouterPolicy` ABC and `QueryAnalyzer` ABC defined in `intelligence/_stubs.py`. `HeuristicRouter` selects model based on query characteristics. `RoutingContext` lives in `core/types.py`.
 2. **Engine** (`src/openjarvis/engine/`) — The inference runtime. Backends: vLLM, SGLang, Ollama, llama.cpp, MLX. All implement `InferenceEngine` ABC with `generate()`, `stream()`, `list_models()`, `health()`. Engines extract and pass through `tool_calls` in OpenAI format.
-3. **Agentic Logic** (`src/openjarvis/agents/`) — Pluggable logic for handling queries, making tool/API calls, managing memory. `SimpleAgent` (single-turn, no tools), `OrchestratorAgent` (multi-turn tool-calling loop with `ToolExecutor`), `CustomAgent` (template for user-defined agents), `OpenClawAgent` (HTTP/subprocess transport). All implement `BaseAgent` ABC with `run()`. Can be static or learned from traces.
-4. **Memory** (`src/openjarvis/memory/`) — Persistent searchable storage. Backends: SQLite/FTS5 (default), FAISS, ColBERTv2, BM25, Hybrid (RRF fusion). All implement `MemoryBackend` ABC with `store()`, `retrieve()`, `delete()`, `clear()`.
+3. **Agents** (`src/openjarvis/agents/`) — Pluggable logic for handling queries, making tool/API calls, managing memory. `SimpleAgent` (single-turn, no tools), `OrchestratorAgent` (multi-turn tool-calling loop with `ToolExecutor`), `ReActAgent` (Thought-Action-Observation loop), `OpenHandsAgent` (CodeAct-style), `CustomAgent` (template for user-defined agents), `OpenClawAgent` (HTTP/subprocess transport). All implement `BaseAgent` ABC with `run()`. Agents call `engine.generate()` directly — telemetry is handled by the `InstrumentedEngine` wrapper when enabled.
+4. **Tools** (`src/openjarvis/tools/`) — All tools managed via MCP (Model Context Protocol).
+   - **API tools**: `CalculatorTool`, `ThinkTool`, `FileReadTool`, `WebSearchTool`, `CodeInterpreterTool` — all implement `BaseTool` ABC
+   - **Storage tools** (`tools/storage_tools.py`): `MemoryStoreTool`, `MemoryRetrieveTool`, `MemorySearchTool`, `MemoryIndexTool` — wrap `MemoryBackend` operations as MCP-discoverable tools
+   - **LM tool** (`tools/llm_tool.py`): Sub-model calls via engine
+   - **Storage backends** (`tools/storage/`): SQLite/FTS5 (default), FAISS, ColBERTv2, BM25, Hybrid (RRF fusion). All implement `MemoryBackend` ABC with `store()`, `retrieve()`, `delete()`, `clear()`. Canonical import: `from openjarvis.tools.storage.sqlite import SQLiteMemory`. Backward-compat shims in `memory/` still work.
+   - **MCP adapter** (`tools/mcp_adapter.py`): `MCPToolAdapter` wraps external MCP server tools as native `BaseTool` instances. `MCPToolProvider` discovers tools from an MCP server.
+   - **MCP server** (`mcp/server.py`): Exposes all built-in tools via JSON-RPC `tools/list` + `tools/call` (MCP spec 2025-11-25). Any MCP client (Claude, GPT, etc.) can discover and use OpenJarvis tools.
+5. **Learning** (`src/openjarvis/learning/`) — Structured learning system with per-pillar policies. `LearningPolicy` ABC taxonomy: `IntelligenceLearningPolicy` (updates model routing), `AgentLearningPolicy` (updates agent logic), `ToolLearningPolicy` (updates tool usage). Implementations: `SFTPolicy` (learns query→model mapping from traces), `AgentAdvisorPolicy` (LM-guided agent restructuring), `ICLUpdaterPolicy` (in-context example + skill discovery). Router policies: `HeuristicRouter` (registered as "heuristic"), `TraceDrivenPolicy` (registered as "learned"), `GRPORouterPolicy` (stub, registered as "grpo"). `HeuristicRewardFunction` scores inference results on latency/cost/efficiency.
 
-### Cross-cutting: Learning & Traces
+### Cross-cutting: Traces
 
 - **Traces** (`src/openjarvis/traces/`) — Full interaction-level recording. Every agent interaction produces a `Trace` capturing the sequence of `TraceStep`s (route, retrieve, generate, tool_call, respond) with timing, inputs, outputs, and outcomes. `TraceStore` persists to SQLite. `TraceCollector` wraps any `BaseAgent` to record traces automatically. `TraceAnalyzer` provides aggregated stats for the learning system.
-- **Learning** (`src/openjarvis/learning/`) — Router policy that determines which model handles a query. `RouterPolicyRegistry` enables pluggable policies. Implementations: `HeuristicRouter` (6 priority rules, registered as "heuristic"), `TraceDrivenPolicy` (learns from trace outcomes, registered as "learned"), `GRPORouterPolicy` (stub for RL training, registered as "grpo"). `HeuristicRewardFunction` scores inference results on latency/cost/efficiency.
+
+### Composition Layer (`src/openjarvis/system.py`)
+
+- `SystemBuilder`: Config-driven fluent builder — `.engine()`, `.model()`, `.agent()`, `.tools()`, `.telemetry()`, `.traces()`, `.build()` → `JarvisSystem`
+- `JarvisSystem`: Fully wired system with `ask()`, `close()`. Single source of truth for pillar wiring.
+- Consolidates duplicated engine/model/tool/agent resolution logic from CLI, SDK, and server.
 
 ### Python SDK (`src/openjarvis/sdk.py`)
 
@@ -89,11 +101,15 @@ OpenJarvis is a research framework for on-device AI organized around **four core
 - `MemoryHandle`: Lazy memory backend proxy on `j.memory`
 - `ask()` / `ask_full()`: Direct engine or agent mode, with router policy selection
 - Lazy engine initialization, telemetry recording, resource cleanup via `close()`
+- Also exports `JarvisSystem` and `SystemBuilder` from `system.py` for config-driven composition
 
 ### Tool System (`src/openjarvis/tools/`)
 
 - `_stubs.py` — `ToolSpec` dataclass, `BaseTool` ABC (abstract `spec`, `execute()`), `ToolExecutor` (dispatch with event bus integration, JSON argument parsing, latency tracking)
-- Built-in tools: `CalculatorTool` (ast-based safe eval), `ThinkTool` (reasoning scratchpad), `RetrievalTool` (memory search), `LLMTool` (sub-model calls), `FileReadTool` (safe file reading with path validation)
+- Built-in API tools: `CalculatorTool` (ast-based safe eval), `ThinkTool` (reasoning scratchpad), `RetrievalTool` (memory search), `LLMTool` (sub-model calls), `FileReadTool` (safe file reading with path validation), `WebSearchTool`, `CodeInterpreterTool`
+- Storage MCP tools (`storage_tools.py`): `MemoryStoreTool`, `MemoryRetrieveTool`, `MemorySearchTool`, `MemoryIndexTool` — expose memory operations as MCP-discoverable tools
+- MCP adapter (`mcp_adapter.py`): `MCPToolAdapter` wraps external MCP tools as native `BaseTool` instances; `MCPToolProvider` discovers tools from an `MCPClient`
+- Storage backends (`tools/storage/`): `MemoryBackend` ABC, `SQLiteMemory`, `BM25Memory`, `FAISSMemory`, `ColBERTMemory`, `HybridMemory`, plus chunking, context injection, embeddings, ingest. Canonical imports from `openjarvis.tools.storage.*`; backward-compat shims in `openjarvis.memory.*`
 - All registered via `@ToolRegistry.register("name")` decorator
 
 ### Benchmarking Framework (`src/openjarvis/bench/`)
@@ -130,7 +146,8 @@ OpenJarvis is a research framework for on-device AI organized around **four core
 
 - `store.py` — `TelemetryStore` writes records to SQLite via EventBus subscription (append-only)
 - `aggregator.py` — `TelemetryAggregator` read-only query layer: `per_model_stats()`, `per_engine_stats()`, `top_models()`, `summary()`, `export_records()`, `clear()`. Time-range filtering via `since`/`until`.
-- `wrapper.py` — `instrumented_generate()` wraps engine calls with timing and telemetry publishing
+- `instrumented_engine.py` — `InstrumentedEngine` wraps any `InferenceEngine` transparently, publishing `INFERENCE_START/END` and `TELEMETRY_RECORD` events. Agents call `engine.generate()` normally; telemetry is opt-in via this wrapper (applied by `SystemBuilder` when `config.telemetry.enabled`).
+- `wrapper.py` — Legacy `instrumented_generate()` function (still used by some CLI/SDK code paths)
 - Dataclasses: `ModelStats`, `EngineStats`, `AggregatedStats`
 
 ### Security (`src/openjarvis/security/`)
@@ -149,9 +166,9 @@ OpenJarvis is a research framework for on-device AI organized around **four core
 
 ### Core Module (`src/openjarvis/core/`)
 
-- `registry.py` — `RegistryBase[T]` generic base class adapted from IPW. Typed subclasses: `ModelRegistry`, `EngineRegistry`, `MemoryRegistry`, `AgentRegistry`, `ToolRegistry`, `RouterPolicyRegistry`, `BenchmarkRegistry`, `ChannelRegistry`.
-- `types.py` — `Message`, `Conversation`, `ModelSpec`, `ToolResult`, `TelemetryRecord`, `StepType`, `TraceStep`, `Trace`.
-- `config.py` — `JarvisConfig` dataclass hierarchy with TOML loader. Includes `LearningConfig` (default_policy, reward_weights), `ChannelConfig` (enabled, gateway_url, default_agent, reconnect_interval), `SecurityConfig` (enabled, scan_input, scan_output, mode, secret_scanner, pii_scanner, audit_log_path, enforce_tool_confirmation). User config lives at `~/.openjarvis/config.toml`. Hardware auto-detection populates defaults. TOML sections: `[engine]`, `[intelligence]`, `[learning]`, `[memory]`, `[agent]`, `[server]`, `[telemetry]`, `[channel]`, `[security]`.
+- `registry.py` — `RegistryBase[T]` generic base class adapted from IPW. Typed subclasses: `ModelRegistry`, `EngineRegistry`, `MemoryRegistry`, `AgentRegistry`, `ToolRegistry`, `RouterPolicyRegistry`, `BenchmarkRegistry`, `ChannelRegistry`, `LearningRegistry`.
+- `types.py` — `Message`, `Conversation`, `ModelSpec`, `ToolResult`, `TelemetryRecord`, `StepType`, `TraceStep`, `Trace`, `RoutingContext`.
+- `config.py` — `JarvisConfig` dataclass hierarchy with TOML loader. Config classes: `EngineConfig`, `IntelligenceConfig`, `AgentConfig`, `ToolsConfig` (nests `StorageConfig` + `MCPConfig`), `LearningConfig` (default_policy, intelligence_policy, agent_policy, tools_policy, update_interval, reward_weights), `TracesConfig` (enabled, db_path), `TelemetryConfig`, `ServerConfig`, `ChannelConfig`, `SecurityConfig`. `JarvisConfig.memory` property provides backward-compat access to `tools.storage`. User config lives at `~/.openjarvis/config.toml`. TOML sections: `[engine]`, `[intelligence]`, `[learning]`, `[tools.storage]`, `[tools.mcp]`, `[memory]` (backward-compat), `[agent]`, `[server]`, `[telemetry]`, `[traces]`, `[channel]`, `[security]`.
 - `events.py` — Pub/sub event bus for inter-pillar telemetry (synchronous dispatch). EventType values: INFERENCE_START/END, TOOL_CALL_START/END, MEMORY_STORE/RETRIEVE, AGENT_TURN_START/END, TELEMETRY_RECORD, TRACE_STEP/COMPLETE, CHANNEL_MESSAGE_RECEIVED/SENT, SECURITY_SCAN/ALERT/BLOCK.
 
 ### Docker & Deployment
@@ -176,7 +193,8 @@ OpenAI-compatible server via `jarvis serve`: `POST /v1/chat/completions`, `GET /
 - **ABC interfaces:** Each pillar defines an ABC. Implement the ABC + register via decorator to add a new backend.
 - **Offline-first:** Cloud APIs are optional. All core functionality works without network.
 - **Hardware-aware:** Auto-detect GPU vendor/model/VRAM via `nvidia-smi`, `rocm-smi`, `system_profiler`, `/proc/cpuinfo`. Recommend engine accordingly.
-- **Telemetry-native:** Every inference call records timing, tokens, energy, cost to SQLite via event bus. `TelemetryAggregator` provides read-only query/aggregation over stored records.
+- **Telemetry opt-in:** When enabled, `InstrumentedEngine` wraps the inference engine to transparently record timing, tokens, energy, cost to SQLite via event bus. Agents call `engine.generate()` without awareness of telemetry. `TelemetryAggregator` provides read-only query/aggregation over stored records.
+- **Backward-compat shims:** `memory/` re-exports from `tools/storage/`, `learning/_stubs.py` re-exports `RouterPolicy` from `intelligence/_stubs.py` and `RoutingContext` from `core/types.py`. Old import paths continue to work.
 - **`ensure_registered()` pattern:** Benchmark and learning modules use lazy registration via `ensure_registered()` to survive registry clearing in tests.
 
 ## Development Phases
@@ -190,3 +208,4 @@ OpenAI-compatible server via `jarvis serve`: `POST /v1/chat/completions`, `GET /
 | v0.5 | Phase 4 | Learning implementations, telemetry aggregation, `--router` CLI, `jarvis telemetry` |
 | v1.0 | Phase 5 | SDK, OpenClaw infrastructure, benchmarks, Docker, documentation |
 | v1.1 | Phase 6 | Trace system, trace-driven learning, pluggable agent architectures |
+| v1.2 | Phase 7 | 5-pillar restructuring: Intelligence ABCs, memory→tools/storage, MCP tool management, composition layer (SystemBuilder/JarvisSystem), InstrumentedEngine, structured learning (SFT/AgentAdvisor/ICL), config schema update |

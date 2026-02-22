@@ -42,4 +42,14 @@ try:
 except ImportError:
     pass
 
+try:
+    import openjarvis.tools.storage_tools  # noqa: F401
+except ImportError:
+    pass
+
+try:
+    import openjarvis.tools.mcp_adapter  # noqa: F401
+except ImportError:
+    pass
+
 __all__ = ["BaseTool", "ToolExecutor", "ToolSpec"]

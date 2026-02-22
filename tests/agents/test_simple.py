@@ -82,8 +82,8 @@ class TestSimpleAgent:
         event_types = [e.event_type for e in bus.history]
         assert EventType.AGENT_TURN_START in event_types
         assert EventType.AGENT_TURN_END in event_types
-        assert EventType.INFERENCE_START in event_types
-        assert EventType.INFERENCE_END in event_types
+        # INFERENCE_START/END are now published by InstrumentedEngine,
+        # not by agents directly
 
     def test_turn_start_event_data(self):
         bus = EventBus(record_history=True)

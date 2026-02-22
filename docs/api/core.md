@@ -67,6 +67,20 @@ class with `@XRegistry.register("name")`.
       show_source: true
       members_order: source
 
+### ChannelRegistry
+
+::: openjarvis.core.registry.ChannelRegistry
+    options:
+      show_source: true
+      members_order: source
+
+### LearningRegistry
+
+::: openjarvis.core.registry.LearningRegistry
+    options:
+      show_source: true
+      members_order: source
+
 ---
 
 ## Types
@@ -151,6 +165,13 @@ structures, model specifications, telemetry records, and trace objects.
       show_source: true
       members_order: source
 
+### RoutingContext
+
+::: openjarvis.core.types.RoutingContext
+    options:
+      show_source: true
+      members_order: source
+
 ---
 
 ## Configuration
@@ -212,6 +233,34 @@ overrides from the TOML file.
 ### TelemetryConfig
 
 ::: openjarvis.core.config.TelemetryConfig
+    options:
+      show_source: true
+      members_order: source
+
+### TracesConfig
+
+::: openjarvis.core.config.TracesConfig
+    options:
+      show_source: true
+      members_order: source
+
+### StorageConfig
+
+::: openjarvis.core.config.StorageConfig
+    options:
+      show_source: true
+      members_order: source
+
+### MCPConfig
+
+::: openjarvis.core.config.MCPConfig
+    options:
+      show_source: true
+      members_order: source
+
+### ToolsConfig
+
+::: openjarvis.core.config.ToolsConfig
     options:
       show_source: true
       members_order: source

@@ -11,7 +11,6 @@ from openjarvis.core.events import EventBus, EventType
 from openjarvis.core.registry import AgentRegistry
 from openjarvis.core.types import Message, Role, ToolCall, ToolResult
 from openjarvis.engine._stubs import InferenceEngine
-from openjarvis.telemetry.wrapper import instrumented_generate
 from openjarvis.tools._stubs import BaseTool, ToolExecutor
 
 OPENHANDS_SYSTEM_PROMPT = """\
@@ -225,18 +224,11 @@ class OpenHandsAgent(BaseAgent):
             ]
             direct_messages = self._truncate_if_needed(direct_messages)
             try:
-                if bus:
-                    result = instrumented_generate(
-                        self._engine, direct_messages, model=self._model,
-                        bus=bus, temperature=self._temperature,
-                        max_tokens=self._max_tokens,
-                    )
-                else:
-                    result = self._engine.generate(
-                        direct_messages, model=self._model,
-                        temperature=self._temperature,
-                        max_tokens=self._max_tokens,
-                    )
+                result = self._engine.generate(
+                    direct_messages, model=self._model,
+                    temperature=self._temperature,
+                    max_tokens=self._max_tokens,
+                )
                 content = self._strip_think_tags(result.get("content", ""))
                 if bus:
                     bus.publish(EventType.AGENT_TURN_END, {"agent": self.agent_id, "turns": 1})
@@ -269,19 +261,12 @@ class OpenHandsAgent(BaseAgent):
             messages = self._truncate_if_needed(messages)
 
             try:
-                if bus:
-                    result = instrumented_generate(
-                        self._engine, messages, model=self._model,
-                        bus=bus, temperature=self._temperature,
-                        max_tokens=self._max_tokens,
-                    )
-                else:
-                    result = self._engine.generate(
-                        messages,
-                        model=self._model,
-                        temperature=self._temperature,
-                        max_tokens=self._max_tokens,
-                    )
+                result = self._engine.generate(
+                    messages,
+                    model=self._model,
+                    temperature=self._temperature,
+                    max_tokens=self._max_tokens,
+                )
             except Exception as exc:
                 error_str = str(exc)
                 if "400" in error_str:

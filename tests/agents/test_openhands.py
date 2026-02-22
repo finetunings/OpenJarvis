@@ -181,7 +181,11 @@ class TestOpenHandsAgent:
         assert result.metadata.get("max_turns_exceeded") is True
 
     def test_event_bus_emissions(self):
-        """Verify AGENT_TURN_START, INFERENCE_START/END, AGENT_TURN_END events."""
+        """Verify AGENT_TURN_START and AGENT_TURN_END events.
+
+        INFERENCE_START/END are now published by InstrumentedEngine,
+        not by agents directly.
+        """
         bus = EventBus(record_history=True)
         engine = MagicMock()
         engine.engine_id = "mock"
@@ -190,8 +194,6 @@ class TestOpenHandsAgent:
         agent.run("Hello")
         event_types = [e.event_type for e in bus.history]
         assert EventType.AGENT_TURN_START in event_types
-        assert EventType.INFERENCE_START in event_types
-        assert EventType.INFERENCE_END in event_types
         assert EventType.AGENT_TURN_END in event_types
 
     def test_event_bus_tool_events(self):

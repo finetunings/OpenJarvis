@@ -267,13 +267,15 @@ class TestOrchestratorAgent:
         assert EventType.AGENT_TURN_END in event_types
 
     def test_event_bus_inference_events(self):
+        """INFERENCE_START/END are now published by InstrumentedEngine,
+        not by agents directly.  Agent tests verify agent-level events."""
         bus = EventBus(record_history=True)
         engine = _make_engine_no_tools()
         agent = OrchestratorAgent(engine, "test-model", bus=bus)
         agent.run("Hello")
         event_types = [e.event_type for e in bus.history]
-        assert EventType.INFERENCE_START in event_types
-        assert EventType.INFERENCE_END in event_types
+        assert EventType.AGENT_TURN_START in event_types
+        assert EventType.AGENT_TURN_END in event_types
 
     def test_event_bus_tool_events(self):
         bus = EventBus(record_history=True)

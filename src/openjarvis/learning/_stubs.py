@@ -1,48 +1,69 @@
-"""ABCs for the Learning pillar — router policies and reward functions.
-
-Phase 4 will provide heuristic and GRPO-based implementations.
-"""
+"""Learning pillar ABCs and re-exports for backward compatibility."""
 
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from typing import Any, Dict
+from typing import TYPE_CHECKING, Any, ClassVar, Dict
 
+from openjarvis.core.registry import LearningRegistry  # noqa: F401
 
-@dataclass(slots=True)
-class RoutingContext:
-    """Inputs available to the router when selecting a model."""
+# Re-export from canonical locations for backward compatibility
+from openjarvis.core.types import RoutingContext  # noqa: F401
+from openjarvis.intelligence._stubs import RouterPolicy  # noqa: F401
 
-    query: str = ""
-    query_length: int = 0
-    has_code: bool = False
-    has_math: bool = False
-    language: str = "en"
-    urgency: float = 0.5  # 0 = low priority, 1 = real-time
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
-
-class RouterPolicy(ABC):
-    """Selects a model key given a ``RoutingContext``."""
-
-    @abstractmethod
-    def select_model(self, context: RoutingContext) -> str:
-        """Return the model registry key best suited for *context*."""
+if TYPE_CHECKING:
+    pass
 
 
 class RewardFunction(ABC):
-    """Computes a scalar reward for a completed inference, used by GRPO training."""
+    """Compute a scalar reward for a routing decision."""
 
     @abstractmethod
     def compute(
         self,
-        context: RoutingContext,
+        context: "RoutingContext",
         model_key: str,
         response: str,
-        **kwargs: Any,
+        **kwargs: object,
     ) -> float:
-        """Return a reward in ``[0, 1]``."""
+        """Return reward in [0, 1]."""
 
 
-__all__ = ["RewardFunction", "RouterPolicy", "RoutingContext"]
+class LearningPolicy(ABC):
+    """Base for all learning policies. Targets one or more pillars."""
+
+    target: ClassVar[str] = ""  # "intelligence" | "agent" | "tools"
+
+    @abstractmethod
+    def update(self, trace_store: Any, **kwargs: object) -> Dict[str, Any]:
+        """Analyze traces and return update actions."""
+
+
+class IntelligenceLearningPolicy(LearningPolicy):
+    """Updates intelligence (model routing) from traces."""
+
+    target: ClassVar[str] = "intelligence"
+
+
+class AgentLearningPolicy(LearningPolicy):
+    """Updates agent logic from traces."""
+
+    target: ClassVar[str] = "agent"
+
+
+class ToolLearningPolicy(LearningPolicy):
+    """Updates tool usage (ICL examples, skills) from traces."""
+
+    target: ClassVar[str] = "tools"
+
+
+__all__ = [
+    "AgentLearningPolicy",
+    "IntelligenceLearningPolicy",
+    "LearningPolicy",
+    "LearningRegistry",
+    "RewardFunction",
+    "RouterPolicy",
+    "RoutingContext",
+    "ToolLearningPolicy",
+]

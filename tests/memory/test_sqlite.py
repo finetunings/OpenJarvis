@@ -135,7 +135,7 @@ def test_event_bus_integration_store(tmp_path: Path):
     bus = EventBus(record_history=True)
     backend = _make_backend(tmp_path)
     # Monkey-patch the global bus for this test
-    import openjarvis.memory.sqlite as mod
+    import openjarvis.tools.storage.sqlite as mod
     original = mod.get_event_bus
     mod.get_event_bus = lambda: bus
     try:
@@ -155,7 +155,7 @@ def test_event_bus_integration_retrieve(tmp_path: Path):
     bus = EventBus(record_history=True)
     backend = _make_backend(tmp_path)
     backend.store("searchable content for events")
-    import openjarvis.memory.sqlite as mod
+    import openjarvis.tools.storage.sqlite as mod
     original = mod.get_event_bus
     mod.get_event_bus = lambda: bus
     try:

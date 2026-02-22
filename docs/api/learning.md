@@ -1,23 +1,32 @@
 # Learning Module
 
-The learning module implements router policies that determine which model
-handles a given query. Policies range from static heuristic rules to
-trace-driven learning that improves routing decisions based on historical
-interaction outcomes. The module also provides reward functions for scoring
-inference results.
+The learning module implements learning policies that improve routing, agent,
+and tool decisions based on historical interaction outcomes. The module provides
+a `LearningPolicy` ABC taxonomy with specialized sub-ABCs for intelligence
+(model routing), agent behavior, and tool selection. It also includes reward
+functions for scoring inference results.
 
 ## Abstract Base Classes
 
 ### RouterPolicy
 
-::: openjarvis.learning._stubs.RouterPolicy
+::: openjarvis.intelligence._stubs.RouterPolicy
+    options:
+      show_source: true
+      members_order: source
+
+### QueryAnalyzer
+
+::: openjarvis.intelligence._stubs.QueryAnalyzer
     options:
       show_source: true
       members_order: source
 
 ### RoutingContext
 
-::: openjarvis.learning._stubs.RoutingContext
+`RoutingContext` is now defined in `core/types.py`:
+
+::: openjarvis.core.types.RoutingContext
     options:
       show_source: true
       members_order: source
@@ -28,6 +37,15 @@ inference results.
     options:
       show_source: true
       members_order: source
+
+### LearningPolicy Taxonomy
+
+The learning system defines a hierarchy of learning policy ABCs:
+
+- **`LearningPolicy`** -- base ABC for all learning policies
+- **`IntelligenceLearningPolicy`** -- specialization for model routing decisions
+- **`AgentLearningPolicy`** -- specialization for agent behavior advice
+- **`ToolLearningPolicy`** -- specialization for tool selection/configuration
 
 ---
 
@@ -45,6 +63,27 @@ inference results.
 ::: openjarvis.learning.trace_policy.classify_query
     options:
       show_source: true
+
+### SFTPolicy
+
+::: openjarvis.learning.sft_policy.SFTPolicy
+    options:
+      show_source: true
+      members_order: source
+
+### AgentAdvisorPolicy
+
+::: openjarvis.learning.agent_advisor.AgentAdvisorPolicy
+    options:
+      show_source: true
+      members_order: source
+
+### ICLUpdaterPolicy
+
+::: openjarvis.learning.icl_updater.ICLUpdaterPolicy
+    options:
+      show_source: true
+      members_order: source
 
 ### GRPORouterPolicy
 

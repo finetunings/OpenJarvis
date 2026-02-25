@@ -1,0 +1,3323 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Programming abstractions for on-device AI">
+      
+      
+        <meta name="author" content="OpenJarvis Contributors">
+      
+      
+        <link rel="canonical" href="https://hazyresearch.stanford.edu/OpenJarvis/development/changelog/">
+      
+      
+        <link rel="prev" href="../roadmap/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
+    
+    
+      
+        <title>Changelog - OpenJarvis</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#changelog" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="OpenJarvis" class="md-header__button md-logo" aria-label="OpenJarvis" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            OpenJarvis
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Changelog
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/HazyResearch/OpenJarvis" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    HazyResearch/OpenJarvis
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/installation/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../user-guide/cli/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../api/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../deployment/docker/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../contributing/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="OpenJarvis" class="md-nav__button md-logo" aria-label="OpenJarvis" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    OpenJarvis
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/HazyResearch/OpenJarvis" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    HazyResearch/OpenJarvis
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/python-sdk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python SDK
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/memory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Memory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scheduler
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/telemetry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Telemetry & Traces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/evaluations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/channels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/intelligence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Intelligence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inference Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentic Logic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/memory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Memory & Storage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learning & Traces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/query-flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query Flow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/design-principles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design Principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/channels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../api/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/sdk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SDK (Jarvis)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/memory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Memory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/intelligence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Intelligence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/traces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Traces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/telemetry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Telemetry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/bench/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/channels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/systemd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    systemd (Linux)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/launchd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    launchd (macOS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/api-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extending/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Extending OpenJarvis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#unreleased-phase-11-nanoclaw-subsumption" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased — Phase 11 (NanoClaw Subsumption)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Unreleased — Phase 11 (NanoClaw Subsumption)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unreleased-phase-10-tooling-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased — Phase 10 Tooling Updates
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Unreleased — Phase 10 Tooling Updates">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.0.0
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v1.0.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v050" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.5.0
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.5.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v040" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.4.0
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.4.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v030" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.3.0
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.3.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v020" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.2.0
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.2.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v010" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.1.0
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.1.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#unreleased-phase-11-nanoclaw-subsumption" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased — Phase 11 (NanoClaw Subsumption)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Unreleased — Phase 11 (NanoClaw Subsumption)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unreleased-phase-10-tooling-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased — Phase 10 Tooling Updates
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Unreleased — Phase 10 Tooling Updates">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.0.0
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v1.0.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v050" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.5.0
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.5.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v040" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.4.0
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.4.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v030" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.3.0
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.3.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v020" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.2.0
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.2.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v010" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.1.0
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.1.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
+<p>All notable changes to OpenJarvis are documented in this file.</p>
+<hr />
+<h2 id="unreleased-phase-11-nanoclaw-subsumption">Unreleased — Phase 11 (NanoClaw Subsumption)<a class="headerlink" href="#unreleased-phase-11-nanoclaw-subsumption" title="Permanent link">&para;</a></h2>
+<p><em>27 new files, ~3,565 lines, 147+ new tests. Full suite: 2059+ tests pass.</em></p>
+<h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><code>ClaudeCodeAgent</code></strong> (<code>agents/claude_code.py</code>) -- Wraps the
+  <code>@anthropic-ai/claude-code</code> <abbr title="Software Development Kit">SDK</abbr> via a bundled Node.js subprocess bridge.
+  Communicates over stdin/stdout using sentinel-delimited JSON
+  (<code>---OPENJARVIS_OUTPUT_START---</code> / <code>---OPENJARVIS_OUTPUT_END---</code>). The
+  bundled runner is auto-installed to <code>~/.openjarvis/claude_code_runner/</code> via
+  <code>npm install --production</code> on first use. Registered as <code>"claude_code"</code> with
+  <code>accepts_tools = False</code>. Requires Node.js 22+ and <code>ANTHROPIC_API_KEY</code>.</li>
+<li><strong><code>WhatsAppBaileysChannel</code></strong> (<code>channels/whatsapp_baileys.py</code>) -- Bidirectional
+  WhatsApp messaging using the Baileys protocol. Spawns a Node.js bridge
+  subprocess (<code>whatsapp_baileys_bridge/</code>) for QR-code authentication, incoming
+  message forwarding, and outbound delivery via JID addressing. Registered as
+  <code>"whatsapp_baileys"</code> in <code>ChannelRegistry</code>. Authentication state is persisted
+  to <code>~/.openjarvis/whatsapp_baileys_bridge/auth/</code>. New config section:
+  <code>[channel.whatsapp_baileys]</code>.</li>
+<li><strong><code>ContainerRunner</code></strong> (<code>sandbox/runner.py</code>) -- Manages Docker (or Podman)
+  container lifecycle for sandboxed agent execution. Builds <code>docker run --rm
+  --network none -i</code> commands with allowlist-validated read-only bind mounts.
+  Supports configurable image, timeout, concurrent container limit, and runtime
+  binary. Uses the same sentinel-delimited JSON protocol as <code>ClaudeCodeAgent</code>.</li>
+<li><strong><code>SandboxedAgent</code></strong> (<code>sandbox/runner.py</code>) -- Transparent wrapper that runs
+  any <code>BaseAgent</code> inside a container via <code>ContainerRunner</code>. Follows the
+  <code>GuardrailsEngine</code> wrapper pattern. <code>accepts_tools = False</code>.</li>
+<li><strong><code>MountAllowlist</code> / <code>validate_mounts()</code></strong> (<code>sandbox/mount_security.py</code>) --
+  Port of NanoClaw's <code>mount-security.ts</code>. Validates bind mounts against a JSON
+  allowlist (allowed root directories + blocked filename patterns). Raises
+  <code>ValueError</code> for blocked or out-of-root paths before the container starts.
+  Default blocked patterns include <code>.ssh</code>, <code>.env</code>, <code>*.pem</code>, <code>*.key</code>, credential
+  files, and cloud config directories.</li>
+<li><strong><code>TaskScheduler</code></strong> (<code>scheduler/scheduler.py</code>) -- Background polling scheduler
+  supporting three schedule types: <code>cron</code> (via <code>croniter</code> or built-in fallback),
+  <code>interval</code> (seconds), and <code>once</code> (ISO 8601 datetime). Runs a daemon thread
+  (<code>jarvis-scheduler</code>) polling SQLite every 60 seconds (configurable). Executes
+  due tasks via <code>JarvisSystem.ask()</code> with optional agent and tool selection.
+  Publishes <code>scheduler_task_start</code> / <code>scheduler_task_end</code> events on the
+  <code>EventBus</code>. New config section: <code>[scheduler]</code>.</li>
+<li><strong><code>SchedulerStore</code></strong> (<code>scheduler/store.py</code>) -- SQLite CRUD backend for
+  scheduled tasks and run logs. Two tables: <code>scheduled_tasks</code> (task state) and
+  <code>task_run_logs</code> (execution history). Supports task filtering by status and
+  due-time polling via <code>get_due_tasks()</code>.</li>
+<li><strong>Scheduler <abbr title="Model Context Protocol">MCP</abbr> tools</strong> (<code>scheduler/tools.py</code>) -- Five new <abbr title="Model Context Protocol">MCP</abbr>-discoverable
+  tools registered in <code>ToolRegistry</code>:<ul>
+<li><code>schedule_task</code> -- Create a new scheduled task</li>
+<li><code>list_scheduled_tasks</code> -- List tasks filtered by status</li>
+<li><code>pause_scheduled_task</code> -- Pause an active task</li>
+<li><code>resume_scheduled_task</code> -- Resume a paused task (recomputes <code>next_run</code>)</li>
+<li><code>cancel_scheduled_task</code> -- Permanently cancel a task</li>
+</ul>
+</li>
+<li><strong>Scheduler <abbr title="Command-Line Interface">CLI</abbr> commands</strong> -- <code>jarvis scheduler</code> subcommand group:<ul>
+<li><code>jarvis scheduler create</code> -- Create a new scheduled task</li>
+<li><code>jarvis scheduler list</code> -- List all or filtered tasks</li>
+<li><code>jarvis scheduler pause &lt;id&gt;</code> -- Pause a task</li>
+<li><code>jarvis scheduler resume &lt;id&gt;</code> -- Resume a task</li>
+<li><code>jarvis scheduler cancel &lt;id&gt;</code> -- Cancel a task</li>
+<li><code>jarvis scheduler logs &lt;id&gt;</code> -- Show run history for a task</li>
+<li><code>jarvis scheduler start</code> -- Start the background scheduler daemon</li>
+</ul>
+</li>
+</ul>
+<h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>ChannelRegistry</code> now includes <code>WhatsAppBaileysChannel</code> alongside
+  <code>OpenClawChannelBridge</code>.</li>
+<li><code>AgentRegistry</code> now includes <code>ClaudeCodeAgent</code> (<code>"claude_code"</code>).</li>
+<li>Architecture overview and source directory layout updated to reflect new
+  <code>sandbox/</code> and <code>scheduler/</code> modules.</li>
+</ul>
+<hr />
+<h2 id="unreleased-phase-10-tooling-updates">Unreleased — Phase 10 Tooling Updates<a class="headerlink" href="#unreleased-phase-10-tooling-updates" title="Permanent link">&para;</a></h2>
+<h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><code>build_tool_descriptions()</code> shared builder</strong> -- Single source of truth for
+  generating enriched tool descriptions in agent system prompts. Produces
+  Markdown sections with name, description, category, and parameter schemas.</li>
+<li><strong>Enriched agent prompts</strong> -- <code>NativeReActAgent</code>, <code>NativeOpenHandsAgent</code>,
+  <code>RLMAgent</code>, and <code>OrchestratorAgent</code> (structured mode) now inject detailed
+  tool descriptions into their system prompts via the shared builder.</li>
+<li><strong>Case-insensitive parsing</strong> -- ReAct (<code>Action:</code> / <code>Final Answer:</code>) and
+  Orchestrator structured-mode parsing (<code>TOOL:</code> / <code>FINAL_ANSWER:</code>) are now
+  case-insensitive.</li>
+<li><strong>Multi-provider tool_calls extraction</strong> -- <code>CloudEngine</code> now extracts
+  <code>tool_calls</code> from Anthropic (<code>tool_use</code> content blocks) and Google
+  (<code>function_call</code> parts), normalizing to the flat <code>{id, name, arguments}</code>
+  format. <code>LiteLLM</code> engine handles the flat-format tool calls returned by
+  the LiteLLM proxy.</li>
+<li><strong>RLM tool awareness</strong> -- <code>RLMAgent</code> injects an <code>## Available Tools</code>
+  section into its system prompt when tools are provided.</li>
+<li><strong>Orchestrator structured tool descriptions</strong> -- Structured mode passes
+  <code>tools=self._tools</code> to <code>build_system_prompt()</code> for enriched descriptions.</li>
+<li><strong>Telemetry modules</strong> -- <code>EfficiencyMetrics</code>, <code>GPUMonitor</code>, <code>VLLMMetrics</code>
+  for energy, GPU utilization, and vLLM server-side metrics collection.</li>
+<li><strong>Eval TOML config</strong> -- TOML-based eval suite configuration system for
+  defining models x benchmarks matrices.</li>
+</ul>
+<h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Agent prompt generation now uses <code>build_tool_descriptions()</code> instead of
+  inline tool name listing.</li>
+<li><code>build_system_prompt()</code> in <code>prompt_registry.py</code> accepts an optional <code>tools</code>
+  parameter for enriched descriptions from <code>BaseTool</code> instances.</li>
+<li>ReAct and OpenHands regex patterns updated for case-insensitive matching.</li>
+</ul>
+<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Engine <code>tool_calls</code> normalization -- Anthropic <code>tool_use</code> blocks and Google
+  <code>function_call</code> parts are now correctly extracted and converted to the
+  standard flat format used by agents.</li>
+</ul>
+<hr />
+<h2 id="v100">v1.0.0<a class="headerlink" href="#v100" title="Permanent link">&para;</a></h2>
+<p><em>Phase 5 -- <abbr title="Software Development Kit">SDK</abbr>, Production Readiness, and Documentation</em></p>
+<h3 id="added_2">Added<a class="headerlink" href="#added_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Python <abbr title="Software Development Kit">SDK</abbr></strong> -- <code>Jarvis</code> class providing a high-level sync <abbr title="Application Programming Interface">API</abbr> for
+  programmatic use<ul>
+<li><code>ask()</code> / <code>ask_full()</code> methods for direct engine and agent mode queries</li>
+<li><code>MemoryHandle</code> proxy for lazy memory backend initialization</li>
+<li><code>list_models()</code> and <code>list_engines()</code> for runtime introspection</li>
+<li>Router policy selection via config (<code>learning.default_policy</code>)</li>
+<li>Lazy engine initialization with automatic discovery and health probing</li>
+<li>Resource cleanup via <code>close()</code></li>
+</ul>
+</li>
+<li><strong>OpenClaw agent infrastructure</strong><ul>
+<li><code>OpenClawAgent</code> with HTTP and subprocess transports</li>
+<li><code>ProtocolMessage</code> dataclass with JSON-line serialization/deserialization</li>
+<li><code>MessageType</code> enum for structured agent communication</li>
+<li><code>HttpTransport</code> for HTTP POST-based communication with OpenClaw servers</li>
+<li><code>SubprocessTransport</code> for Node.js stdin/stdout communication</li>
+<li><code>ProviderPlugin</code> wrapping inference engines for OpenClaw</li>
+<li><code>MemorySearchManager</code> wrapping memory backends for OpenClaw</li>
+</ul>
+</li>
+<li><strong>Benchmarking framework</strong><ul>
+<li><code>BaseBenchmark</code> <abbr title="Abstract Base Class">ABC</abbr> and <code>BenchmarkSuite</code> runner</li>
+<li><code>LatencyBenchmark</code> measuring per-call latency (mean, p50, p95, min, max)</li>
+<li><code>ThroughputBenchmark</code> measuring tokens-per-second throughput</li>
+<li><code>BenchmarkResult</code> dataclass with JSONL export</li>
+<li><code>jarvis bench run</code> <abbr title="Command-Line Interface">CLI</abbr> with options for model, engine, sample count,
+  benchmark selection, and JSON/JSONL output</li>
+</ul>
+</li>
+<li><strong>Docker deployment</strong><ul>
+<li><code>Dockerfile</code> -- Multi-stage Python 3.12-slim build with <code>[server]</code> extra</li>
+<li><code>Dockerfile.gpu</code> -- NVIDIA CUDA 12.4 runtime variant</li>
+<li><code>docker-compose.yml</code> -- Services for <code>jarvis</code> (port 8000) and <code>ollama</code>
+  (port 11434)</li>
+<li><code>deploy/systemd/openjarvis.service</code> -- systemd unit file for Linux</li>
+<li><code>deploy/launchd/com.openjarvis.plist</code> -- launchd plist for macOS</li>
+</ul>
+</li>
+<li><strong>Documentation site</strong> -- MkDocs Material with mkdocstrings, covering
+  getting started, user guide, architecture, <abbr title="Application Programming Interface">API</abbr> reference, deployment, and
+  development</li>
+</ul>
+<hr />
+<h2 id="v050">v0.5.0<a class="headerlink" href="#v050" title="Permanent link">&para;</a></h2>
+<p><em>Phase 4 -- Learning, Telemetry, and Router Policies</em></p>
+<h3 id="added_3">Added<a class="headerlink" href="#added_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Learning system</strong><ul>
+<li><code>RouterPolicy</code> <abbr title="Abstract Base Class">ABC</abbr> and <code>RoutingContext</code> dataclass</li>
+<li><code>RewardFunction</code> <abbr title="Abstract Base Class">ABC</abbr> for scoring inference results</li>
+<li><code>HeuristicRewardFunction</code> scoring on latency, cost, and efficiency</li>
+<li><code>RouterPolicyRegistry</code> for pluggable routing strategies</li>
+<li><code>HeuristicRouter</code> registered as <code>"heuristic"</code> policy (6 priority rules:
+  code detection, math detection, short/long queries, urgency override,
+  default fallback)</li>
+<li><code>TraceDrivenPolicy</code> registered as <code>"learned"</code> policy with batch updates
+  via <code>update_from_traces()</code> and online updates via <code>observe()</code></li>
+<li><code>GRPORouterPolicy</code> stub registered as <code>"grpo"</code> for future RL training</li>
+<li><code>ensure_registered()</code> pattern for lazy, test-safe registration</li>
+</ul>
+</li>
+<li><strong>Telemetry aggregation</strong><ul>
+<li><code>TelemetryAggregator</code> with <code>per_model_stats()</code>, <code>per_engine_stats()</code>,
+  <code>top_models()</code>, <code>summary()</code>, <code>export_records()</code>, and <code>clear()</code> methods</li>
+<li>Time-range filtering via <code>since</code> / <code>until</code> parameters</li>
+<li><code>ModelStats</code> and <code>EngineStats</code> dataclasses</li>
+<li><code>AggregatedStats</code> summary dataclass</li>
+</ul>
+</li>
+<li><strong><abbr title="Command-Line Interface">CLI</abbr> enhancements</strong><ul>
+<li><code>--router</code> flag on <code>jarvis ask</code> for explicit policy selection</li>
+<li><code>jarvis telemetry stats</code> -- display aggregated telemetry statistics</li>
+<li><code>jarvis telemetry export --format json|csv</code> -- export telemetry records</li>
+<li><code>jarvis telemetry clear --yes</code> -- delete all telemetry records</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="v040">v0.4.0<a class="headerlink" href="#v040" title="Permanent link">&para;</a></h2>
+<p><em>Phase 3 -- Agents, Tools, and <abbr title="Application Programming Interface">API</abbr> Server</em></p>
+<h3 id="added_4">Added<a class="headerlink" href="#added_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Agent system</strong><ul>
+<li><code>BaseAgent</code> <abbr title="Abstract Base Class">ABC</abbr> with <code>run()</code> method returning <code>AgentResult</code></li>
+<li><code>AgentContext</code> dataclass with conversation, tools, and memory results</li>
+<li><code>AgentResult</code> dataclass with content, tool results, turns, and metadata</li>
+<li><code>AgentRegistry</code> for pluggable agent implementations</li>
+<li><code>SimpleAgent</code> -- single-turn query-to-response, no tool calling</li>
+<li><code>OrchestratorAgent</code> -- multi-turn tool-calling loop with <code>ToolExecutor</code>,
+  configurable <code>max_turns</code></li>
+<li><code>CustomAgent</code> -- template for user-defined agent behavior</li>
+<li><code>OpenClawAgent</code> -- transport-based agent with tool-call loop and event
+  bus integration</li>
+</ul>
+</li>
+<li><strong>Tool system</strong><ul>
+<li><code>BaseTool</code> <abbr title="Abstract Base Class">ABC</abbr> with <code>spec</code> property and <code>execute()</code> method</li>
+<li><code>ToolSpec</code> dataclass describing tool interface and characteristics</li>
+<li><code>ToolExecutor</code> dispatch engine with JSON argument parsing, latency
+  tracking, and event bus integration (<code>TOOL_CALL_START</code> / <code>TOOL_CALL_END</code>)</li>
+<li><code>ToolRegistry</code> for tool discovery</li>
+<li><code>to_openai_function()</code> method for OpenAI function calling format</li>
+<li>Built-in tools:<ul>
+<li><code>CalculatorTool</code> -- safe math evaluation via AST parsing</li>
+<li><code>ThinkTool</code> -- reasoning scratchpad for chain-of-thought</li>
+<li><code>RetrievalTool</code> -- memory search integration</li>
+<li><code>LLMTool</code> -- sub-model calls within agent loops</li>
+<li><code>FileReadTool</code> -- safe file reading with path validation</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>OpenAI-compatible <abbr title="Application Programming Interface">API</abbr> server</strong> (<code>jarvis serve</code>)<ul>
+<li>FastAPI + Uvicorn with optional <code>[server]</code> extra</li>
+<li><code>POST /v1/chat/completions</code> -- non-streaming and <abbr title="Server-Sent Events">SSE</abbr> streaming</li>
+<li><code>GET /v1/models</code> -- list available models</li>
+<li><code>GET /health</code> -- health check endpoint</li>
+<li>Pydantic request/response models matching OpenAI <abbr title="Application Programming Interface">API</abbr> format</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="v030">v0.3.0<a class="headerlink" href="#v030" title="Permanent link">&para;</a></h2>
+<p><em>Phase 2 -- Memory System</em></p>
+<h3 id="added_5">Added<a class="headerlink" href="#added_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Memory backends</strong><ul>
+<li><code>MemoryBackend</code> <abbr title="Abstract Base Class">ABC</abbr> with <code>store()</code>, <code>retrieve()</code>, <code>delete()</code>, <code>clear()</code></li>
+<li><code>RetrievalResult</code> dataclass with content, score, source, and metadata</li>
+<li><code>MemoryRegistry</code> for backend discovery</li>
+<li><code>SQLiteMemory</code> -- zero-dependency default using SQLite <abbr title="Full-Text Search version 5">FTS5</abbr> with BM25
+  ranking and <abbr title="Full-Text Search version 5">FTS5</abbr> query escaping</li>
+<li><code>FAISSMemory</code> -- vector search using FAISS with sentence-transformers
+  embeddings (optional <code>[memory-faiss]</code> extra)</li>
+<li><code>ColBERTMemory</code> -- ColBERTv2 neural retrieval backend (optional
+  <code>[memory-colbert]</code> extra)</li>
+<li><code>BM25Memory</code> -- BM25 ranking backend using rank-bm25 (optional
+  <code>[memory-bm25]</code> extra)</li>
+<li><code>HybridMemory</code> -- Reciprocal Rank Fusion combining multiple backends</li>
+</ul>
+</li>
+<li><strong>Document processing</strong><ul>
+<li><code>ChunkConfig</code> dataclass for chunk size and overlap settings</li>
+<li><code>chunk_text()</code> for splitting documents into overlapping chunks</li>
+<li><code>ingest_path()</code> for recursively indexing files and directories</li>
+<li><code>read_document()</code> with support for plain text, Markdown, and PDF
+  (optional <code>[memory-pdf]</code> extra)</li>
+</ul>
+</li>
+<li><strong>Context injection</strong><ul>
+<li><code>ContextConfig</code> with top-k, minimum score, and max context token settings</li>
+<li><code>inject_context()</code> for prepending memory results as system messages with
+  source attribution</li>
+<li><code>--no-context</code> flag on <code>jarvis ask</code> to disable injection</li>
+</ul>
+</li>
+<li><strong><abbr title="Command-Line Interface">CLI</abbr> commands</strong><ul>
+<li><code>jarvis memory index &lt;path&gt;</code> -- index documents into memory</li>
+<li><code>jarvis memory search &lt;query&gt;</code> -- search memory for relevant chunks</li>
+<li><code>jarvis memory stats</code> -- show backend statistics</li>
+</ul>
+</li>
+<li><strong>Event bus integration</strong> -- <code>MEMORY_STORE</code> and <code>MEMORY_RETRIEVE</code> events</li>
+</ul>
+<hr />
+<h2 id="v020">v0.2.0<a class="headerlink" href="#v020" title="Permanent link">&para;</a></h2>
+<p><em>Phase 1 -- Intelligence and Inference</em></p>
+<h3 id="added_6">Added<a class="headerlink" href="#added_6" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Intelligence pillar</strong><ul>
+<li><code>ModelSpec</code> dataclass with parameter count, context length, quantization,
+  <abbr title="Video Random Access Memory">VRAM</abbr> requirements, and supported engines</li>
+<li><code>ModelRegistry</code> for model metadata storage</li>
+<li><code>BUILTIN_MODELS</code> catalog with pre-defined model specifications</li>
+<li><code>register_builtin_models()</code> and <code>merge_discovered_models()</code> helpers</li>
+<li><code>HeuristicRouter</code> with rule-based model selection</li>
+<li><code>build_routing_context()</code> for query analysis (code detection, math
+  detection, length classification)</li>
+</ul>
+</li>
+<li><strong>Inference engines</strong><ul>
+<li><code>InferenceEngine</code> <abbr title="Abstract Base Class">ABC</abbr> with <code>generate()</code>, <code>stream()</code>, <code>list_models()</code>,
+  and <code>health()</code> methods</li>
+<li><code>EngineRegistry</code> for engine discovery</li>
+<li><code>OllamaEngine</code> -- Ollama backend via native HTTP <abbr title="Application Programming Interface">API</abbr> with tool call
+  extraction</li>
+<li><code>VllmEngine</code> -- vLLM backend via OpenAI-compatible <abbr title="Application Programming Interface">API</abbr></li>
+<li><code>LlamaCppEngine</code> -- llama.cpp server backend</li>
+<li><code>EngineConnectionError</code> for unreachable engines</li>
+<li><code>messages_to_dicts()</code> for Message-to-OpenAI-format conversion</li>
+</ul>
+</li>
+<li><strong>Engine discovery</strong><ul>
+<li><code>discover_engines()</code> -- probe all registered engines for health</li>
+<li><code>discover_models()</code> -- aggregate model lists across engines</li>
+<li><code>get_engine()</code> -- get configured default with automatic fallback</li>
+</ul>
+</li>
+<li><strong>Hardware detection</strong><ul>
+<li>NVIDIA GPU detection via <code>nvidia-smi</code></li>
+<li>AMD GPU detection via <code>rocm-smi</code></li>
+<li>Apple Silicon detection via <code>system_profiler</code></li>
+<li>CPU brand detection via <code>/proc/cpuinfo</code> and <code>sysctl</code></li>
+<li><code>recommend_engine()</code> mapping hardware to best engine</li>
+</ul>
+</li>
+<li><strong>Telemetry</strong><ul>
+<li><code>TelemetryRecord</code> dataclass with timing, tokens, energy, and cost</li>
+<li><code>TelemetryStore</code> with SQLite persistence and EventBus subscription</li>
+<li><code>instrumented_generate()</code> wrapper for automatic telemetry recording</li>
+</ul>
+</li>
+<li><strong><abbr title="Command-Line Interface">CLI</abbr></strong><ul>
+<li><code>jarvis ask &lt;query&gt;</code> -- query via discovered engine</li>
+<li><code>jarvis ask --agent simple &lt;query&gt;</code> -- route through SimpleAgent</li>
+<li><code>jarvis model list</code> -- list models from running engines</li>
+<li><code>jarvis model info &lt;model&gt;</code> -- show model details</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="v010">v0.1.0<a class="headerlink" href="#v010" title="Permanent link">&para;</a></h2>
+<p><em>Phase 0 -- Project Scaffolding</em></p>
+<h3 id="added_7">Added<a class="headerlink" href="#added_7" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Project structure</strong> -- <code>hatchling</code> build backend, <code>uv</code> package manager,
+  <code>pyproject.toml</code> with extras for optional backends</li>
+<li><strong>Registry system</strong> -- <code>RegistryBase[T]</code> generic base class with
+  class-specific entry isolation, <code>register()</code> decorator, <code>get()</code>, <code>create()</code>,
+  <code>items()</code>, <code>keys()</code>, <code>contains()</code>, <code>clear()</code> methods</li>
+<li><strong>Typed registries</strong> -- <code>ModelRegistry</code>, <code>EngineRegistry</code>, <code>MemoryRegistry</code>,
+  <code>AgentRegistry</code>, <code>ToolRegistry</code>, <code>RouterPolicyRegistry</code>, <code>BenchmarkRegistry</code></li>
+<li><strong>Core types</strong> -- <code>Role</code> enum, <code>Message</code>, <code>Conversation</code> (with sliding
+  window), <code>ModelSpec</code>, <code>Quantization</code> enum, <code>ToolCall</code>, <code>ToolResult</code>,
+  <code>TelemetryRecord</code>, <code>StepType</code> enum, <code>TraceStep</code>, <code>Trace</code></li>
+<li><strong>Configuration</strong> -- <code>JarvisConfig</code> dataclass hierarchy, TOML loader with
+  overlay semantics, hardware auto-detection, <code>generate_default_toml()</code> for
+  <code>jarvis init</code></li>
+<li><strong>Event bus</strong> -- Synchronous pub/sub <code>EventBus</code> with <code>EventType</code> enum for
+  inter-pillar communication</li>
+<li><strong><abbr title="Command-Line Interface">CLI</abbr> skeleton</strong> -- Click-based <code>jarvis</code> command group with <code>--version</code>,
+  <code>--help</code>, and <code>init</code> subcommand</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../roadmap/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Roadmap">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Roadmap
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 OpenJarvis Contributors
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/HazyResearch/OpenJarvis" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.indexes", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

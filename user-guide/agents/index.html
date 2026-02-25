@@ -1,0 +1,4097 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Programming abstractions for on-device AI">
+      
+      
+        <meta name="author" content="OpenJarvis Contributors">
+      
+      
+        <link rel="canonical" href="https://hazyresearch.stanford.edu/OpenJarvis/user-guide/agents/">
+      
+      
+        <link rel="prev" href="../python-sdk/">
+      
+      
+        <link rel="next" href="../memory/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
+    
+    
+      
+        <title>Agents - OpenJarvis</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#agents" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="OpenJarvis" class="md-header__button md-logo" aria-label="OpenJarvis" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            OpenJarvis
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Agents
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/HazyResearch/OpenJarvis" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    HazyResearch/OpenJarvis
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/installation/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../cli/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../api/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../deployment/docker/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../development/contributing/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="OpenJarvis" class="md-nav__button md-logo" aria-label="OpenJarvis" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    OpenJarvis
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/HazyResearch/OpenJarvis" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    HazyResearch/OpenJarvis
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../python-sdk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python SDK
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#baseagent-abc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BaseAgent ABC
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BaseAgent ABC">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agentcontext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AgentContext
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agentresult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AgentResult
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#simpleagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SimpleAgent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#orchestratoragent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OrchestratorAgent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nativereactagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NativeReActAgent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nativeopenhandsagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NativeOpenHandsAgent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rlmagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RLMAgent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openhandsagent-sdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OpenHandsAgent (SDK)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openclawagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OpenClawAgent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using Agents
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Using Agents">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#via-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Via CLI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#via-python-sdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Via Python SDK
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#claudecodeagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ClaudeCodeAgent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sandboxedagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SandboxedAgent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#containerrunner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ContainerRunner
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#agent-registration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Registration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-agents_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using Agents
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Using Agents">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#via-cli_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Via CLI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#via-python-sdk_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Via Python SDK
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#event-bus-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Event Bus Integration
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../memory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Memory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scheduler
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../telemetry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Telemetry & Traces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../evaluations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../channels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/intelligence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Intelligence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inference Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentic Logic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/memory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Memory & Storage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learning & Traces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/query-flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query Flow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/design-principles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design Principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/channels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../api/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/sdk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SDK (Jarvis)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/memory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Memory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/intelligence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Intelligence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/traces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Traces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/telemetry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Telemetry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/bench/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/channels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/systemd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    systemd (Linux)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/launchd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    launchd (macOS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/api-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/extending/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Extending OpenJarvis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#baseagent-abc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BaseAgent ABC
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BaseAgent ABC">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agentcontext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AgentContext
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agentresult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AgentResult
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#simpleagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SimpleAgent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#orchestratoragent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OrchestratorAgent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nativereactagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NativeReActAgent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nativeopenhandsagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NativeOpenHandsAgent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rlmagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RLMAgent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openhandsagent-sdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OpenHandsAgent (SDK)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openclawagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OpenClawAgent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using Agents
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Using Agents">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#via-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Via CLI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#via-python-sdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Via Python SDK
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#claudecodeagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ClaudeCodeAgent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sandboxedagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SandboxedAgent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#containerrunner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ContainerRunner
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#agent-registration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Registration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-agents_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using Agents
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Using Agents">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#via-cli_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Via CLI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#via-python-sdk_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Via Python SDK
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#event-bus-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Event Bus Integration
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="agents">Agents<a class="headerlink" href="#agents" title="Permanent link">&para;</a></h1>
+<p>Agents are the agentic logic layer of OpenJarvis. They determine how a query is processed -- whether it goes directly to a model, through a tool-calling loop, via ReAct reasoning, CodeAct code execution, recursive decomposition, or an external agent runtime. All agents implement the <code>BaseAgent</code> <abbr title="Abstract Base Class">ABC</abbr> and are registered via the <code>AgentRegistry</code>.</p>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Agent</th>
+<th>Registry Key</th>
+<th><code>accepts_tools</code></th>
+<th>Multi-turn</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SimpleAgent</code></td>
+<td><code>simple</code></td>
+<td>No</td>
+<td>No</td>
+<td>Single-turn query-to-response</td>
+</tr>
+<tr>
+<td><code>OrchestratorAgent</code></td>
+<td><code>orchestrator</code></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Multi-turn tool-calling loop (function_calling + structured)</td>
+</tr>
+<tr>
+<td><code>NativeReActAgent</code></td>
+<td><code>native_react</code></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Thought-Action-Observation loop</td>
+</tr>
+<tr>
+<td><code>NativeOpenHandsAgent</code></td>
+<td><code>native_openhands</code></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>CodeAct-style code execution + tool calls</td>
+</tr>
+<tr>
+<td><code>RLMAgent</code></td>
+<td><code>rlm</code></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Recursive LM with persistent REPL</td>
+</tr>
+<tr>
+<td><code>OpenHandsAgent</code></td>
+<td><code>openhands</code></td>
+<td>No</td>
+<td>Yes</td>
+<td>Wraps real openhands-sdk</td>
+</tr>
+<tr>
+<td><code>OpenClawAgent</code></td>
+<td><code>openclaw</code></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>External agent via HTTP or subprocess</td>
+</tr>
+<tr>
+<td><code>ClaudeCodeAgent</code></td>
+<td><code>claude_code</code></td>
+<td>No</td>
+<td>Yes</td>
+<td>Claude Agent <abbr title="Software Development Kit">SDK</abbr> via Node.js subprocess</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="baseagent-abc">BaseAgent <abbr title="Abstract Base Class">ABC</abbr><a class="headerlink" href="#baseagent-abc" title="Permanent link">&para;</a></h2>
+<p>All agents extend the abstract <code>BaseAgent</code> class.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis.agents._stubs</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentContext</span><span class="p">,</span> <span class="n">AgentResult</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="k">class</span><span class="w"> </span><span class="nc">BaseAgent</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">accepts_tools</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        <span class="n">engine</span><span class="p">:</span> <span class="n">InferenceEngine</span><span class="p">,</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        <span class="n">bus</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventBus</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">,</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>        <span class="n">max_tokens</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">,</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="nd">@abstractmethod</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>        <span class="nb">input</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>        <span class="n">context</span><span class="p">:</span> <span class="n">AgentContext</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AgentResult</span><span class="p">:</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute the agent on the given input.&quot;&quot;&quot;</span>
+</span></code></pre></div>
+<p>The <code>accepts_tools</code> class attribute controls whether an agent can receive tools via <code>--tools</code> on the <abbr title="Command-Line Interface">CLI</abbr> or <code>tools=</code> in the <abbr title="Software Development Kit">SDK</abbr>. Agents with <code>accepts_tools = False</code> ignore tool arguments.</p>
+<p><code>BaseAgent</code> also provides concrete helper methods (<code>_emit_turn_start</code>, <code>_emit_turn_end</code>, <code>_build_messages</code>, <code>_generate</code>, <code>_max_turns_result</code>, <code>_strip_think_tags</code>) that subclasses use to avoid duplicating common logic. See the <a href="../../architecture/agents/#baseagent-abc">architecture docs</a> for details.</p>
+<p><strong>ToolUsingAgent</strong> is an intermediate base class (extends <code>BaseAgent</code>) that sets <code>accepts_tools = True</code> and adds a <code>ToolExecutor</code> and <code>max_turns</code> loop limit. All tool-using agents extend this class.</p>
+<h3 id="agentcontext">AgentContext<a class="headerlink" href="#agentcontext" title="Permanent link">&para;</a></h3>
+<p>The runtime context handed to an agent on each invocation.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>conversation</code></td>
+<td><code>Conversation</code></td>
+<td>Message history (pre-filled with context if memory injection is active)</td>
+</tr>
+<tr>
+<td><code>tools</code></td>
+<td><code>list[str]</code></td>
+<td>Tool names available to the agent</td>
+</tr>
+<tr>
+<td><code>memory_results</code></td>
+<td><code>list[Any]</code></td>
+<td>Pre-fetched memory retrieval results</td>
+</tr>
+<tr>
+<td><code>metadata</code></td>
+<td><code>dict[str, Any]</code></td>
+<td>Arbitrary metadata for the run</td>
+</tr>
+</tbody>
+</table>
+<h3 id="agentresult">AgentResult<a class="headerlink" href="#agentresult" title="Permanent link">&para;</a></h3>
+<p>The result returned after an agent completes a run.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>content</code></td>
+<td><code>str</code></td>
+<td>The final response text</td>
+</tr>
+<tr>
+<td><code>tool_results</code></td>
+<td><code>list[ToolResult]</code></td>
+<td>Results from tool executions during the run</td>
+</tr>
+<tr>
+<td><code>turns</code></td>
+<td><code>int</code></td>
+<td>Number of turns (inference calls) taken</td>
+</tr>
+<tr>
+<td><code>metadata</code></td>
+<td><code>dict[str, Any]</code></td>
+<td>Arbitrary metadata about the run</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="simpleagent">SimpleAgent<a class="headerlink" href="#simpleagent" title="Permanent link">&para;</a></h2>
+<p>The <code>SimpleAgent</code> is a single-turn agent that sends the query directly to the inference engine and returns the response. It does not support tool calling.</p>
+<p><strong>How it works:</strong></p>
+<ol>
+<li>Builds a message list from the conversation context (if provided) plus the user query.</li>
+<li>Calls the inference engine via <code>_generate()</code>.</li>
+<li>Returns the response as an <code>AgentResult</code> with <code>turns=1</code>.</li>
+</ol>
+<p><strong>Constructor parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>engine</code></td>
+<td><code>InferenceEngine</code></td>
+<td>--</td>
+<td>The inference engine to use</td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td><code>str</code></td>
+<td>--</td>
+<td>Model identifier</td>
+</tr>
+<tr>
+<td><code>bus</code></td>
+<td><code>EventBus</code></td>
+<td><code>None</code></td>
+<td>Event bus for telemetry</td>
+</tr>
+<tr>
+<td><code>temperature</code></td>
+<td><code>float</code></td>
+<td><code>0.7</code></td>
+<td>Sampling temperature</td>
+</tr>
+<tr>
+<td><code>max_tokens</code></td>
+<td><code>int</code></td>
+<td><code>1024</code></td>
+<td>Maximum tokens to generate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>When to use:</strong> For straightforward question-answering without tool calling or multi-turn reasoning.</p>
+<hr />
+<h2 id="orchestratoragent">OrchestratorAgent<a class="headerlink" href="#orchestratoragent" title="Permanent link">&para;</a></h2>
+<p>The <code>OrchestratorAgent</code> is a multi-turn agent that implements a tool-calling loop. It is the primary agent for queries that require computation, knowledge retrieval, or structured reasoning. Extends <code>ToolUsingAgent</code>.</p>
+<p><strong>How it works:</strong></p>
+<ol>
+<li>Builds the initial message list from context and the user query.</li>
+<li>Sends messages with tool definitions (OpenAI function-calling format) to the engine.</li>
+<li>If the engine responds with <code>tool_calls</code>, the <code>ToolExecutor</code> dispatches each call.</li>
+<li>Tool results are appended as <code>TOOL</code> messages and the loop continues.</li>
+<li>If no <code>tool_calls</code> are returned, the response is treated as the final answer.</li>
+<li>The loop stops after <code>max_turns</code> iterations (default: 10), returning whatever content is available along with a <code>max_turns_exceeded</code> metadata flag.</li>
+</ol>
+<p><strong>Constructor parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>engine</code></td>
+<td><code>InferenceEngine</code></td>
+<td>--</td>
+<td>The inference engine to use</td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td><code>str</code></td>
+<td>--</td>
+<td>Model identifier</td>
+</tr>
+<tr>
+<td><code>tools</code></td>
+<td><code>list[BaseTool]</code></td>
+<td><code>[]</code></td>
+<td>Tool instances to make available</td>
+</tr>
+<tr>
+<td><code>bus</code></td>
+<td><code>EventBus</code></td>
+<td><code>None</code></td>
+<td>Event bus for telemetry</td>
+</tr>
+<tr>
+<td><code>max_turns</code></td>
+<td><code>int</code></td>
+<td><code>10</code></td>
+<td>Maximum number of tool-calling turns</td>
+</tr>
+<tr>
+<td><code>temperature</code></td>
+<td><code>float</code></td>
+<td><code>0.7</code></td>
+<td>Sampling temperature</td>
+</tr>
+<tr>
+<td><code>max_tokens</code></td>
+<td><code>int</code></td>
+<td><code>1024</code></td>
+<td>Maximum tokens to generate</td>
+</tr>
+<tr>
+<td><code>mode</code></td>
+<td><code>str</code></td>
+<td><code>"function_calling"</code></td>
+<td>Tool-calling mode (<code>function_calling</code> or <code>structured</code>)</td>
+</tr>
+<tr>
+<td><code>system_prompt</code></td>
+<td><code>str</code></td>
+<td><code>None</code></td>
+<td>Custom system prompt</td>
+</tr>
+</tbody>
+</table>
+<p><strong>When to use:</strong> For queries that need calculation, memory search, sub-model calls, file reading, or multi-step reasoning.</p>
+<div class="admonition info">
+<p class="admonition-title">Tool-Calling Loop</p>
+<p>The orchestrator follows the OpenAI function-calling convention. The engine must support returning <code>tool_calls</code> in its response for the loop to engage. If tools are provided but the engine does not return any tool calls, the agent behaves like a single-turn agent.</p>
+</div>
+<hr />
+<h2 id="nativereactagent">NativeReActAgent<a class="headerlink" href="#nativereactagent" title="Permanent link">&para;</a></h2>
+<p>The <code>NativeReActAgent</code> implements a <strong>Thought-Action-Observation</strong> loop following the ReAct pattern. It prompts the <abbr title="Large Language Model">LLM</abbr> to produce structured output (<code>Thought:</code>, <code>Action:</code>, <code>Action Input:</code>, <code>Final Answer:</code>) and parses the response to drive tool execution. Extends <code>ToolUsingAgent</code>.</p>
+<p><strong>How it works:</strong></p>
+<ol>
+<li>Builds a system prompt with enriched tool descriptions (names, parameter schemas, categories) via <code>build_tool_descriptions()</code>. Parsing is case-insensitive.</li>
+<li>Generates a response and parses the ReAct-structured output.</li>
+<li>If a <code>Final Answer:</code> is found, returns it.</li>
+<li>If an <code>Action:</code> is found, executes the tool and feeds the result back as an <code>Observation:</code>.</li>
+<li>Loops until a final answer is produced or <code>max_turns</code> is exceeded.</li>
+</ol>
+<p><strong>Constructor parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>engine</code></td>
+<td><code>InferenceEngine</code></td>
+<td>--</td>
+<td>The inference engine to use</td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td><code>str</code></td>
+<td>--</td>
+<td>Model identifier</td>
+</tr>
+<tr>
+<td><code>tools</code></td>
+<td><code>list[BaseTool]</code></td>
+<td><code>[]</code></td>
+<td>Tool instances to make available</td>
+</tr>
+<tr>
+<td><code>bus</code></td>
+<td><code>EventBus</code></td>
+<td><code>None</code></td>
+<td>Event bus for telemetry</td>
+</tr>
+<tr>
+<td><code>max_turns</code></td>
+<td><code>int</code></td>
+<td><code>10</code></td>
+<td>Maximum number of reasoning turns</td>
+</tr>
+<tr>
+<td><code>temperature</code></td>
+<td><code>float</code></td>
+<td><code>0.7</code></td>
+<td>Sampling temperature</td>
+</tr>
+<tr>
+<td><code>max_tokens</code></td>
+<td><code>int</code></td>
+<td><code>1024</code></td>
+<td>Maximum tokens to generate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>When to use:</strong> For queries that benefit from explicit step-by-step reasoning with tool use, where you want visibility into the agent's thought process.</p>
+<div class="admonition note">
+<p class="admonition-title">Backward compatibility</p>
+<p>The registry alias <code>"react"</code> maps to <code>NativeReActAgent</code>. The old import <code>from openjarvis.agents.react import ReActAgent</code> also still works.</p>
+</div>
+<hr />
+<h2 id="nativeopenhandsagent">NativeOpenHandsAgent<a class="headerlink" href="#nativeopenhandsagent" title="Permanent link">&para;</a></h2>
+<p>The <code>NativeOpenHandsAgent</code> is a CodeAct-style agent that generates and executes Python code alongside structured tool calls. It can also pre-fetch URL content from user input to provide direct context to the <abbr title="Large Language Model">LLM</abbr>. Extends <code>ToolUsingAgent</code>.</p>
+<p><strong>How it works:</strong></p>
+<ol>
+<li>Builds a detailed system prompt with enriched tool descriptions (via shared <code>build_tool_descriptions()</code> builder) and code execution instructions.</li>
+<li>Pre-fetches any URLs in the user input, inlining the content directly.</li>
+<li>For each turn, generates a response and attempts to extract code blocks or tool calls.</li>
+<li>Code is executed via <code>code_interpreter</code>; tool calls are dispatched via <code>ToolExecutor</code>.</li>
+<li>If neither is found, returns the content as the final answer.</li>
+</ol>
+<p><strong>Constructor parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>engine</code></td>
+<td><code>InferenceEngine</code></td>
+<td>--</td>
+<td>The inference engine to use</td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td><code>str</code></td>
+<td>--</td>
+<td>Model identifier</td>
+</tr>
+<tr>
+<td><code>tools</code></td>
+<td><code>list[BaseTool]</code></td>
+<td><code>[]</code></td>
+<td>Tool instances to make available</td>
+</tr>
+<tr>
+<td><code>bus</code></td>
+<td><code>EventBus</code></td>
+<td><code>None</code></td>
+<td>Event bus for telemetry</td>
+</tr>
+<tr>
+<td><code>max_turns</code></td>
+<td><code>int</code></td>
+<td><code>3</code></td>
+<td>Maximum number of turns</td>
+</tr>
+<tr>
+<td><code>temperature</code></td>
+<td><code>float</code></td>
+<td><code>0.7</code></td>
+<td>Sampling temperature</td>
+</tr>
+<tr>
+<td><code>max_tokens</code></td>
+<td><code>int</code></td>
+<td><code>2048</code></td>
+<td>Maximum tokens to generate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>When to use:</strong> For queries involving URL content, code execution, or tasks where the <abbr title="Large Language Model">LLM</abbr> can write and run Python to solve the problem.</p>
+<hr />
+<h2 id="rlmagent">RLMAgent<a class="headerlink" href="#rlmagent" title="Permanent link">&para;</a></h2>
+<p>The <code>RLMAgent</code> implements recursive decomposition via a persistent REPL, based on the RLM paper. Context is stored as a Python variable rather than injected into the prompt, enabling processing of arbitrarily long inputs through recursive sub-LM calls. Extends <code>ToolUsingAgent</code>.</p>
+<p><strong>How it works:</strong></p>
+<ol>
+<li>Creates a persistent REPL with <code>llm_query()</code> and <code>llm_batch()</code> callbacks.</li>
+<li>Injects context from <code>AgentContext</code> into the REPL as a variable.</li>
+<li>Generates code and executes it in the REPL.</li>
+<li>If <code>FINAL(value)</code> is called, returns the value as the final answer.</li>
+<li>If no code block is found, treats the content as a direct text answer.</li>
+</ol>
+<p><strong>Constructor parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>engine</code></td>
+<td><code>InferenceEngine</code></td>
+<td>--</td>
+<td>The inference engine to use</td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td><code>str</code></td>
+<td>--</td>
+<td>Model identifier</td>
+</tr>
+<tr>
+<td><code>tools</code></td>
+<td><code>list[BaseTool]</code></td>
+<td><code>[]</code></td>
+<td>Tool instances (optional)</td>
+</tr>
+<tr>
+<td><code>bus</code></td>
+<td><code>EventBus</code></td>
+<td><code>None</code></td>
+<td>Event bus for telemetry</td>
+</tr>
+<tr>
+<td><code>max_turns</code></td>
+<td><code>int</code></td>
+<td><code>10</code></td>
+<td>Maximum number of code-execute turns</td>
+</tr>
+<tr>
+<td><code>temperature</code></td>
+<td><code>float</code></td>
+<td><code>0.7</code></td>
+<td>Sampling temperature</td>
+</tr>
+<tr>
+<td><code>max_tokens</code></td>
+<td><code>int</code></td>
+<td><code>2048</code></td>
+<td>Maximum tokens to generate</td>
+</tr>
+<tr>
+<td><code>sub_model</code></td>
+<td><code>str</code></td>
+<td>same as <code>model</code></td>
+<td>Model for sub-LM calls</td>
+</tr>
+<tr>
+<td><code>sub_temperature</code></td>
+<td><code>float</code></td>
+<td><code>0.3</code></td>
+<td>Temperature for sub-LM calls</td>
+</tr>
+<tr>
+<td><code>sub_max_tokens</code></td>
+<td><code>int</code></td>
+<td><code>1024</code></td>
+<td>Max tokens for sub-LM calls</td>
+</tr>
+<tr>
+<td><code>max_output_chars</code></td>
+<td><code>int</code></td>
+<td><code>10000</code></td>
+<td>Max REPL output characters</td>
+</tr>
+<tr>
+<td><code>system_prompt</code></td>
+<td><code>str</code></td>
+<td><code>RLM_SYSTEM_PROMPT</code></td>
+<td>Override the system prompt</td>
+</tr>
+</tbody>
+</table>
+<p><strong>When to use:</strong> For long-context tasks that benefit from recursive decomposition, such as summarizing large documents, processing structured data, or tasks that require programmatic manipulation of context.</p>
+<hr />
+<h2 id="openhandsagent-sdk">OpenHandsAgent (<abbr title="Software Development Kit">SDK</abbr>)<a class="headerlink" href="#openhandsagent-sdk" title="Permanent link">&para;</a></h2>
+<p>The <code>OpenHandsAgent</code> wraps the real <code>openhands-sdk</code> package for AI-driven software development. Extends <code>BaseAgent</code> directly (tool management is handled by the <abbr title="Software Development Kit">SDK</abbr> internally).</p>
+<p><strong>How it works:</strong></p>
+<ol>
+<li>Imports <code>openhands.sdk</code> at runtime.</li>
+<li>Creates an <abbr title="Large Language Model">LLM</abbr>, Agent, and Conversation from the <abbr title="Software Development Kit">SDK</abbr>.</li>
+<li>Sends the input and runs the conversation.</li>
+<li>Returns the final message content.</li>
+</ol>
+<p><strong>Constructor parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>engine</code></td>
+<td><code>InferenceEngine</code></td>
+<td>--</td>
+<td>The inference engine (fallback)</td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td><code>str</code></td>
+<td>--</td>
+<td>Model identifier</td>
+</tr>
+<tr>
+<td><code>bus</code></td>
+<td><code>EventBus</code></td>
+<td><code>None</code></td>
+<td>Event bus for telemetry</td>
+</tr>
+<tr>
+<td><code>temperature</code></td>
+<td><code>float</code></td>
+<td><code>0.7</code></td>
+<td>Sampling temperature</td>
+</tr>
+<tr>
+<td><code>max_tokens</code></td>
+<td><code>int</code></td>
+<td><code>1024</code></td>
+<td>Maximum tokens to generate</td>
+</tr>
+<tr>
+<td><code>workspace</code></td>
+<td><code>str</code></td>
+<td><code>os.getcwd()</code></td>
+<td>Working directory for the agent</td>
+</tr>
+<tr>
+<td><code>api_key</code></td>
+<td><code>str</code></td>
+<td><code>$LLM_API_KEY</code></td>
+<td><abbr title="Application Programming Interface">API</abbr> key for the <abbr title="Large Language Model">LLM</abbr> provider</td>
+</tr>
+</tbody>
+</table>
+<p><strong>When to use:</strong> For software development tasks (debugging, code editing, test fixing) where the OpenHands <abbr title="Software Development Kit">SDK</abbr> provides a full development agent runtime.</p>
+<div class="admonition warning">
+<p class="admonition-title">Optional dependency</p>
+<p>Requires <code>openhands-sdk</code> (<code>pip install openjarvis[openhands]</code>) and Python 3.12+.</p>
+</div>
+<hr />
+<h2 id="openclawagent">OpenClawAgent<a class="headerlink" href="#openclawagent" title="Permanent link">&para;</a></h2>
+<p>The <code>OpenClawAgent</code> wraps the OpenClaw Pi agent runtime, communicating via either HTTP or subprocess transport. It supports tool calling through the OpenClaw protocol.</p>
+<p><strong>How it works:</strong></p>
+<ol>
+<li>Checks transport health.</li>
+<li>Sends a <code>QUERY</code> protocol message through the transport.</li>
+<li>If the response is a <code>TOOL_CALL</code>, dispatches the tool locally via <code>ToolExecutor</code>.</li>
+<li>Sends the tool result back as a <code>TOOL_RESULT</code> message.</li>
+<li>Continues the tool-call loop until the response is a final answer or error (up to 10 turns).</li>
+</ol>
+<p><strong>Constructor parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>engine</code></td>
+<td><code>Any</code></td>
+<td><code>None</code></td>
+<td>Inference engine (fallback/provider)</td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Model identifier</td>
+</tr>
+<tr>
+<td><code>transport</code></td>
+<td><code>OpenClawTransport</code></td>
+<td><code>None</code></td>
+<td>Pre-configured transport (overrides mode)</td>
+</tr>
+<tr>
+<td><code>mode</code></td>
+<td><code>str</code></td>
+<td><code>"http"</code></td>
+<td>Transport mode: <code>"http"</code> or <code>"subprocess"</code></td>
+</tr>
+<tr>
+<td><code>bus</code></td>
+<td><code>EventBus</code></td>
+<td><code>None</code></td>
+<td>Event bus for telemetry</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Transport modes:</strong></p>
+<ul>
+<li><strong>HTTP</strong> (<code>HttpTransport</code>): Sends HTTP POST requests to an OpenClaw server.</li>
+<li><strong>Subprocess</strong> (<code>SubprocessTransport</code>): Spawns a Node.js process and communicates via stdin/stdout using JSON-line protocol.</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Node.js Requirement</p>
+<p>The subprocess transport mode requires Node.js 22+ to be installed on the system.</p>
+</div>
+<hr />
+<h2 id="using-agents">Using Agents<a class="headerlink" href="#using-agents" title="Permanent link">&para;</a></h2>
+<h3 id="via-cli">Via <abbr title="Command-Line Interface">CLI</abbr><a class="headerlink" href="#via-cli" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Simple agent</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>jarvis<span class="w"> </span>ask<span class="w"> </span>--agent<span class="w"> </span>simple<span class="w"> </span><span class="s2">&quot;What is the capital of France?&quot;</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Orchestrator with tools</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>jarvis<span class="w"> </span>ask<span class="w"> </span>--agent<span class="w"> </span>orchestrator<span class="w"> </span>--tools<span class="w"> </span>calculator,think<span class="w"> </span><span class="s2">&quot;What is sqrt(256)?&quot;</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># NativeReActAgent</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>jarvis<span class="w"> </span>ask<span class="w"> </span>--agent<span class="w"> </span>native_react<span class="w"> </span>--tools<span class="w"> </span>calculator<span class="w"> </span><span class="s2">&quot;What is 2+2?&quot;</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># ReAct alias (same as native_react)</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>jarvis<span class="w"> </span>ask<span class="w"> </span>--agent<span class="w"> </span>react<span class="w"> </span>--tools<span class="w"> </span>calculator,think<span class="w"> </span><span class="s2">&quot;Solve step by step: 15% of 340&quot;</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="c1"># NativeOpenHandsAgent</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>jarvis<span class="w"> </span>ask<span class="w"> </span>--agent<span class="w"> </span>native_openhands<span class="w"> </span>--tools<span class="w"> </span>calculator,web_search<span class="w"> </span><span class="s2">&quot;Summarize example.com&quot;</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="c1"># RLMAgent</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>jarvis<span class="w"> </span>ask<span class="w"> </span>--agent<span class="w"> </span>rlm<span class="w"> </span><span class="s2">&quot;Summarize this long document&quot;</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="c1"># OpenHands SDK agent</span>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>jarvis<span class="w"> </span>ask<span class="w"> </span>--agent<span class="w"> </span>openhands<span class="w"> </span><span class="s2">&quot;Fix the bug in test_utils.py&quot;</span>
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="c1"># OpenClaw agent</span>
+</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>jarvis<span class="w"> </span>ask<span class="w"> </span>--agent<span class="w"> </span>openclaw<span class="w"> </span><span class="s2">&quot;Tell me a story&quot;</span>
+</span></code></pre></div>
+<h3 id="via-python-sdk">Via Python <abbr title="Software Development Kit">SDK</abbr><a class="headerlink" href="#via-python-sdk" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jarvis</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">j</span> <span class="o">=</span> <span class="n">Jarvis</span><span class="p">()</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1"># Simple agent</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">response</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,</span> <span class="n">agent</span><span class="o">=</span><span class="s2">&quot;simple&quot;</span><span class="p">)</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="c1"># Orchestrator with tools</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="n">response</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="s2">&quot;Calculate 15</span><span class="si">% o</span><span class="s2">f 340&quot;</span><span class="p">,</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="n">agent</span><span class="o">=</span><span class="s2">&quot;orchestrator&quot;</span><span class="p">,</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;calculator&quot;</span><span class="p">],</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="p">)</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="c1"># NativeReActAgent with tools</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="n">response</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>    <span class="s2">&quot;What is sqrt(256)?&quot;</span><span class="p">,</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>    <span class="n">agent</span><span class="o">=</span><span class="s2">&quot;native_react&quot;</span><span class="p">,</span>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>    <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;calculator&quot;</span><span class="p">,</span> <span class="s2">&quot;think&quot;</span><span class="p">],</span>
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="p">)</span>
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>
+</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="c1"># Full result with tool details</span>
+</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="n">result</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">ask_full</span><span class="p">(</span>
+</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>    <span class="s2">&quot;What is the square root of 144?&quot;</span><span class="p">,</span>
+</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>    <span class="n">agent</span><span class="o">=</span><span class="s2">&quot;orchestrator&quot;</span><span class="p">,</span>
+</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>    <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;calculator&quot;</span><span class="p">,</span> <span class="s2">&quot;think&quot;</span><span class="p">],</span>
+</span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="p">)</span>
+</span><span id="__span-2-28"><a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">])</span>
+</span><span id="__span-2-29"><a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;turns&quot;</span><span class="p">])</span>
+</span><span id="__span-2-30"><a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;tool_results&quot;</span><span class="p">])</span>
+</span><span id="__span-2-31"><a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a>
+</span><span id="__span-2-32"><a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a><span class="n">j</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span></code></pre></div>
+<hr />
+<hr />
+<h2 id="claudecodeagent">ClaudeCodeAgent<a class="headerlink" href="#claudecodeagent" title="Permanent link">&para;</a></h2>
+<p>The <code>ClaudeCodeAgent</code> wraps the <code>@anthropic-ai/claude-code</code> <abbr title="Software Development Kit">SDK</abbr> via a bundled Node.js subprocess bridge. Unlike the other agents, inference is handled entirely by the Claude Agent <abbr title="Software Development Kit">SDK</abbr> -- the <code>engine</code> parameter is accepted only for <code>BaseAgent</code> interface conformance and is not used.</p>
+<div class="admonition warning">
+<p class="admonition-title">Requirements</p>
+<p>Requires Node.js 22+ on <code>PATH</code> and an <code>ANTHROPIC_API_KEY</code> environment variable (or pass <code>api_key=</code> directly). The bundled runner is auto-installed to <code>~/.openjarvis/claude_code_runner/</code> on first use via <code>npm install</code>.</p>
+</div>
+<p><strong>How it works:</strong></p>
+<ol>
+<li>On first call, copies the bundled <code>claude_code_runner/</code> to <code>~/.openjarvis/claude_code_runner/</code> and runs <code>npm install --production</code> if <code>node_modules</code> is missing.</li>
+<li>Builds a JSON request payload (prompt, <abbr title="Application Programming Interface">API</abbr> key, workspace, allowed tools, system prompt, session ID) and sends it to <code>stdin</code> of a <code>node dist/index.js</code> subprocess.</li>
+<li>The Node.js runner calls the Claude Agent <abbr title="Software Development Kit">SDK</abbr> and writes sentinel-delimited JSON to <code>stdout</code>.</li>
+<li>The Python side parses the output between <code>---OPENJARVIS_OUTPUT_START---</code> and <code>---OPENJARVIS_OUTPUT_END---</code> markers, extracting content, tool results, and metadata.</li>
+<li>Returns an <code>AgentResult</code> with <code>turns=1</code>.</li>
+</ol>
+<p><strong>Constructor parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>engine</code></td>
+<td><code>InferenceEngine</code></td>
+<td>--</td>
+<td>Accepted for interface conformance; not used</td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td><code>str</code></td>
+<td>--</td>
+<td>Accepted for interface conformance; not used</td>
+</tr>
+<tr>
+<td><code>bus</code></td>
+<td><code>EventBus</code></td>
+<td><code>None</code></td>
+<td>Event bus for telemetry</td>
+</tr>
+<tr>
+<td><code>temperature</code></td>
+<td><code>float</code></td>
+<td><code>0.7</code></td>
+<td>Accepted for interface conformance; not used</td>
+</tr>
+<tr>
+<td><code>max_tokens</code></td>
+<td><code>int</code></td>
+<td><code>1024</code></td>
+<td>Accepted for interface conformance; not used</td>
+</tr>
+<tr>
+<td><code>api_key</code></td>
+<td><code>str</code></td>
+<td><code>$ANTHROPIC_API_KEY</code></td>
+<td>Anthropic <abbr title="Application Programming Interface">API</abbr> key</td>
+</tr>
+<tr>
+<td><code>workspace</code></td>
+<td><code>str</code></td>
+<td><code>os.getcwd()</code></td>
+<td>Working directory for the Claude agent</td>
+</tr>
+<tr>
+<td><code>session_id</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Optional session ID for conversation continuity</td>
+</tr>
+<tr>
+<td><code>allowed_tools</code></td>
+<td><code>list[str]</code></td>
+<td><code>None</code> (all)</td>
+<td>Claude Code tool names to allow</td>
+</tr>
+<tr>
+<td><code>system_prompt</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Additional system prompt for the agent</td>
+</tr>
+<tr>
+<td><code>timeout</code></td>
+<td><code>int</code></td>
+<td><code>300</code></td>
+<td>Subprocess timeout in seconds</td>
+</tr>
+</tbody>
+</table>
+<p><strong>When to use:</strong> For software engineering tasks where the Claude Agent <abbr title="Software Development Kit">SDK</abbr>'s built-in tools (code editing, bash execution, file operations) provide capabilities beyond what OpenJarvis tool-calling agents support.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis.agents.claude_code</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClaudeCodeAgent</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">agent</span> <span class="o">=</span> <span class="n">ClaudeCodeAgent</span><span class="p">(</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">engine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>          <span class="c1"># not used</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>             <span class="c1"># not used</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">workspace</span><span class="o">=</span><span class="s2">&quot;/path/to/project&quot;</span><span class="p">,</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">allowed_tools</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Read&quot;</span><span class="p">,</span> <span class="s2">&quot;Write&quot;</span><span class="p">,</span> <span class="s2">&quot;Bash&quot;</span><span class="p">],</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">)</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="n">result</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;Add type hints to all functions in utils.py&quot;</span><span class="p">)</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</span></code></pre></div>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Via CLI</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>jarvis<span class="w"> </span>ask<span class="w"> </span>--agent<span class="w"> </span>claude_code<span class="w"> </span><span class="s2">&quot;Refactor the tests to use pytest fixtures&quot;</span>
+</span></code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">accepts_tools = False</p>
+<p><code>ClaudeCodeAgent</code> does not accept OpenJarvis tools via <code>--tools</code>. Tool access for the Claude agent is configured separately via the <code>allowed_tools</code> constructor parameter, which passes tool names understood by the Claude Agent <abbr title="Software Development Kit">SDK</abbr> itself.</p>
+</div>
+<hr />
+<h2 id="sandboxedagent">SandboxedAgent<a class="headerlink" href="#sandboxedagent" title="Permanent link">&para;</a></h2>
+<p><code>SandboxedAgent</code> is a transparent wrapper that runs <strong>any</strong> <code>BaseAgent</code> inside a Docker (or Podman) container. It follows the same wrapper pattern as <code>GuardrailsEngine</code> -- the inner agent's configuration is serialized and sent to the container's stdin, and the result is read back from stdout.</p>
+<p>See also the <a href="#containerrunner"><code>ContainerRunner</code></a> reference below, which manages the container lifecycle.</p>
+<p><strong>How it works:</strong></p>
+<ol>
+<li>Builds a JSON payload with the prompt, wrapped agent ID, and model.</li>
+<li>Invokes <code>ContainerRunner.run()</code>, which starts a container with <code>--network none</code> and <code>--rm</code>, writes the payload to stdin, and waits for JSON output on stdout.</li>
+<li>Mount paths are validated against a configurable allowlist before the container is started.</li>
+<li>Parses the sentinel-delimited output and returns an <code>AgentResult</code>.</li>
+</ol>
+<p><strong>Constructor parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent</code></td>
+<td><code>BaseAgent</code></td>
+<td>--</td>
+<td>The wrapped agent to execute inside the container</td>
+</tr>
+<tr>
+<td><code>runner</code></td>
+<td><code>ContainerRunner</code></td>
+<td>--</td>
+<td>Container runner managing Docker lifecycle</td>
+</tr>
+<tr>
+<td><code>engine</code></td>
+<td><code>InferenceEngine</code></td>
+<td><code>None</code></td>
+<td>Override engine (defaults to wrapped agent's)</td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Override model (defaults to wrapped agent's)</td>
+</tr>
+<tr>
+<td><code>workspace</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Working directory inside the container</td>
+</tr>
+<tr>
+<td><code>mounts</code></td>
+<td><code>list[str]</code></td>
+<td><code>[]</code></td>
+<td>Host paths to bind-mount (read-only)</td>
+</tr>
+<tr>
+<td><code>secrets</code></td>
+<td><code>dict[str, str]</code></td>
+<td><code>{}</code></td>
+<td>Injected into payload (not environment variables)</td>
+</tr>
+<tr>
+<td><code>bus</code></td>
+<td><code>EventBus</code></td>
+<td><code>None</code></td>
+<td>Event bus for telemetry</td>
+</tr>
+</tbody>
+</table>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis.sandbox</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContainerRunner</span><span class="p">,</span> <span class="n">SandboxedAgent</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis.agents.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleAgent</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">runner</span> <span class="o">=</span> <span class="n">ContainerRunner</span><span class="p">(</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;openjarvis-sandbox:latest&quot;</span><span class="p">,</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="n">mount_allowlist_path</span><span class="o">=</span><span class="s2">&quot;/etc/openjarvis/mount_allowlist.json&quot;</span><span class="p">,</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="p">)</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="n">inner</span> <span class="o">=</span> <span class="n">SimpleAgent</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;qwen3:8b&quot;</span><span class="p">)</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="n">agent</span> <span class="o">=</span> <span class="n">SandboxedAgent</span><span class="p">(</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    <span class="n">agent</span><span class="o">=</span><span class="n">inner</span><span class="p">,</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    <span class="n">runner</span><span class="o">=</span><span class="n">runner</span><span class="p">,</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    <span class="n">mounts</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;/home/user/data&quot;</span><span class="p">],</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="p">)</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="n">result</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;Summarize the CSV files in /home/user/data&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<hr />
+<h2 id="containerrunner">ContainerRunner<a class="headerlink" href="#containerrunner" title="Permanent link">&para;</a></h2>
+<p><code>ContainerRunner</code> manages the Docker (or Podman) container lifecycle for sandboxed execution. It is used directly by <code>SandboxedAgent</code> but can also be used standalone.</p>
+<p><strong>Constructor parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>image</code></td>
+<td><code>str</code></td>
+<td><code>"openjarvis-sandbox:latest"</code></td>
+<td>Docker image to run</td>
+</tr>
+<tr>
+<td><code>timeout</code></td>
+<td><code>int</code></td>
+<td><code>300</code></td>
+<td>Max container execution time in seconds</td>
+</tr>
+<tr>
+<td><code>mount_allowlist_path</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Path to JSON mount-allowlist file</td>
+</tr>
+<tr>
+<td><code>max_concurrent</code></td>
+<td><code>int</code></td>
+<td><code>5</code></td>
+<td>Max concurrent containers (informational)</td>
+</tr>
+<tr>
+<td><code>runtime</code></td>
+<td><code>str</code></td>
+<td><code>"docker"</code></td>
+<td>Container runtime binary (<code>docker</code> or <code>podman</code>)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Mount allowlist format:</strong></p>
+<div class="language-json highlight"><span class="filename">mount_allowlist.json</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">&quot;roots&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="p">{</span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/user/projects&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;read_only&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">},</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="p">{</span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/data/shared&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;read_only&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">}</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="p">],</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="nt">&quot;blocked_patterns&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;.ssh&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;.env&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;*.pem&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;*.key&quot;</span><span class="p">]</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>If <code>mount_allowlist_path</code> is not set, no root restriction is applied. Blocked patterns always include <code>.ssh</code>, <code>.env</code>, <code>*.pem</code>, <code>*.key</code>, credential files, and cloud config directories by default.</p>
+<div class="admonition warning">
+<p class="admonition-title">Docker required</p>
+<p><code>ContainerRunner</code> raises <code>RuntimeError</code> if the configured runtime (<code>docker</code> or <code>podman</code>) is not found on <code>PATH</code>.</p>
+</div>
+<hr />
+<h2 id="agent-registration">Agent Registration<a class="headerlink" href="#agent-registration" title="Permanent link">&para;</a></h2>
+<p>Agents are registered via the <code>@AgentRegistry.register()</code> decorator. This makes them discoverable by name at runtime:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis.core.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentRegistry</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="c1"># Check if an agent is registered</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">AgentRegistry</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s2">&quot;orchestrator&quot;</span><span class="p">)</span>  <span class="c1"># True</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="c1"># Get the agent class</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="n">agent_cls</span> <span class="o">=</span> <span class="n">AgentRegistry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;orchestrator&quot;</span><span class="p">)</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="c1"># List all registered agent keys</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="n">AgentRegistry</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="c1"># [&quot;simple&quot;, &quot;orchestrator&quot;, &quot;native_react&quot;, &quot;react&quot;, &quot;native_openhands&quot;,</span>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="c1">#  &quot;rlm&quot;, &quot;openhands&quot;, &quot;claude_code&quot;]</span>
+</span></code></pre></div>
+<hr />
+<h2 id="using-agents_1">Using Agents<a class="headerlink" href="#using-agents_1" title="Permanent link">&para;</a></h2>
+<h3 id="via-cli_1">Via <abbr title="Command-Line Interface">CLI</abbr><a class="headerlink" href="#via-cli_1" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Simple agent</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>jarvis<span class="w"> </span>ask<span class="w"> </span>--agent<span class="w"> </span>simple<span class="w"> </span><span class="s2">&quot;What is the capital of France?&quot;</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Orchestrator with tools</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>jarvis<span class="w"> </span>ask<span class="w"> </span>--agent<span class="w"> </span>orchestrator<span class="w"> </span>--tools<span class="w"> </span>calculator,think<span class="w"> </span><span class="s2">&quot;What is sqrt(256)?&quot;</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1"># NativeReActAgent</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>jarvis<span class="w"> </span>ask<span class="w"> </span>--agent<span class="w"> </span>native_react<span class="w"> </span>--tools<span class="w"> </span>calculator<span class="w"> </span><span class="s2">&quot;What is 2+2?&quot;</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="c1"># ReAct alias (same as native_react)</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>jarvis<span class="w"> </span>ask<span class="w"> </span>--agent<span class="w"> </span>react<span class="w"> </span>--tools<span class="w"> </span>calculator,think<span class="w"> </span><span class="s2">&quot;Solve step by step: 15% of 340&quot;</span>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="c1"># NativeOpenHandsAgent</span>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>jarvis<span class="w"> </span>ask<span class="w"> </span>--agent<span class="w"> </span>native_openhands<span class="w"> </span>--tools<span class="w"> </span>calculator,web_search<span class="w"> </span><span class="s2">&quot;Summarize example.com&quot;</span>
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="c1"># RLMAgent</span>
+</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>jarvis<span class="w"> </span>ask<span class="w"> </span>--agent<span class="w"> </span>rlm<span class="w"> </span><span class="s2">&quot;Summarize this long document&quot;</span>
+</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>
+</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="c1"># OpenHands SDK agent</span>
+</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>jarvis<span class="w"> </span>ask<span class="w"> </span>--agent<span class="w"> </span>openhands<span class="w"> </span><span class="s2">&quot;Fix the bug in test_utils.py&quot;</span>
+</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a>
+</span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="c1"># OpenClaw agent</span>
+</span><span id="__span-8-23"><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a>jarvis<span class="w"> </span>ask<span class="w"> </span>--agent<span class="w"> </span>openclaw<span class="w"> </span><span class="s2">&quot;Tell me a story&quot;</span>
+</span><span id="__span-8-24"><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a>
+</span><span id="__span-8-25"><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="c1"># Claude Code agent (requires Node.js 22+ and ANTHROPIC_API_KEY)</span>
+</span><span id="__span-8-26"><a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a>jarvis<span class="w"> </span>ask<span class="w"> </span>--agent<span class="w"> </span>claude_code<span class="w"> </span><span class="s2">&quot;Add docstrings to all functions in utils.py&quot;</span>
+</span></code></pre></div>
+<h3 id="via-python-sdk_1">Via Python <abbr title="Software Development Kit">SDK</abbr><a class="headerlink" href="#via-python-sdk_1" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jarvis</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">j</span> <span class="o">=</span> <span class="n">Jarvis</span><span class="p">()</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="c1"># Simple agent</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="n">response</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,</span> <span class="n">agent</span><span class="o">=</span><span class="s2">&quot;simple&quot;</span><span class="p">)</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="c1"># Orchestrator with tools</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="n">response</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>    <span class="s2">&quot;Calculate 15</span><span class="si">% o</span><span class="s2">f 340&quot;</span><span class="p">,</span>
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>    <span class="n">agent</span><span class="o">=</span><span class="s2">&quot;orchestrator&quot;</span><span class="p">,</span>
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>    <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;calculator&quot;</span><span class="p">],</span>
+</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="p">)</span>
+</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>
+</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="c1"># NativeReActAgent with tools</span>
+</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="n">response</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span>
+</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>    <span class="s2">&quot;What is sqrt(256)?&quot;</span><span class="p">,</span>
+</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>    <span class="n">agent</span><span class="o">=</span><span class="s2">&quot;native_react&quot;</span><span class="p">,</span>
+</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>    <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;calculator&quot;</span><span class="p">,</span> <span class="s2">&quot;think&quot;</span><span class="p">],</span>
+</span><span id="__span-9-20"><a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="p">)</span>
+</span><span id="__span-9-21"><a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>
+</span><span id="__span-9-22"><a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="c1"># Full result with tool details</span>
+</span><span id="__span-9-23"><a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="n">result</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">ask_full</span><span class="p">(</span>
+</span><span id="__span-9-24"><a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a>    <span class="s2">&quot;What is the square root of 144?&quot;</span><span class="p">,</span>
+</span><span id="__span-9-25"><a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a>    <span class="n">agent</span><span class="o">=</span><span class="s2">&quot;orchestrator&quot;</span><span class="p">,</span>
+</span><span id="__span-9-26"><a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a>    <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;calculator&quot;</span><span class="p">,</span> <span class="s2">&quot;think&quot;</span><span class="p">],</span>
+</span><span id="__span-9-27"><a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a><span class="p">)</span>
+</span><span id="__span-9-28"><a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">])</span>
+</span><span id="__span-9-29"><a id="__codelineno-9-29" name="__codelineno-9-29" href="#__codelineno-9-29"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;turns&quot;</span><span class="p">])</span>
+</span><span id="__span-9-30"><a id="__codelineno-9-30" name="__codelineno-9-30" href="#__codelineno-9-30"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;tool_results&quot;</span><span class="p">])</span>
+</span><span id="__span-9-31"><a id="__codelineno-9-31" name="__codelineno-9-31" href="#__codelineno-9-31"></a>
+</span><span id="__span-9-32"><a id="__codelineno-9-32" name="__codelineno-9-32" href="#__codelineno-9-32"></a><span class="n">j</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span></code></pre></div>
+<hr />
+<h2 id="event-bus-integration">Event Bus Integration<a class="headerlink" href="#event-bus-integration" title="Permanent link">&para;</a></h2>
+<p>All agents publish events on the <code>EventBus</code> when a bus is provided:</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AGENT_TURN_START</code></td>
+<td>At the beginning of a run (via <code>_emit_turn_start</code>)</td>
+</tr>
+<tr>
+<td><code>AGENT_TURN_END</code></td>
+<td>At the end of a run (via <code>_emit_turn_end</code>)</td>
+</tr>
+<tr>
+<td><code>TOOL_CALL_START</code></td>
+<td>Before each tool execution (<code>ToolUsingAgent</code> subclasses)</td>
+</tr>
+<tr>
+<td><code>TOOL_CALL_END</code></td>
+<td>After each tool execution (<code>ToolUsingAgent</code> subclasses)</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition info">
+<p class="admonition-title">Inference events</p>
+<p><code>INFERENCE_START</code> / <code>INFERENCE_END</code> events are published by the <code>InstrumentedEngine</code> wrapper, not by agents directly. This keeps telemetry opt-in and transparent to agent code.</p>
+</div>
+<p>These events enable the telemetry and trace systems to record detailed interaction data automatically.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../python-sdk/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Python SDK">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Python SDK
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../memory/" class="md-footer__link md-footer__link--next" aria-label="Next: Memory">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Memory
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 OpenJarvis Contributors
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/HazyResearch/OpenJarvis" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.indexes", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

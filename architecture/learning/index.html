@@ -1,0 +1,3771 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Programming abstractions for on-device AI">
+      
+      
+        <meta name="author" content="OpenJarvis Contributors">
+      
+      
+        <link rel="canonical" href="https://hazyresearch.stanford.edu/OpenJarvis/architecture/learning/">
+      
+      
+        <link rel="prev" href="../memory/">
+      
+      
+        <link rel="next" href="../query-flow/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
+    
+    
+      
+        <title>Learning & Traces - OpenJarvis</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#learning-traces" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="OpenJarvis" class="md-header__button md-logo" aria-label="OpenJarvis" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            OpenJarvis
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Learning & Traces
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/HazyResearch/OpenJarvis" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    HazyResearch/OpenJarvis
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/installation/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../user-guide/cli/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../api/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../deployment/docker/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../development/contributing/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="OpenJarvis" class="md-nav__button md-logo" aria-label="OpenJarvis" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    OpenJarvis
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/HazyResearch/OpenJarvis" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    HazyResearch/OpenJarvis
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/python-sdk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python SDK
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/memory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Memory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scheduler
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/telemetry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Telemetry & Traces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/evaluations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/channels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../intelligence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Intelligence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inference Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentic Logic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../memory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Memory & Storage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learning & Traces
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learning & Traces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#learningpolicy-abc-taxonomy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LearningPolicy ABC Taxonomy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#routerpolicy-abc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RouterPolicy ABC
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RouterPolicy ABC">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#routingcontext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RoutingContext
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#routerpolicyregistry-learningregistry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RouterPolicyRegistry &amp; LearningRegistry
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RouterPolicyRegistry &amp; LearningRegistry">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-ensure_registered-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The ensure_registered() Pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#heuristicrouter-heuristic-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HeuristicRouter (Heuristic Policy)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="HeuristicRouter (Heuristic Policy)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#routing-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Routing Rules
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build_routing_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build_routing_context()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#registration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Registration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tracedrivenpolicy-learned-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TraceDrivenPolicy (Learned Policy)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TraceDrivenPolicy (Learned Policy)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-classification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query Classification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model Selection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#batch-updates-via-update_from_traces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Batch Updates via update_from_traces()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#online-updates-via-observe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Online Updates via observe()
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sftrouterpolicy-trace-driven-router" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SFTRouterPolicy (Trace-Driven Router)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#agentadvisorpolicy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AgentAdvisorPolicy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#iclupdaterpolicy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ICLUpdaterPolicy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#grporouterpolicy-stub" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GRPORouterPolicy (Stub)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rewardfunction-abc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RewardFunction ABC
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RewardFunction ABC">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#heuristicrewardfunction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HeuristicRewardFunction
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trace-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trace System
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Trace System">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tracestore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TraceStore
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tracecollector" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TraceCollector
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#traceanalyzer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TraceAnalyzer
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-learning-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Learning Loop
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Learning Loop">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-by-step-cycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step-by-step cycle:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trace-data-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trace Data Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../query-flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query Flow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../design-principles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design Principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../channels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../api/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/sdk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SDK (Jarvis)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/memory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Memory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/intelligence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Intelligence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/traces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Traces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/telemetry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Telemetry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/bench/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/channels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/systemd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    systemd (Linux)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/launchd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    launchd (macOS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/api-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/extending/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Extending OpenJarvis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#learningpolicy-abc-taxonomy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LearningPolicy ABC Taxonomy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#routerpolicy-abc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RouterPolicy ABC
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RouterPolicy ABC">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#routingcontext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RoutingContext
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#routerpolicyregistry-learningregistry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RouterPolicyRegistry &amp; LearningRegistry
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RouterPolicyRegistry &amp; LearningRegistry">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-ensure_registered-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The ensure_registered() Pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#heuristicrouter-heuristic-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HeuristicRouter (Heuristic Policy)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="HeuristicRouter (Heuristic Policy)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#routing-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Routing Rules
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build_routing_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build_routing_context()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#registration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Registration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tracedrivenpolicy-learned-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TraceDrivenPolicy (Learned Policy)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TraceDrivenPolicy (Learned Policy)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-classification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query Classification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model Selection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#batch-updates-via-update_from_traces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Batch Updates via update_from_traces()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#online-updates-via-observe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Online Updates via observe()
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sftrouterpolicy-trace-driven-router" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SFTRouterPolicy (Trace-Driven Router)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#agentadvisorpolicy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AgentAdvisorPolicy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#iclupdaterpolicy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ICLUpdaterPolicy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#grporouterpolicy-stub" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GRPORouterPolicy (Stub)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rewardfunction-abc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RewardFunction ABC
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RewardFunction ABC">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#heuristicrewardfunction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HeuristicRewardFunction
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trace-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trace System
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Trace System">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tracestore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TraceStore
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tracecollector" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TraceCollector
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#traceanalyzer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TraceAnalyzer
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-learning-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Learning Loop
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Learning Loop">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-by-step-cycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step-by-step cycle:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trace-data-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trace Data Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="learning-traces">Learning &amp; Traces<a class="headerlink" href="#learning-traces" title="Permanent link">&para;</a></h1>
+<p>The Learning system is a <strong>cross-cutting concern</strong> that connects all four pillars through trace-driven feedback. It determines which model handles each query (router policies), records the full interaction as a trace, analyzes outcomes, and updates policies based on what worked.</p>
+<hr />
+<h2 id="learningpolicy-abc-taxonomy">LearningPolicy <abbr title="Abstract Base Class">ABC</abbr> Taxonomy<a class="headerlink" href="#learningpolicy-abc-taxonomy" title="Permanent link">&para;</a></h2>
+<p>The learning system defines a hierarchy of learning policy ABCs. The base <code>LearningPolicy</code> <abbr title="Abstract Base Class">ABC</abbr> is specialized into two sub-ABCs corresponding to the two learnable concerns:</p>
+<table>
+<thead>
+<tr>
+<th><abbr title="Abstract Base Class">ABC</abbr></th>
+<th>Concern</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>IntelligenceLearningPolicy</code></td>
+<td>Model routing</td>
+<td>Determines which model handles a query (replaces the legacy <code>RouterPolicy</code>)</td>
+</tr>
+<tr>
+<td><code>AgentLearningPolicy</code></td>
+<td>Agent behavior</td>
+<td>Advises on agent strategy (e.g., ICL examples, tool selection, turn limits)</td>
+</tr>
+</tbody>
+</table>
+<p>All learning policies are registered in the <code>LearningRegistry</code> (in <code>core/registry.py</code>).</p>
+<h2 id="routerpolicy-abc">RouterPolicy <abbr title="Abstract Base Class">ABC</abbr><a class="headerlink" href="#routerpolicy-abc" title="Permanent link">&para;</a></h2>
+<p>The <code>RouterPolicy</code> <abbr title="Abstract Base Class">ABC</abbr> and the <code>QueryAnalyzer</code> <abbr title="Abstract Base Class">ABC</abbr> are defined in <code>learning/_stubs.py</code>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># learning/_stubs.py</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">RouterPolicy</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="nd">@abstractmethod</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">select_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">RoutingContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the model registry key best suited for *context*.&quot;&quot;&quot;</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="k">class</span><span class="w"> </span><span class="nc">QueryAnalyzer</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="nd">@abstractmethod</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">analyze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RoutingContext</span><span class="p">:</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Analyze a raw query string and return a RoutingContext.&quot;&quot;&quot;</span>
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Backward compatibility</p>
+<p>The canonical locations are now <code>openjarvis.learning._stubs</code> (for <code>RouterPolicy</code> and <code>QueryAnalyzer</code>) and <code>openjarvis.core.types</code> (for <code>RoutingContext</code>). The old <code>openjarvis.intelligence._stubs</code> import path still works via a backward-compatibility shim, but new code should import from <code>openjarvis.learning._stubs</code>.</p>
+</div>
+<h3 id="routingcontext">RoutingContext<a class="headerlink" href="#routingcontext" title="Permanent link">&para;</a></h3>
+<p>The <code>RoutingContext</code> dataclass is now defined in <code>core/types.py</code> (moved from <code>learning/_stubs.py</code>):</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># core/types.py</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nd">@dataclass</span><span class="p">(</span><span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">RoutingContext</span><span class="p">:</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>            <span class="c1"># The raw query text</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">query_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>      <span class="c1"># Character count</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">has_code</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>     <span class="c1"># Whether code patterns were detected</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">has_math</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>     <span class="c1"># Whether math keywords were detected</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;en&quot;</span>       <span class="c1"># Detected language</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">urgency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>      <span class="c1"># 0 = low priority, 1 = real-time</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+</span></code></pre></div>
+<hr />
+<h2 id="routerpolicyregistry-learningregistry">RouterPolicyRegistry &amp; LearningRegistry<a class="headerlink" href="#routerpolicyregistry-learningregistry" title="Permanent link">&para;</a></h2>
+<p>Router policies are registered in the <code>RouterPolicyRegistry</code> and selected at runtime. Additionally, the <code>LearningRegistry</code> (in <code>core/registry.py</code>) manages the broader set of learning policies across the taxonomy.</p>
+<p>The system ships with these router policies:</p>
+<table>
+<thead>
+<tr>
+<th>Registry Key</th>
+<th>Policy Class</th>
+<th>Status</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>heuristic</code></td>
+<td><code>HeuristicRouter</code></td>
+<td>Active</td>
+<td>Rule-based routing with 6 priority rules</td>
+</tr>
+<tr>
+<td><code>learned</code></td>
+<td><code>TraceDrivenPolicy</code></td>
+<td>Active</td>
+<td>Learns from trace outcomes</td>
+</tr>
+<tr>
+<td><code>grpo</code></td>
+<td><code>GRPORouterPolicy</code></td>
+<td>Stub</td>
+<td>Placeholder for future RL training</td>
+</tr>
+<tr>
+<td><code>sft</code></td>
+<td><code>SFTRouterPolicy</code></td>
+<td>Active</td>
+<td>Trace-driven routing policy (learns query→model mapping); <code>SFTPolicy</code> is a backward-compat alias</td>
+</tr>
+</tbody>
+</table>
+<p>And these additional learning policies (registered in <code>LearningRegistry</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Registry Key</th>
+<th>Policy Class</th>
+<th>Taxonomy</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent_advisor</code></td>
+<td><code>AgentAdvisorPolicy</code></td>
+<td><code>AgentLearningPolicy</code></td>
+<td>Advises on agent strategy based on trace patterns</td>
+</tr>
+<tr>
+<td><code>icl_updater</code></td>
+<td><code>ICLUpdaterPolicy</code></td>
+<td><code>AgentLearningPolicy</code></td>
+<td>In-context learning updater — discovers ICL examples and multi-tool skills from traces</td>
+</tr>
+</tbody>
+</table>
+<p>Users select a policy via <code>config.toml</code> or the <code>--router</code> <abbr title="Command-Line Interface">CLI</abbr> flag:</p>
+<div class="language-toml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">[learning.routing]</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">policy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;heuristic&quot;</span>
+</span></code></pre></div>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>jarvis<span class="w"> </span>ask<span class="w"> </span>--router<span class="w"> </span>learned<span class="w"> </span><span class="s2">&quot;What is the capital of France?&quot;</span>
+</span></code></pre></div>
+<h3 id="the-ensure_registered-pattern">The <code>ensure_registered()</code> Pattern<a class="headerlink" href="#the-ensure_registered-pattern" title="Permanent link">&para;</a></h3>
+<p>Learning modules use a lazy registration pattern to survive registry clearing in tests:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">ensure_registered</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Register TraceDrivenPolicy if not already present.&quot;&quot;&quot;</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">RouterPolicyRegistry</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s2">&quot;learned&quot;</span><span class="p">):</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>        <span class="n">RouterPolicyRegistry</span><span class="o">.</span><span class="n">register_value</span><span class="p">(</span><span class="s2">&quot;learned&quot;</span><span class="p">,</span> <span class="n">TraceDrivenPolicy</span><span class="p">)</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">ensure_registered</span><span class="p">()</span>  <span class="c1"># Called at module import time</span>
+</span></code></pre></div>
+<p>This ensures that policies are available even after <code>RouterPolicyRegistry.clear()</code> is called in test teardown, because re-importing the module re-registers them.</p>
+<hr />
+<h2 id="heuristicrouter-heuristic-policy">HeuristicRouter (Heuristic Policy)<a class="headerlink" href="#heuristicrouter-heuristic-policy" title="Permanent link">&para;</a></h2>
+<p>The <code>HeuristicRouter</code> is the default routing policy. It is defined in <code>learning/router.py</code> and applies six static priority rules to select the best model based on query characteristics.</p>
+<h3 id="routing-rules">Routing Rules<a class="headerlink" href="#routing-rules" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Rule</th>
+<th>Condition</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Code detection</td>
+<td>Query contains code patterns (backticks, <code>def</code>, <code>class</code>, <code>import</code>, <code>function</code>, <code>=&gt;</code>, etc.)</td>
+<td>Prefer model with "code" or "coder" in name; fall back to largest model</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Math detection</td>
+<td>Query contains math keywords (<code>solve</code>, <code>integral</code>, <code>equation</code>, <code>calculate</code>, <code>compute</code>, etc.)</td>
+<td>Select the largest available model</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Short query</td>
+<td>Query length &lt; 50 characters, no code/math</td>
+<td>Select the smallest available model (faster response)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Long/complex query</td>
+<td>Query length &gt; 500 characters OR contains reasoning keywords (<code>explain</code>, <code>analyze</code>, <code>compare</code>, <code>step-by-step</code>, etc.)</td>
+<td>Select the largest available model</td>
+</tr>
+<tr>
+<td>5</td>
+<td>High urgency</td>
+<td><code>urgency &gt; 0.8</code></td>
+<td>Override to smallest model (fastest response)</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Default fallback</td>
+<td>None of the above match</td>
+<td>Use <code>default_model</code>, then <code>fallback_model</code>, then first available</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Priority 5 overrides all others</p>
+<p>The urgency check (rule 5) is evaluated <strong>first</strong> in the code — if urgency exceeds 0.8, the router immediately returns the smallest model regardless of query content.</p>
+</div>
+<h3 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis.learning.router</span><span class="w"> </span><span class="kn">import</span> <span class="n">HeuristicRouter</span><span class="p">,</span> <span class="n">build_routing_context</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">router</span> <span class="o">=</span> <span class="n">HeuristicRouter</span><span class="p">(</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">available_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;qwen3:8b&quot;</span><span class="p">,</span> <span class="s2">&quot;llama3.2:3b&quot;</span><span class="p">,</span> <span class="s2">&quot;deepseek-coder-v2:16b&quot;</span><span class="p">],</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">default_model</span><span class="o">=</span><span class="s2">&quot;qwen3:8b&quot;</span><span class="p">,</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="n">fallback_model</span><span class="o">=</span><span class="s2">&quot;llama3.2:3b&quot;</span><span class="p">,</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">)</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">build_routing_context</span><span class="p">(</span><span class="s2">&quot;Write a Python function to sort a list&quot;</span><span class="p">)</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="n">model</span> <span class="o">=</span> <span class="n">router</span><span class="o">.</span><span class="n">select_model</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span>  <span class="c1"># Returns &quot;deepseek-coder-v2:16b&quot; (has &quot;coder&quot;)</span>
+</span></code></pre></div>
+<h3 id="build_routing_context">build_routing_context()<a class="headerlink" href="#build_routing_context" title="Permanent link">&para;</a></h3>
+<p>The <code>build_routing_context()</code> function (in <code>learning/router.py</code>) analyzes a raw query string and produces a <code>RoutingContext</code> dataclass:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis.learning.router</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_routing_context</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">build_routing_context</span><span class="p">(</span><span class="s2">&quot;Solve the integral of x^2 dx&quot;</span><span class="p">)</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># ctx.has_math = True, ctx.has_code = False, ctx.query_length = 32</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">build_routing_context</span><span class="p">(</span><span class="s2">&quot;```python</span><span class="se">\n</span><span class="s2">def hello():</span><span class="se">\n</span><span class="s2">    pass</span><span class="se">\n</span><span class="s2">```&quot;</span><span class="p">)</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># ctx.has_code = True, ctx.has_math = False</span>
+</span></code></pre></div>
+<p><strong>Code detection</strong> uses regex patterns matching:</p>
+<ul>
+<li>Backtick code blocks (<code>```</code> or <code>`inline`</code>)</li>
+<li>Language keywords (<code>def</code>, <code>class</code>, <code>import</code>, <code>function</code>, <code>const</code>, <code>var</code>, <code>let</code>)</li>
+<li>Syntax patterns (<code>if (</code>, <code>-&gt;</code>, <code>=&gt;</code>, <code>{ }</code>, <code>for x in</code>, <code>#include</code>, <code>System.out</code>)</li>
+</ul>
+<p><strong>Math detection</strong> uses regex patterns matching:</p>
+<ul>
+<li>Mathematical terms (<code>solve</code>, <code>integral</code>, <code>equation</code>, <code>proof</code>, <code>derivative</code>, <code>matrix</code>)</li>
+<li>Computational keywords (<code>calculate</code>, <code>compute</code>, <code>sigma</code>, <code>sum</code>, <code>limit</code>, <code>probability</code>)</li>
+</ul>
+<h3 id="registration">Registration<a class="headerlink" href="#registration" title="Permanent link">&para;</a></h3>
+<p>The <code>heuristic_policy.py</code> module wires <code>HeuristicRouter</code> into the <code>RouterPolicyRegistry</code>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># learning/heuristic_policy.py</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">ensure_registered</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">RouterPolicyRegistry</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s2">&quot;heuristic&quot;</span><span class="p">):</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>        <span class="n">RouterPolicyRegistry</span><span class="o">.</span><span class="n">register_value</span><span class="p">(</span><span class="s2">&quot;heuristic&quot;</span><span class="p">,</span> <span class="n">HeuristicRouter</span><span class="p">)</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="n">ensure_registered</span><span class="p">()</span>
+</span></code></pre></div>
+<hr />
+<h2 id="tracedrivenpolicy-learned-policy">TraceDrivenPolicy (Learned Policy)<a class="headerlink" href="#tracedrivenpolicy-learned-policy" title="Permanent link">&para;</a></h2>
+<p>The <code>TraceDrivenPolicy</code> learns from historical traces to determine which model performs best for different types of queries. Unlike the heuristic router's static rules, this policy adapts based on actual outcomes.</p>
+<h3 id="query-classification">Query Classification<a class="headerlink" href="#query-classification" title="Permanent link">&para;</a></h3>
+<p>Queries are classified into broad categories for grouping:</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Condition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>code</code></td>
+<td>Contains code patterns (backticks, <code>def</code>, <code>class</code>, <code>import</code>, <code>function</code>)</td>
+</tr>
+<tr>
+<td><code>math</code></td>
+<td>Contains math keywords (<code>solve</code>, <code>integral</code>, <code>equation</code>, <code>calculate</code>, <code>compute</code>)</td>
+</tr>
+<tr>
+<td><code>short</code></td>
+<td>Query length &lt; 50 characters</td>
+</tr>
+<tr>
+<td><code>long</code></td>
+<td>Query length &gt; 500 characters</td>
+</tr>
+<tr>
+<td><code>general</code></td>
+<td>None of the above</td>
+</tr>
+</tbody>
+</table>
+<h3 id="model-selection">Model Selection<a class="headerlink" href="#model-selection" title="Permanent link">&para;</a></h3>
+<p>When <code>select_model()</code> is called:</p>
+<ol>
+<li>Classify the query into a category</li>
+<li>If the policy map has an entry for this category <strong>and</strong> the confidence (sample count) exceeds <code>min_samples</code> (default: 5), use the learned model</li>
+<li>Otherwise, fall back to: <code>default_model</code> -&gt; <code>fallback_model</code> -&gt; first available model</li>
+</ol>
+<h3 id="batch-updates-via-update_from_traces">Batch Updates via <code>update_from_traces()</code><a class="headerlink" href="#batch-updates-via-update_from_traces" title="Permanent link">&para;</a></h3>
+<p>The primary update mechanism reads all traces from a <code>TraceAnalyzer</code> and recomputes the policy map:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis.learning.trace_policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">TraceDrivenPolicy</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis.traces.analyzer</span><span class="w"> </span><span class="kn">import</span> <span class="n">TraceAnalyzer</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis.traces.store</span><span class="w"> </span><span class="kn">import</span> <span class="n">TraceStore</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">store</span> <span class="o">=</span> <span class="n">TraceStore</span><span class="p">(</span><span class="s2">&quot;traces.db&quot;</span><span class="p">)</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="n">analyzer</span> <span class="o">=</span> <span class="n">TraceAnalyzer</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="n">policy</span> <span class="o">=</span> <span class="n">TraceDrivenPolicy</span><span class="p">(</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>    <span class="n">analyzer</span><span class="o">=</span><span class="n">analyzer</span><span class="p">,</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>    <span class="n">available_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;qwen3:8b&quot;</span><span class="p">,</span> <span class="s2">&quot;llama3.2:3b&quot;</span><span class="p">,</span> <span class="s2">&quot;deepseek-coder-v2:16b&quot;</span><span class="p">],</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>    <span class="n">default_model</span><span class="o">=</span><span class="s2">&quot;qwen3:8b&quot;</span><span class="p">,</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="p">)</span>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="c1"># Recompute routing decisions from trace history</span>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="n">result</span> <span class="o">=</span> <span class="n">policy</span><span class="o">.</span><span class="n">update_from_traces</span><span class="p">()</span>
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="c1"># {&quot;updated&quot;: True, &quot;query_classes&quot;: 3, &quot;total_traces&quot;: 150, &quot;changes&quot;: {...}}</span>
+</span></code></pre></div>
+<p>The update algorithm:</p>
+<ol>
+<li>Fetches all traces (optionally filtered by time range)</li>
+<li>Groups traces by query classification</li>
+<li>For each query class, scores each model using a <strong>composite score</strong>:<ul>
+<li>60% success rate (fraction of traces with <code>outcome="success"</code>)</li>
+<li>40% average feedback score (user quality ratings)</li>
+</ul>
+</li>
+<li>Selects the model with the highest composite score for each query class</li>
+<li>Returns a summary of changes</li>
+</ol>
+<h3 id="online-updates-via-observe">Online Updates via <code>observe()</code><a class="headerlink" href="#online-updates-via-observe" title="Permanent link">&para;</a></h3>
+<p>For real-time policy updates after every interaction:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">policy</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="n">query</span><span class="o">=</span><span class="s2">&quot;Write a Python function&quot;</span><span class="p">,</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;deepseek-coder-v2:16b&quot;</span><span class="p">,</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="n">outcome</span><span class="o">=</span><span class="s2">&quot;success&quot;</span><span class="p">,</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="n">feedback</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="p">)</span>
+</span></code></pre></div>
+<p>The online update uses a conservative strategy: it only switches the preferred model for a query class when the new model shows clearly better outcomes (<code>feedback &gt; 0.7</code>) and the existing policy has fewer than <code>min_samples</code> observations.</p>
+<hr />
+<h2 id="sftrouterpolicy-trace-driven-router">SFTRouterPolicy (Trace-Driven Router)<a class="headerlink" href="#sftrouterpolicy-trace-driven-router" title="Permanent link">&para;</a></h2>
+<p>The <code>SFTRouterPolicy</code> (in <code>learning/sft_policy.py</code>) is an <code>IntelligenceLearningPolicy</code> that learns routing decisions from historical traces. It analyzes trace outcomes, groups by query class (code, math, short, long, general), and builds a <code>query_class → model</code> mapping from the highest-scoring model per class. A backward-compatible alias <code>SFTPolicy = SFTRouterPolicy</code> is provided for code that used the old name.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis.learning.sft_policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">SFTRouterPolicy</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="c1"># or via the backward-compat alias:</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis.learning.sft_policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">SFTPolicy</span>
+</span></code></pre></div>
+<hr />
+<h2 id="agentadvisorpolicy">AgentAdvisorPolicy<a class="headerlink" href="#agentadvisorpolicy" title="Permanent link">&para;</a></h2>
+<p>The <code>AgentAdvisorPolicy</code> (in <code>learning/agent_advisor.py</code>) is an <code>AgentLearningPolicy</code> that advises on agent strategy -- for example, recommending tool sets, turn limits, or agent type -- based on patterns observed in historical traces.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis.learning.agent_advisor</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentAdvisorPolicy</span>
+</span></code></pre></div>
+<hr />
+<h2 id="iclupdaterpolicy">ICLUpdaterPolicy<a class="headerlink" href="#iclupdaterpolicy" title="Permanent link">&para;</a></h2>
+<p>The <code>ICLUpdaterPolicy</code> (in <code>learning/icl_updater.py</code>) is an <code>AgentLearningPolicy</code> that uses in-context learning to discover reusable examples and multi-tool skill sequences from traces. It analyzes successful tool-call patterns to recommend ICL examples and skill libraries that update agent behavior.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis.learning.icl_updater</span><span class="w"> </span><span class="kn">import</span> <span class="n">ICLUpdaterPolicy</span>
+</span></code></pre></div>
+<hr />
+<h2 id="grporouterpolicy-stub">GRPORouterPolicy (Stub)<a class="headerlink" href="#grporouterpolicy-stub" title="Permanent link">&para;</a></h2>
+<p>The <code>GRPORouterPolicy</code> is a placeholder for future reinforcement learning-based routing. Currently, calling <code>select_model()</code> raises <code>NotImplementedError</code>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">GRPORouterPolicy</span><span class="p">(</span><span class="n">RouterPolicy</span><span class="p">):</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">select_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">RoutingContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>            <span class="s2">&quot;GRPORouterPolicy is not yet implemented. &quot;</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>            <span class="s2">&quot;GRPO training will be available in a future phase.&quot;</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>        <span class="p">)</span>
+</span></code></pre></div>
+<hr />
+<h2 id="rewardfunction-abc">RewardFunction <abbr title="Abstract Base Class">ABC</abbr><a class="headerlink" href="#rewardfunction-abc" title="Permanent link">&para;</a></h2>
+<p>The <code>RewardFunction</code> <abbr title="Abstract Base Class">ABC</abbr> defines how to score completed inferences for use in training:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">RewardFunction</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    <span class="nd">@abstractmethod</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>        <span class="n">context</span><span class="p">:</span> <span class="n">RoutingContext</span><span class="p">,</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>        <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>        <span class="n">response</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a reward in [0, 1].&quot;&quot;&quot;</span>
+</span></code></pre></div>
+<h3 id="heuristicrewardfunction">HeuristicRewardFunction<a class="headerlink" href="#heuristicrewardfunction" title="Permanent link">&para;</a></h3>
+<p>The built-in reward function computes a weighted combination of three factors:</p>
+<table>
+<thead>
+<tr>
+<th>Factor</th>
+<th>Weight (default)</th>
+<th>Normalization</th>
+<th>Score Range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Latency</strong></td>
+<td>0.4</td>
+<td><code>1 - (latency / max_latency)</code></td>
+<td>0 = 30s+, 1 = instant</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>0.3</td>
+<td><code>1 - (cost / max_cost)</code></td>
+<td>0 = $0.01+, 1 = free</td>
+</tr>
+<tr>
+<td><strong>Efficiency</strong></td>
+<td>0.3</td>
+<td><code>completion_tokens / total_tokens</code></td>
+<td>0 = all prompt, 1 = all completion</td>
+</tr>
+</tbody>
+</table>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis.learning.heuristic_reward</span><span class="w"> </span><span class="kn">import</span> <span class="n">HeuristicRewardFunction</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="n">reward_fn</span> <span class="o">=</span> <span class="n">HeuristicRewardFunction</span><span class="p">(</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    <span class="n">weight_latency</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="n">weight_cost</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>    <span class="n">weight_efficiency</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="n">max_latency</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>   <span class="c1"># seconds</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>    <span class="n">max_cost</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>       <span class="c1"># USD</span>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="p">)</span>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>
+</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="n">reward</span> <span class="o">=</span> <span class="n">reward_fn</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span>
+</span><span id="__span-15-12"><a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>    <span class="n">context</span><span class="o">=</span><span class="n">routing_context</span><span class="p">,</span>
+</span><span id="__span-15-13"><a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>    <span class="n">model_key</span><span class="o">=</span><span class="s2">&quot;qwen3:8b&quot;</span><span class="p">,</span>
+</span><span id="__span-15-14"><a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>    <span class="n">response</span><span class="o">=</span><span class="s2">&quot;The answer is 42.&quot;</span><span class="p">,</span>
+</span><span id="__span-15-15"><a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a>    <span class="n">latency_seconds</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span>
+</span><span id="__span-15-16"><a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>    <span class="n">cost_usd</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+</span><span id="__span-15-17"><a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a>    <span class="n">prompt_tokens</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+</span><span id="__span-15-18"><a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a>    <span class="n">completion_tokens</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+</span><span id="__span-15-19"><a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a><span class="p">)</span>
+</span><span id="__span-15-20"><a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a><span class="c1"># Returns a float in [0, 1]</span>
+</span></code></pre></div>
+<hr />
+<h2 id="trace-system">Trace System<a class="headerlink" href="#trace-system" title="Permanent link">&para;</a></h2>
+<p>The trace system records the full sequence of steps in every agent interaction, providing the raw data that the learning system uses to improve.</p>
+<h3 id="tracestore">TraceStore<a class="headerlink" href="#tracestore" title="Permanent link">&para;</a></h3>
+<p><code>TraceStore</code> is an append-only SQLite store for interaction traces:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis.traces.store</span><span class="w"> </span><span class="kn">import</span> <span class="n">TraceStore</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">store</span> <span class="o">=</span> <span class="n">TraceStore</span><span class="p">(</span><span class="s2">&quot;~/.openjarvis/traces.db&quot;</span><span class="p">)</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">store</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>                          <span class="c1"># Persist a complete trace</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">trace</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;abc123&quot;</span><span class="p">)</span>                <span class="c1"># Retrieve by trace ID</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="n">traces</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">list_traces</span><span class="p">(</span>                <span class="c1"># Query with filters</span>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>    <span class="n">agent</span><span class="o">=</span><span class="s2">&quot;orchestrator&quot;</span><span class="p">,</span>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;qwen3:8b&quot;</span><span class="p">,</span>
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>    <span class="n">outcome</span><span class="o">=</span><span class="s2">&quot;success&quot;</span><span class="p">,</span>
+</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>    <span class="n">since</span><span class="o">=</span><span class="mf">1700000000.0</span><span class="p">,</span>
+</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>    <span class="n">limit</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+</span><span id="__span-16-12"><a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="p">)</span>
+</span><span id="__span-16-13"><a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="n">count</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>                      <span class="c1"># Total trace count</span>
+</span></code></pre></div>
+<p><strong>Database schema:</strong></p>
+<ul>
+<li><code>traces</code> table -- one row per interaction (trace_id, query, agent, model, engine, result, outcome, feedback, timing, tokens, metadata)</li>
+<li><code>trace_steps</code> table -- one row per step within a trace (step_type, timestamp, duration, input, output, metadata)</li>
+</ul>
+<p><strong>EventBus integration:</strong> The store can subscribe to <code>TRACE_COMPLETE</code> events for automatic persistence:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">store</span><span class="o">.</span><span class="n">subscribe_to_bus</span><span class="p">(</span><span class="n">bus</span><span class="p">)</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="c1"># Any TRACE_COMPLETE event will now auto-save the trace</span>
+</span></code></pre></div>
+<h3 id="tracecollector">TraceCollector<a class="headerlink" href="#tracecollector" title="Permanent link">&para;</a></h3>
+<p><code>TraceCollector</code> wraps any <code>BaseAgent</code> and automatically records a <code>Trace</code> for every <code>run()</code> call:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis.traces.collector</span><span class="w"> </span><span class="kn">import</span> <span class="n">TraceCollector</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="n">agent</span> <span class="o">=</span> <span class="n">OrchestratorAgent</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="n">tools</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">)</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="n">collector</span> <span class="o">=</span> <span class="n">TraceCollector</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">trace_store</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">)</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="n">result</span> <span class="o">=</span> <span class="n">collector</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;What is 2+2?&quot;</span><span class="p">)</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="c1"># Trace is automatically saved to trace_store</span>
+</span></code></pre></div>
+<p>How it works:</p>
+<ol>
+<li>Subscribes to EventBus events before running the agent:<ul>
+<li><code>INFERENCE_START</code> / <code>INFERENCE_END</code> -- creates <code>GENERATE</code> steps</li>
+<li><code>TOOL_CALL_START</code> / <code>TOOL_CALL_END</code> -- creates <code>TOOL_CALL</code> steps</li>
+<li><code>MEMORY_RETRIEVE</code> -- creates <code>RETRIEVE</code> steps</li>
+</ul>
+</li>
+<li>Runs the wrapped agent's <code>run()</code> method</li>
+<li>Unsubscribes from events</li>
+<li>Adds a final <code>RESPOND</code> step</li>
+<li>Builds a <code>Trace</code> object with all collected steps</li>
+<li>Saves to the <code>TraceStore</code> and publishes <code>TRACE_COMPLETE</code></li>
+</ol>
+<h3 id="traceanalyzer">TraceAnalyzer<a class="headerlink" href="#traceanalyzer" title="Permanent link">&para;</a></h3>
+<p><code>TraceAnalyzer</code> provides a read-only query layer over stored traces, computing aggregated statistics:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openjarvis.traces.analyzer</span><span class="w"> </span><span class="kn">import</span> <span class="n">TraceAnalyzer</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="n">analyzer</span> <span class="o">=</span> <span class="n">TraceAnalyzer</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="c1"># Overall summary</span>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="n">summary</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="c1"># TraceSummary(total_traces=150, avg_latency=2.3, success_rate=0.85, ...)</span>
+</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>
+</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="c1"># Stats grouped by (model, agent) routing decisions</span>
+</span><span id="__span-19-10"><a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="n">route_stats</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">per_route_stats</span><span class="p">()</span>
+</span><span id="__span-19-11"><a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="c1"># [RouteStats(model=&quot;qwen3:8b&quot;, agent=&quot;orchestrator&quot;, count=45, avg_latency=1.8, ...), ...]</span>
+</span><span id="__span-19-12"><a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a>
+</span><span id="__span-19-13"><a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="c1"># Stats grouped by tool</span>
+</span><span id="__span-19-14"><a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="n">tool_stats</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">per_tool_stats</span><span class="p">()</span>
+</span><span id="__span-19-15"><a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a><span class="c1"># [ToolStats(tool_name=&quot;calculator&quot;, call_count=23, avg_latency=0.01, success_rate=1.0), ...]</span>
+</span><span id="__span-19-16"><a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a>
+</span><span id="__span-19-17"><a id="__codelineno-19-17" name="__codelineno-19-17" href="#__codelineno-19-17"></a><span class="c1"># Find traces matching query characteristics</span>
+</span><span id="__span-19-18"><a id="__codelineno-19-18" name="__codelineno-19-18" href="#__codelineno-19-18"></a><span class="n">code_traces</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">traces_for_query_type</span><span class="p">(</span><span class="n">has_code</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-19-19"><a id="__codelineno-19-19" name="__codelineno-19-19" href="#__codelineno-19-19"></a>
+</span><span id="__span-19-20"><a id="__codelineno-19-20" name="__codelineno-19-20" href="#__codelineno-19-20"></a><span class="c1"># Export traces as plain dicts (for JSON serialization)</span>
+</span><span id="__span-19-21"><a id="__codelineno-19-21" name="__codelineno-19-21" href="#__codelineno-19-21"></a><span class="n">exported</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">export_traces</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</span></code></pre></div>
+<p><strong>Computed statistics:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Dataclass</th>
+<th>Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TraceSummary</code></td>
+<td>total_traces, total_steps, avg_steps_per_trace, avg_latency, avg_tokens, success_rate, step_type_distribution</td>
+</tr>
+<tr>
+<td><code>RouteStats</code></td>
+<td>model, agent, count, avg_latency, avg_tokens, success_rate, avg_feedback</td>
+</tr>
+<tr>
+<td><code>ToolStats</code></td>
+<td>tool_name, call_count, avg_latency, success_rate</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="the-learning-loop">The Learning Loop<a class="headerlink" href="#the-learning-loop" title="Permanent link">&para;</a></h2>
+<p>The trace-driven learning loop connects all the pieces:</p>
+<pre class="mermaid"><code>graph TB
+    subgraph "Runtime"
+        Q["User Query"] --&gt; AGT["Agent executes"]
+        AGT --&gt; ENG["Engine generates"]
+        ENG --&gt; RESP["Response returned"]
+    end
+
+    subgraph "Recording"
+        AGT -.-&gt;|"events"| COL["TraceCollector"]
+        ENG -.-&gt;|"events"| COL
+        COL --&gt;|"save"| STO["TraceStore&lt;br/&gt;(SQLite)"]
+    end
+
+    subgraph "Analysis"
+        STO --&gt;|"read"| ANA["TraceAnalyzer"]
+        ANA --&gt;|"summary(),&lt;br/&gt;per_route_stats()"| STATS["Aggregated&lt;br/&gt;Statistics"]
+    end
+
+    subgraph "Learning"
+        STATS --&gt;|"update_from_traces()"| POL["TraceDrivenPolicy"]
+        POL --&gt;|"select_model()"| Q
+    end
+
+    style Q fill:#e1f5fe
+    style RESP fill:#e8f5e9
+    style POL fill:#fff3e0</code></pre>
+<h3 id="step-by-step-cycle">Step-by-step cycle:<a class="headerlink" href="#step-by-step-cycle" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Query arrives</strong> -- The system needs to select a model</li>
+<li><strong>Router policy selects model</strong> -- <code>TraceDrivenPolicy.select_model()</code> checks the learned policy map; falls back to heuristic if insufficient data</li>
+<li><strong>Agent executes</strong> -- The agent processes the query, calling tools and memory as needed</li>
+<li><strong>Events captured</strong> -- The <code>TraceCollector</code> captures all events (inference, tool calls, memory retrieval) during execution</li>
+<li><strong>Trace saved</strong> -- A complete <code>Trace</code> with all <code>TraceStep</code> objects is saved to <code>TraceStore</code></li>
+<li><strong>Analysis</strong> -- Periodically, <code>TraceAnalyzer</code> computes aggregate statistics from stored traces</li>
+<li><strong>Policy update</strong> -- <code>TraceDrivenPolicy.update_from_traces()</code> recomputes the <code>query_class -&gt; model</code> mapping based on success rates and feedback scores</li>
+<li><strong>Better routing</strong> -- The next query benefits from the updated routing decisions</li>
+</ol>
+<h3 id="trace-data-model">Trace Data Model<a class="headerlink" href="#trace-data-model" title="Permanent link">&para;</a></h3>
+<p>Each interaction produces a <code>Trace</code> containing multiple <code>TraceStep</code> objects:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>Trace
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>  trace_id: &quot;a1b2c3d4e5f6&quot;
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>  query: &quot;What is 2+2?&quot;
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>  agent: &quot;orchestrator&quot;
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>  model: &quot;qwen3:8b&quot;
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>  engine: &quot;ollama&quot;
+</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>  steps:
+</span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a>    [0] GENERATE  -- model inference, 0.8s, 150 tokens
+</span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a>    [1] TOOL_CALL -- calculator, 0.01s, success
+</span><span id="__span-20-10"><a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a>    [2] GENERATE  -- model inference, 0.5s, 80 tokens
+</span><span id="__span-20-11"><a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a>    [3] RESPOND   -- final answer
+</span><span id="__span-20-12"><a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a>  result: &quot;2+2 = 4&quot;
+</span><span id="__span-20-13"><a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a>  outcome: &quot;success&quot;
+</span><span id="__span-20-14"><a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a>  feedback: 1.0
+</span><span id="__span-20-15"><a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a>  total_latency_seconds: 1.31
+</span><span id="__span-20-16"><a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a>  total_tokens: 230
+</span></code></pre></div>
+<p><strong>Step types:</strong></p>
+<table>
+<thead>
+<tr>
+<th>StepType</th>
+<th>Description</th>
+<th>Created By</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ROUTE</code></td>
+<td>Model selection decision</td>
+<td>Router policy</td>
+</tr>
+<tr>
+<td><code>RETRIEVE</code></td>
+<td>Memory search</td>
+<td>Memory backend</td>
+</tr>
+<tr>
+<td><code>GENERATE</code></td>
+<td><abbr title="Large Language Model">LLM</abbr> inference call</td>
+<td>Engine</td>
+</tr>
+<tr>
+<td><code>TOOL_CALL</code></td>
+<td>Tool execution</td>
+<td>ToolExecutor</td>
+</tr>
+<tr>
+<td><code>RESPOND</code></td>
+<td>Final response</td>
+<td>TraceCollector</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../memory/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Memory &amp; Storage">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Memory & Storage
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../query-flow/" class="md-footer__link md-footer__link--next" aria-label="Next: Query Flow">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Query Flow
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 OpenJarvis Contributors
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/HazyResearch/OpenJarvis" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.indexes", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

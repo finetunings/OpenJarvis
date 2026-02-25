@@ -1,0 +1,5087 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Programming abstractions for on-device AI">
+      
+      
+        <meta name="author" content="OpenJarvis Contributors">
+      
+      
+        <link rel="canonical" href="https://hazyresearch.stanford.edu/OpenJarvis/api/evals/">
+      
+      
+        <link rel="prev" href="../bench/">
+      
+      
+        <link rel="next" href="../server/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
+    
+    
+      
+        <title>Evals - OpenJarvis</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#evaluation-framework" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="OpenJarvis" class="md-header__button md-logo" aria-label="OpenJarvis" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            OpenJarvis
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Evals
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/HazyResearch/OpenJarvis" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    HazyResearch/OpenJarvis
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/installation/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../user-guide/cli/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../deployment/docker/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../development/contributing/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="OpenJarvis" class="md-nav__button md-logo" aria-label="OpenJarvis" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    OpenJarvis
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/HazyResearch/OpenJarvis" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    HazyResearch/OpenJarvis
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/python-sdk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python SDK
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/memory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Memory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scheduler
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/telemetry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Telemetry & Traces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/evaluations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/channels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/intelligence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Intelligence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inference Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentic Logic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/memory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Memory & Storage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learning & Traces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/query-flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query Flow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/design-principles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design Principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/channels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sdk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SDK (Jarvis)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../memory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Memory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../intelligence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Intelligence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../traces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Traces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../telemetry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Telemetry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bench/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evals
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#core-types-evalscoretypes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Types (evals.core.types)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Types (evals.core.types)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#evalrecord" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvalRecord
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evalresult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvalResult
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#runconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RunConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#runsummary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RunSummary
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#suite-config-types-evalscoretypes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Suite Config Types (evals.core.types)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Suite Config Types (evals.core.types)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metaconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MetaConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#defaultsconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultsConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#judgeconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JudgeConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#executionconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ExecutionConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modelconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ModelConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#benchmarkconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BenchmarkConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evalsuiteconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvalSuiteConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config-module-evalscoreconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Config Module (evals.core.config)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Config Module (evals.core.config)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#evalconfigerror" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvalConfigError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#load_eval_config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        load_eval_config
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expand_suite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        expand_suite
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#abstract-base-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Abstract Base Classes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Abstract Base Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inferencebackend-evalscorebackend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        InferenceBackend (evals.core.backend)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datasetprovider-evalscoredataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DatasetProvider (evals.core.dataset)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scorer-evalscorescorer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scorer (evals.core.scorer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#llmjudgescorer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LLMJudgeScorer
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#evalrunner-evalscorerunner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvalRunner (evals.core.runner)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EvalRunner (evals.core.runner)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constructor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#backends" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backends
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Backends">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jarvisdirectbackend-evalsbackendsjarvis_direct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JarvisDirectBackend (evals.backends.jarvis_direct)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jarvisagentbackend-evalsbackendsjarvis_agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JarvisAgentBackend (evals.backends.jarvis_agent)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dataset-providers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dataset Providers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dataset Providers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#supergpqadataset-evalsdatasetssupergpqa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SuperGPQADataset (evals.datasets.supergpqa)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gaiadataset-evalsdatasetsgaia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GAIADataset (evals.datasets.gaia)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framesdataset-evalsdatasetsframes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FRAMESDataset (evals.datasets.frames)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wildchatdataset-evalsdatasetswildchat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WildChatDataset (evals.datasets.wildchat)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scorers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scorers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scorers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#supergpqascorer-evalsscorerssupergpqa_mcq" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SuperGPQAScorer (evals.scorers.supergpqa_mcq)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gaiascorer-evalsscorersgaia_exact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GAIAScorer (evals.scorers.gaia_exact)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framesscorer-evalsscorersframes_judge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FRAMESScorer (evals.scorers.frames_judge)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wildchatscorer-evalsscorerswildchat_judge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WildChatScorer (evals.scorers.wildchat_judge)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI Reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CLI Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#openjarvis-eval-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        openjarvis-eval run
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openjarvis-eval-run-all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        openjarvis-eval run-all
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openjarvis-eval-summarize" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        openjarvis-eval summarize
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openjarvis-eval-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        openjarvis-eval list
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#toml-suite-config-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TOML Suite Config Format
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../channels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/systemd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    systemd (Linux)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/launchd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    launchd (macOS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/api-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/extending/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Extending OpenJarvis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#core-types-evalscoretypes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Types (evals.core.types)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Types (evals.core.types)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#evalrecord" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvalRecord
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evalresult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvalResult
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#runconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RunConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#runsummary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RunSummary
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#suite-config-types-evalscoretypes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Suite Config Types (evals.core.types)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Suite Config Types (evals.core.types)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metaconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MetaConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#defaultsconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultsConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#judgeconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JudgeConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#executionconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ExecutionConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modelconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ModelConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#benchmarkconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BenchmarkConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evalsuiteconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvalSuiteConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config-module-evalscoreconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Config Module (evals.core.config)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Config Module (evals.core.config)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#evalconfigerror" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvalConfigError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#load_eval_config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        load_eval_config
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expand_suite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        expand_suite
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#abstract-base-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Abstract Base Classes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Abstract Base Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inferencebackend-evalscorebackend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        InferenceBackend (evals.core.backend)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datasetprovider-evalscoredataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DatasetProvider (evals.core.dataset)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scorer-evalscorescorer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scorer (evals.core.scorer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#llmjudgescorer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LLMJudgeScorer
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#evalrunner-evalscorerunner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvalRunner (evals.core.runner)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EvalRunner (evals.core.runner)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constructor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#backends" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backends
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Backends">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jarvisdirectbackend-evalsbackendsjarvis_direct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JarvisDirectBackend (evals.backends.jarvis_direct)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jarvisagentbackend-evalsbackendsjarvis_agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JarvisAgentBackend (evals.backends.jarvis_agent)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dataset-providers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dataset Providers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dataset Providers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#supergpqadataset-evalsdatasetssupergpqa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SuperGPQADataset (evals.datasets.supergpqa)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gaiadataset-evalsdatasetsgaia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GAIADataset (evals.datasets.gaia)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framesdataset-evalsdatasetsframes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FRAMESDataset (evals.datasets.frames)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wildchatdataset-evalsdatasetswildchat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WildChatDataset (evals.datasets.wildchat)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scorers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scorers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scorers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#supergpqascorer-evalsscorerssupergpqa_mcq" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SuperGPQAScorer (evals.scorers.supergpqa_mcq)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gaiascorer-evalsscorersgaia_exact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GAIAScorer (evals.scorers.gaia_exact)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framesscorer-evalsscorersframes_judge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FRAMESScorer (evals.scorers.frames_judge)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wildchatscorer-evalsscorerswildchat_judge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WildChatScorer (evals.scorers.wildchat_judge)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI Reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CLI Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#openjarvis-eval-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        openjarvis-eval run
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openjarvis-eval-run-all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        openjarvis-eval run-all
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openjarvis-eval-summarize" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        openjarvis-eval summarize
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openjarvis-eval-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        openjarvis-eval list
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#toml-suite-config-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TOML Suite Config Format
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="evaluation-framework">Evaluation Framework<a class="headerlink" href="#evaluation-framework" title="Permanent link">&para;</a></h1>
+<p>The <code>openjarvis-evals</code> package provides a structured harness for measuring model quality
+across research benchmarks. It is a separate package from the main <code>openjarvis</code> library,
+installed from the <code>evals/</code> directory, and exposes a <abbr title="Command-Line Interface">CLI</abbr> (<code>openjarvis-eval</code>) plus a
+Python <abbr title="Application Programming Interface">API</abbr> for programmatic use.</p>
+<p>The framework is organized around four ABCs — <code>InferenceBackend</code>, <code>DatasetProvider</code>,
+<code>Scorer</code>, and the concrete <code>EvalRunner</code> — wired together by <code>RunConfig</code>. A TOML-based
+suite configuration system expands a models-by-benchmarks matrix into individual
+<code>RunConfig</code> objects so an entire comparison table can be launched from a single file.</p>
+<div class="admonition note">
+<p class="admonition-title">Installation</p>
+<p>The evaluation framework is a separate package. Install it from the repository root:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>evals/
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># or</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
+</span></code></pre></div>
+<p>The package requires Python 3.10+, <code>openjarvis&gt;=1.0.0</code>, and <code>datasets&gt;=2.14</code>.</p>
+</div>
+<hr />
+<h2 id="core-types-evalscoretypes">Core Types (<code>evals.core.types</code>)<a class="headerlink" href="#core-types-evalscoretypes" title="Permanent link">&para;</a></h2>
+<p>These dataclasses are the shared vocabulary for every component in the framework.</p>
+<h3 id="evalrecord">EvalRecord<a class="headerlink" href="#evalrecord" title="Permanent link">&para;</a></h3>
+<p>A single evaluation sample loaded from a dataset.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvalRecord</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>record_id</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>Unique identifier for this sample</td>
+</tr>
+<tr>
+<td><code>problem</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>The prompt or question presented to the model</td>
+</tr>
+<tr>
+<td><code>reference</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>Ground-truth answer used for scoring</td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>Task category: <code>"chat"</code>, <code>"reasoning"</code>, <code>"rag"</code>, or <code>"agentic"</code></td>
+</tr>
+<tr>
+<td><code>subject</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Subject area or sub-topic within the benchmark</td>
+</tr>
+<tr>
+<td><code>metadata</code></td>
+<td><code>Dict[str, Any]</code></td>
+<td><code>{}</code></td>
+<td>Benchmark-specific extra fields (options, difficulty, file paths, etc.)</td>
+</tr>
+</tbody>
+</table>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">record</span> <span class="o">=</span> <span class="n">EvalRecord</span><span class="p">(</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">record_id</span><span class="o">=</span><span class="s2">&quot;supergpqa-0&quot;</span><span class="p">,</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">problem</span><span class="o">=</span><span class="s2">&quot;What is the capital of France?</span><span class="se">\n</span><span class="s2">Options:</span><span class="se">\n</span><span class="s2">A. Berlin</span><span class="se">\n</span><span class="s2">B. Paris</span><span class="se">\n</span><span class="s2">C. Madrid&quot;</span><span class="p">,</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">reference</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">category</span><span class="o">=</span><span class="s2">&quot;reasoning&quot;</span><span class="p">,</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">subject</span><span class="o">=</span><span class="s2">&quot;geography&quot;</span><span class="p">,</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;difficulty&quot;</span><span class="p">:</span> <span class="s2">&quot;easy&quot;</span><span class="p">,</span> <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Berlin&quot;</span><span class="p">,</span> <span class="s2">&quot;Paris&quot;</span><span class="p">,</span> <span class="s2">&quot;Madrid&quot;</span><span class="p">]},</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">)</span>
+</span></code></pre></div>
+<hr />
+<h3 id="evalresult">EvalResult<a class="headerlink" href="#evalresult" title="Permanent link">&para;</a></h3>
+<p>The result of running inference on a single <code>EvalRecord</code>.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvalResult</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>record_id</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>Matches the source <code>EvalRecord.record_id</code></td>
+</tr>
+<tr>
+<td><code>model_answer</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>Raw text output from the model</td>
+</tr>
+<tr>
+<td><code>is_correct</code></td>
+<td><code>Optional[bool]</code></td>
+<td><code>None</code></td>
+<td>Scoring verdict; <code>None</code> if scoring could not be determined</td>
+</tr>
+<tr>
+<td><code>score</code></td>
+<td><code>Optional[float]</code></td>
+<td><code>None</code></td>
+<td>Numeric score (typically <code>1.0</code> / <code>0.0</code>); may be <code>None</code> if <code>is_correct</code> is <code>None</code></td>
+</tr>
+<tr>
+<td><code>latency_seconds</code></td>
+<td><code>float</code></td>
+<td><code>0.0</code></td>
+<td>Wall-clock generation time</td>
+</tr>
+<tr>
+<td><code>prompt_tokens</code></td>
+<td><code>int</code></td>
+<td><code>0</code></td>
+<td>Input token count from usage metadata</td>
+</tr>
+<tr>
+<td><code>completion_tokens</code></td>
+<td><code>int</code></td>
+<td><code>0</code></td>
+<td>Output token count from usage metadata</td>
+</tr>
+<tr>
+<td><code>cost_usd</code></td>
+<td><code>float</code></td>
+<td><code>0.0</code></td>
+<td>Estimated inference cost in USD</td>
+</tr>
+<tr>
+<td><code>error</code></td>
+<td><code>Optional[str]</code></td>
+<td><code>None</code></td>
+<td>Exception message if inference or scoring failed</td>
+</tr>
+<tr>
+<td><code>scoring_metadata</code></td>
+<td><code>Dict[str, Any]</code></td>
+<td><code>{}</code></td>
+<td>Scorer-specific details (extracted letter, judge output, match type, etc.)</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">Distinguishing errors from wrong answers</p>
+<p>A non-<code>None</code> <code>error</code> field means inference itself failed. When <code>error</code> is <code>None</code> but
+<code>is_correct</code> is <code>None</code>, scoring was attempted but the scorer could not determine a
+verdict (for example, the judge returned an unparseable response).</p>
+</div>
+<hr />
+<h3 id="runconfig">RunConfig<a class="headerlink" href="#runconfig" title="Permanent link">&para;</a></h3>
+<p>Configuration for a single evaluation run (one model on one benchmark).</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunConfig</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>benchmark</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>Benchmark name: <code>"supergpqa"</code>, <code>"gaia"</code>, <code>"frames"</code>, or <code>"wildchat"</code></td>
+</tr>
+<tr>
+<td><code>backend</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>Backend identifier: <code>"jarvis-direct"</code> or <code>"jarvis-agent"</code></td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>Model identifier passed to the backend (e.g., <code>"qwen3:8b"</code>, <code>"gpt-4o"</code>)</td>
+</tr>
+<tr>
+<td><code>max_samples</code></td>
+<td><code>Optional[int]</code></td>
+<td><code>None</code></td>
+<td>Limit the dataset to this many records; <code>None</code> uses the full dataset</td>
+</tr>
+<tr>
+<td><code>max_workers</code></td>
+<td><code>int</code></td>
+<td><code>4</code></td>
+<td>Number of parallel threads for inference</td>
+</tr>
+<tr>
+<td><code>temperature</code></td>
+<td><code>float</code></td>
+<td><code>0.0</code></td>
+<td>Sampling temperature</td>
+</tr>
+<tr>
+<td><code>max_tokens</code></td>
+<td><code>int</code></td>
+<td><code>2048</code></td>
+<td>Maximum output tokens per sample</td>
+</tr>
+<tr>
+<td><code>judge_model</code></td>
+<td><code>str</code></td>
+<td><code>"gpt-4o"</code></td>
+<td>Model identifier used by the <abbr title="Large Language Model">LLM</abbr> judge scorer</td>
+</tr>
+<tr>
+<td><code>engine_key</code></td>
+<td><code>Optional[str]</code></td>
+<td><code>None</code></td>
+<td>Override the OpenJarvis engine (<code>"ollama"</code>, <code>"vllm"</code>, <code>"cloud"</code>, etc.)</td>
+</tr>
+<tr>
+<td><code>agent_name</code></td>
+<td><code>Optional[str]</code></td>
+<td><code>None</code></td>
+<td>Agent name for <code>jarvis-agent</code> backend; defaults to <code>"orchestrator"</code></td>
+</tr>
+<tr>
+<td><code>tools</code></td>
+<td><code>List[str]</code></td>
+<td><code>[]</code></td>
+<td>Tool names enabled for the agent (e.g., <code>["calculator", "file_read"]</code>)</td>
+</tr>
+<tr>
+<td><code>output_path</code></td>
+<td><code>Optional[str]</code></td>
+<td><code>None</code></td>
+<td>JSONL output file path; auto-generated from benchmark and model name if <code>None</code></td>
+</tr>
+<tr>
+<td><code>seed</code></td>
+<td><code>int</code></td>
+<td><code>42</code></td>
+<td>Random seed for dataset shuffling</td>
+</tr>
+<tr>
+<td><code>dataset_split</code></td>
+<td><code>Optional[str]</code></td>
+<td><code>None</code></td>
+<td>Override the dataset split (e.g., <code>"validation"</code>, <code>"test"</code>)</td>
+</tr>
+</tbody>
+</table>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">config</span> <span class="o">=</span> <span class="n">RunConfig</span><span class="p">(</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;supergpqa&quot;</span><span class="p">,</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;jarvis-direct&quot;</span><span class="p">,</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;qwen3:8b&quot;</span><span class="p">,</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">max_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="n">max_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="n">engine_key</span><span class="o">=</span><span class="s2">&quot;ollama&quot;</span><span class="p">,</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="n">output_path</span><span class="o">=</span><span class="s2">&quot;results/supergpqa_qwen3-8b.jsonl&quot;</span><span class="p">,</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="p">)</span>
+</span></code></pre></div>
+<hr />
+<h3 id="runsummary">RunSummary<a class="headerlink" href="#runsummary" title="Permanent link">&para;</a></h3>
+<p>Aggregate statistics produced by <code>EvalRunner.run()</code> at the end of a completed run.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunSummary</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>benchmark</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>Benchmark name</td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>Task category (inferred from records; falls back to <code>benchmark</code> name)</td>
+</tr>
+<tr>
+<td><code>backend</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>Backend used</td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>Model identifier</td>
+</tr>
+<tr>
+<td><code>total_samples</code></td>
+<td><code>int</code></td>
+<td>—</td>
+<td>Total records processed (including errors)</td>
+</tr>
+<tr>
+<td><code>scored_samples</code></td>
+<td><code>int</code></td>
+<td>—</td>
+<td>Records where <code>is_correct</code> is not <code>None</code></td>
+</tr>
+<tr>
+<td><code>correct</code></td>
+<td><code>int</code></td>
+<td>—</td>
+<td>Records where <code>is_correct</code> is <code>True</code></td>
+</tr>
+<tr>
+<td><code>accuracy</code></td>
+<td><code>float</code></td>
+<td>—</td>
+<td><code>correct / scored_samples</code>; rounded to 4 decimal places</td>
+</tr>
+<tr>
+<td><code>errors</code></td>
+<td><code>int</code></td>
+<td>—</td>
+<td>Records where inference or scoring raised an exception</td>
+</tr>
+<tr>
+<td><code>mean_latency_seconds</code></td>
+<td><code>float</code></td>
+<td>—</td>
+<td>Mean wall-clock latency across all successful inferences</td>
+</tr>
+<tr>
+<td><code>total_cost_usd</code></td>
+<td><code>float</code></td>
+<td>—</td>
+<td>Sum of <code>cost_usd</code> across all records</td>
+</tr>
+<tr>
+<td><code>per_subject</code></td>
+<td><code>Dict[str, Dict[str, float]]</code></td>
+<td><code>{}</code></td>
+<td>Per-subject breakdown: <code>{subject: {accuracy, total, scored, correct}}</code></td>
+</tr>
+<tr>
+<td><code>started_at</code></td>
+<td><code>float</code></td>
+<td><code>0.0</code></td>
+<td>Unix timestamp at run start</td>
+</tr>
+<tr>
+<td><code>ended_at</code></td>
+<td><code>float</code></td>
+<td><code>0.0</code></td>
+<td>Unix timestamp at run end</td>
+</tr>
+</tbody>
+</table>
+<p>The runner also writes a <code>.summary.json</code> file alongside the JSONL output, containing
+the serialized <code>RunSummary</code>.</p>
+<hr />
+<h2 id="suite-config-types-evalscoretypes">Suite Config Types (<code>evals.core.types</code>)<a class="headerlink" href="#suite-config-types-evalscoretypes" title="Permanent link">&para;</a></h2>
+<p>These dataclasses map directly to sections in a TOML eval suite config file.
+They are populated by <code>load_eval_config()</code> and consumed by <code>expand_suite()</code>.</p>
+<h3 id="metaconfig">MetaConfig<a class="headerlink" href="#metaconfig" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nd">@dataclass</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">MetaConfig</span><span class="p">:</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span></code></pre></div>
+<p>Maps to the <code>[meta]</code> TOML section. Both fields are optional and used only for
+display output in the <abbr title="Command-Line Interface">CLI</abbr>.</p>
+<hr />
+<h3 id="defaultsconfig">DefaultsConfig<a class="headerlink" href="#defaultsconfig" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nd">@dataclass</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">DefaultsConfig</span><span class="p">:</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="n">max_tokens</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2048</span>
+</span></code></pre></div>
+<p>Maps to <code>[defaults]</code>. These values are the lowest-priority settings in the merge
+precedence: <code>benchmark-level &gt; model-level &gt; [defaults] &gt; built-in defaults</code>.</p>
+<hr />
+<h3 id="judgeconfig">JudgeConfig<a class="headerlink" href="#judgeconfig" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nd">@dataclass</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">JudgeConfig</span><span class="p">:</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o&quot;</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="n">provider</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    <span class="n">max_tokens</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span>
+</span></code></pre></div>
+<p>Maps to <code>[judge]</code>. The judge model is used by <abbr title="Large Language Model">LLM</abbr>-as-judge scorers (GAIA, FRAMES,
+WildChat, SuperGPQA). The <code>provider</code> field is reserved for future routing; currently
+the judge backend is always constructed with <code>engine_key="cloud"</code>.</p>
+<hr />
+<h3 id="executionconfig">ExecutionConfig<a class="headerlink" href="#executionconfig" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nd">@dataclass</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">ExecutionConfig</span><span class="p">:</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="n">max_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="n">output_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;results/&quot;</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span>
+</span></code></pre></div>
+<p>Maps to <code>[run]</code>. <code>output_dir</code> is the base directory for all JSONL output files;
+individual filenames are auto-generated as <code>{benchmark}_{model-slug}.jsonl</code>.</p>
+<hr />
+<h3 id="modelconfig">ModelConfig<a class="headerlink" href="#modelconfig" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nd">@dataclass</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">ModelConfig</span><span class="p">:</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="n">engine</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="n">provider</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>    <span class="n">temperature</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>    <span class="n">max_tokens</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span></code></pre></div>
+<p>Maps to each <code>[[models]]</code> entry. <code>name</code> is required. <code>temperature</code> and <code>max_tokens</code>
+override <code>[defaults]</code> for every benchmark this model runs against, unless a
+benchmark-level override also exists.</p>
+<hr />
+<h3 id="benchmarkconfig">BenchmarkConfig<a class="headerlink" href="#benchmarkconfig" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nd">@dataclass</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">BenchmarkConfig</span><span class="p">:</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;jarvis-direct&quot;</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>    <span class="n">max_samples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>    <span class="n">split</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>    <span class="n">agent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>    <span class="n">tools</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>    <span class="n">judge_model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>    <span class="n">temperature</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>    <span class="n">max_tokens</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span></code></pre></div>
+<p>Maps to each <code>[[benchmarks]]</code> entry. <code>name</code> is required. <code>backend</code> must be one of
+<code>"jarvis-direct"</code> or <code>"jarvis-agent"</code>. <code>judge_model</code> overrides <code>[judge].model</code> for
+this benchmark only.</p>
+<hr />
+<h3 id="evalsuiteconfig">EvalSuiteConfig<a class="headerlink" href="#evalsuiteconfig" title="Permanent link">&para;</a></h3>
+<p>The top-level config object returned by <code>load_eval_config()</code>.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nd">@dataclass</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">EvalSuiteConfig</span><span class="p">:</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    <span class="n">meta</span><span class="p">:</span> <span class="n">MetaConfig</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    <span class="n">defaults</span><span class="p">:</span> <span class="n">DefaultsConfig</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    <span class="n">judge</span><span class="p">:</span> <span class="n">JudgeConfig</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>    <span class="n">run</span><span class="p">:</span> <span class="n">ExecutionConfig</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>    <span class="n">models</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ModelConfig</span><span class="p">]</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>    <span class="n">benchmarks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BenchmarkConfig</span><span class="p">]</span>
+</span></code></pre></div>
+<p><code>expand_suite(suite)</code> iterates over <code>models x benchmarks</code> to produce one <code>RunConfig</code>
+per pair, applying the merge precedence rules documented in <code>DefaultsConfig</code>.</p>
+<hr />
+<h2 id="config-module-evalscoreconfig">Config Module (<code>evals.core.config</code>)<a class="headerlink" href="#config-module-evalscoreconfig" title="Permanent link">&para;</a></h2>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.core.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_eval_config</span><span class="p">,</span> <span class="n">expand_suite</span><span class="p">,</span> <span class="n">EvalConfigError</span>
+</span></code></pre></div>
+<h3 id="evalconfigerror">EvalConfigError<a class="headerlink" href="#evalconfigerror" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">EvalConfigError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span> <span class="o">...</span>
+</span></code></pre></div>
+<p>Raised by <code>load_eval_config()</code> for structural validation failures: missing required
+fields, invalid backend names, or empty <code>[[models]]</code> / <code>[[benchmarks]]</code> lists.</p>
+<hr />
+<h3 id="load_eval_config">load_eval_config<a class="headerlink" href="#load_eval_config" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">load_eval_config</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvalSuiteConfig</span>
+</span></code></pre></div>
+<p>Load and validate an eval suite configuration from a TOML file.</p>
+<p>Uses the standard library <code>tomllib</code> on Python 3.11+ and the <code>tomli</code> backport on
+Python 3.10.</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>path</code></td>
+<td><code>str \| Path</code></td>
+<td>Path to the TOML config file</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>EvalSuiteConfig</code></p>
+<p><strong>Raises:</strong></p>
+<ul>
+<li><code>EvalConfigError</code> — structural validation failures (missing <code>name</code>, invalid backend, no models/benchmarks defined)</li>
+<li><code>FileNotFoundError</code> — if the config file does not exist</li>
+</ul>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.core.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_eval_config</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">suite</span> <span class="o">=</span> <span class="n">load_eval_config</span><span class="p">(</span><span class="s2">&quot;evals/configs/full-suite.toml&quot;</span><span class="p">)</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">suite</span><span class="o">.</span><span class="n">models</span><span class="p">)</span><span class="si">}</span><span class="s2"> models, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">suite</span><span class="o">.</span><span class="n">benchmarks</span><span class="p">)</span><span class="si">}</span><span class="s2"> benchmarks&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<hr />
+<h3 id="expand_suite">expand_suite<a class="headerlink" href="#expand_suite" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">expand_suite</span><span class="p">(</span><span class="n">suite</span><span class="p">:</span> <span class="n">EvalSuiteConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RunConfig</span><span class="p">]</span>
+</span></code></pre></div>
+<p>Expand an <code>EvalSuiteConfig</code> into a flat list of <code>RunConfig</code> objects, one per
+model-benchmark pair, with all override layers merged.</p>
+<p><strong>Merge precedence (highest wins):</strong></p>
+<ol>
+<li>Benchmark-level (<code>BenchmarkConfig.temperature</code>, <code>.max_tokens</code>, <code>.judge_model</code>)</li>
+<li>Model-level (<code>ModelConfig.temperature</code>, <code>.max_tokens</code>)</li>
+<li>Suite defaults (<code>DefaultsConfig</code>)</li>
+<li>Built-in dataclass defaults</li>
+</ol>
+<p>Output paths are auto-generated as <code>{output_dir}/{benchmark}_{model-slug}.jsonl</code>,
+where <code>model-slug</code> replaces <code>/</code> and <code>:</code> with <code>-</code>.</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>suite</code></td>
+<td><code>EvalSuiteConfig</code></td>
+<td>Parsed suite configuration</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>List[RunConfig]</code> — one entry per model-benchmark combination.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.core.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_eval_config</span><span class="p">,</span> <span class="n">expand_suite</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="n">suite</span> <span class="o">=</span> <span class="n">load_eval_config</span><span class="p">(</span><span class="s2">&quot;evals/configs/full-suite.toml&quot;</span><span class="p">)</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="n">run_configs</span> <span class="o">=</span> <span class="n">expand_suite</span><span class="p">(</span><span class="n">suite</span><span class="p">)</span>  <span class="c1"># e.g., 3 models x 4 benchmarks = 12 RunConfigs</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="n">run_configs</span><span class="p">:</span>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rc</span><span class="o">.</span><span class="n">benchmark</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">rc</span><span class="o">.</span><span class="n">model</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">rc</span><span class="o">.</span><span class="n">output_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<hr />
+<h2 id="abstract-base-classes">Abstract Base Classes<a class="headerlink" href="#abstract-base-classes" title="Permanent link">&para;</a></h2>
+<h3 id="inferencebackend-evalscorebackend">InferenceBackend (<code>evals.core.backend</code>)<a class="headerlink" href="#inferencebackend-evalscorebackend" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.core.backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">InferenceBackend</span>
+</span></code></pre></div>
+<p>Base class for all inference backends. A backend wraps an engine or agent and
+provides a uniform text-in / text-out interface for the runner.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">InferenceBackend</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="n">backend_id</span><span class="p">:</span> <span class="nb">str</span>
+</span></code></pre></div>
+<p><strong>Class attribute:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>backend_id</code></td>
+<td><code>str</code></td>
+<td>Registry identifier (e.g., <code>"jarvis-direct"</code>, <code>"jarvis-agent"</code>)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Abstract methods:</strong></p>
+<h4 id="generate">generate<a class="headerlink" href="#generate" title="Permanent link">&para;</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="nd">@abstractmethod</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>    <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>    <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a>    <span class="n">system</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a>    <span class="n">max_tokens</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2048</span><span class="p">,</span>
+</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</span></code></pre></div>
+<p>Generate a response and return the text content only.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>prompt</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>User message or formatted problem text</td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>Model identifier</td>
+</tr>
+<tr>
+<td><code>system</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Optional system prompt</td>
+</tr>
+<tr>
+<td><code>temperature</code></td>
+<td><code>float</code></td>
+<td><code>0.0</code></td>
+<td>Sampling temperature</td>
+</tr>
+<tr>
+<td><code>max_tokens</code></td>
+<td><code>int</code></td>
+<td><code>2048</code></td>
+<td>Maximum output tokens</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>str</code> — model text output.</p>
+<hr />
+<h4 id="generate_full">generate_full<a class="headerlink" href="#generate_full" title="Permanent link">&para;</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nd">@abstractmethod</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">generate_full</span><span class="p">(</span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>    <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>    <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a>    <span class="n">system</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+</span><span id="__span-23-8"><a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a>    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="__span-23-9"><a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a>    <span class="n">max_tokens</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2048</span><span class="p">,</span>
+</span><span id="__span-23-10"><a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</span></code></pre></div>
+<p>Generate a response and return full details including usage and cost metadata.</p>
+<p><strong>Returns:</strong> <code>dict</code> with keys:</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>content</code></td>
+<td><code>str</code></td>
+<td>Model text output</td>
+</tr>
+<tr>
+<td><code>usage</code></td>
+<td><code>dict</code></td>
+<td>Token usage (<code>prompt_tokens</code>, <code>completion_tokens</code>)</td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td><code>str</code></td>
+<td>Model identifier used</td>
+</tr>
+<tr>
+<td><code>latency_seconds</code></td>
+<td><code>float</code></td>
+<td>Wall-clock generation time</td>
+</tr>
+<tr>
+<td><code>cost_usd</code></td>
+<td><code>float</code></td>
+<td>Estimated inference cost</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h4 id="close">close<a class="headerlink" href="#close" title="Permanent link">&para;</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+<p>Release resources held by the backend (connections, engine handles, etc.).
+The default implementation is a no-op; subclasses override as needed.</p>
+<hr />
+<h3 id="datasetprovider-evalscoredataset">DatasetProvider (<code>evals.core.dataset</code>)<a class="headerlink" href="#datasetprovider-evalscoredataset" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetProvider</span>
+</span></code></pre></div>
+<p>Base class for all evaluation dataset providers. Datasets are loaded lazily via
+<code>load()</code> and then consumed record-by-record through <code>iter_records()</code>.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">DatasetProvider</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>    <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>    <span class="n">dataset_name</span><span class="p">:</span> <span class="nb">str</span>
+</span></code></pre></div>
+<p><strong>Class attributes:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dataset_id</code></td>
+<td><code>str</code></td>
+<td>Short identifier matching the <abbr title="Command-Line Interface">CLI</abbr> benchmark name</td>
+</tr>
+<tr>
+<td><code>dataset_name</code></td>
+<td><code>str</code></td>
+<td>Human-readable display name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Abstract methods:</strong></p>
+<h4 id="load">load<a class="headerlink" href="#load" title="Permanent link">&para;</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="nd">@abstractmethod</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span>
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>    <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>    <span class="n">max_samples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>    <span class="n">split</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-27-7"><a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a>    <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-27-8"><a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+<p>Load the dataset, optionally downloading from HuggingFace Hub. Must be called
+before <code>iter_records()</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>max_samples</code></td>
+<td><code>Optional[int]</code></td>
+<td><code>None</code></td>
+<td>Truncate to this many records after shuffling</td>
+</tr>
+<tr>
+<td><code>split</code></td>
+<td><code>Optional[str]</code></td>
+<td><code>None</code></td>
+<td>Dataset split override (e.g., <code>"test"</code>, <code>"validation"</code>)</td>
+</tr>
+<tr>
+<td><code>seed</code></td>
+<td><code>Optional[int]</code></td>
+<td><code>None</code></td>
+<td>Shuffle seed; <code>None</code> preserves original order</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h4 id="iter_records">iter_records<a class="headerlink" href="#iter_records" title="Permanent link">&para;</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="nd">@abstractmethod</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">iter_records</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">EvalRecord</span><span class="p">]</span>
+</span></code></pre></div>
+<p>Iterate over the loaded <code>EvalRecord</code> objects. Raises if called before <code>load()</code>.</p>
+<hr />
+<h4 id="size">size<a class="headerlink" href="#size" title="Permanent link">&para;</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="nd">@abstractmethod</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span>
+</span></code></pre></div>
+<p>Return the count of loaded records.</p>
+<hr />
+<h3 id="scorer-evalscorescorer">Scorer (<code>evals.core.scorer</code>)<a class="headerlink" href="#scorer-evalscorescorer" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.core.scorer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Scorer</span><span class="p">,</span> <span class="n">LLMJudgeScorer</span>
+</span></code></pre></div>
+<p>Base class for all scorers. A scorer compares a model's answer to the reference
+in an <code>EvalRecord</code> and returns a correctness verdict with optional metadata.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">Scorer</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>    <span class="n">scorer_id</span><span class="p">:</span> <span class="nb">str</span>
+</span></code></pre></div>
+<p><strong>Class attribute:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>scorer_id</code></td>
+<td><code>str</code></td>
+<td>Short identifier matching the benchmark name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Abstract method:</strong></p>
+<h4 id="score">score<a class="headerlink" href="#score" title="Permanent link">&para;</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="nd">@abstractmethod</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">score</span><span class="p">(</span>
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>    <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>    <span class="n">record</span><span class="p">:</span> <span class="n">EvalRecord</span><span class="p">,</span>
+</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a>    <span class="n">model_answer</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-32-6"><a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+</span></code></pre></div>
+<p>Score a model answer against the reference.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>record</code></td>
+<td><code>EvalRecord</code></td>
+<td>The source sample including <code>reference</code> and <code>metadata</code></td>
+</tr>
+<tr>
+<td><code>model_answer</code></td>
+<td><code>str</code></td>
+<td>Raw text output from the model</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>(is_correct, metadata)</code> tuple where:</p>
+<ul>
+<li><code>is_correct</code> is <code>True</code>, <code>False</code>, or <code>None</code> (if scoring could not be determined)</li>
+<li><code>metadata</code> is a <code>dict</code> of scorer-specific details stored in <code>EvalResult.scoring_metadata</code></li>
+</ul>
+<hr />
+<h3 id="llmjudgescorer">LLMJudgeScorer<a class="headerlink" href="#llmjudgescorer" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">LLMJudgeScorer</span><span class="p">(</span><span class="n">Scorer</span><span class="p">):</span>
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">judge_backend</span><span class="p">:</span> <span class="n">InferenceBackend</span><span class="p">,</span> <span class="n">judge_model</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+<p>Convenience base class for scorers that call an <abbr title="Large Language Model">LLM</abbr> to evaluate answers.
+Exposes <code>_ask_judge()</code> to subclasses.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">_ask_judge</span><span class="p">(</span>
+</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>    <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>    <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-34-5"><a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a>    <span class="n">system</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+</span><span id="__span-34-6"><a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a>    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="__span-34-7"><a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a>    <span class="n">max_tokens</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">,</span>
+</span><span id="__span-34-8"><a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</span></code></pre></div>
+<p>Send a prompt to the judge <abbr title="Large Language Model">LLM</abbr> and return the response text. Delegates to
+<code>judge_backend.generate()</code>.</p>
+<hr />
+<h2 id="evalrunner-evalscorerunner">EvalRunner (<code>evals.core.runner</code>)<a class="headerlink" href="#evalrunner-evalscorerunner" title="Permanent link">&para;</a></h2>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.core.runner</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvalRunner</span>
+</span></code></pre></div>
+<p>The <code>EvalRunner</code> wires together a <code>RunConfig</code>, <code>DatasetProvider</code>, <code>InferenceBackend</code>,
+and <code>Scorer</code> and executes the benchmark. Inference is parallelized using a
+<code>ThreadPoolExecutor</code>. Results are written to JSONL incrementally so progress is
+not lost if the run is interrupted.</p>
+<h3 id="constructor">Constructor<a class="headerlink" href="#constructor" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">EvalRunner</span><span class="p">:</span>
+</span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+</span><span id="__span-36-3"><a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-36-4"><a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a>        <span class="n">config</span><span class="p">:</span> <span class="n">RunConfig</span><span class="p">,</span>
+</span><span id="__span-36-5"><a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a>        <span class="n">dataset</span><span class="p">:</span> <span class="n">DatasetProvider</span><span class="p">,</span>
+</span><span id="__span-36-6"><a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a>        <span class="n">backend</span><span class="p">:</span> <span class="n">InferenceBackend</span><span class="p">,</span>
+</span><span id="__span-36-7"><a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a>        <span class="n">scorer</span><span class="p">:</span> <span class="n">Scorer</span><span class="p">,</span>
+</span><span id="__span-36-8"><a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>config</code></td>
+<td><code>RunConfig</code></td>
+<td>Run parameters (model, workers, output path, etc.)</td>
+</tr>
+<tr>
+<td><code>dataset</code></td>
+<td><code>DatasetProvider</code></td>
+<td>Dataset to evaluate against</td>
+</tr>
+<tr>
+<td><code>backend</code></td>
+<td><code>InferenceBackend</code></td>
+<td>Inference backend for generation</td>
+</tr>
+<tr>
+<td><code>scorer</code></td>
+<td><code>Scorer</code></td>
+<td>Scorer for comparing model answers to references</td>
+</tr>
+</tbody>
+</table>
+<h3 id="run">run<a class="headerlink" href="#run" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RunSummary</span>
+</span></code></pre></div>
+<p>Execute the full evaluation and return aggregate statistics.</p>
+<p>The method:</p>
+<ol>
+<li>Calls <code>dataset.load()</code> with the <code>RunConfig</code> sampling parameters</li>
+<li>Submits all records to a <code>ThreadPoolExecutor</code> with <code>config.max_workers</code> threads</li>
+<li>For each record, calls <code>backend.generate_full()</code> then <code>scorer.score()</code></li>
+<li>Writes each <code>EvalResult</code> to a JSONL file as it completes</li>
+<li>Writes a <code>.summary.json</code> alongside the JSONL at the end</li>
+</ol>
+<p><strong>Returns:</strong> <code>RunSummary</code></p>
+<div class="language-python highlight"><span class="filename">programmatic_eval.py</span><pre><span></span><code><span id="__span-38-1"><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunConfig</span>
+</span><span id="__span-38-2"><a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.core.runner</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvalRunner</span>
+</span><span id="__span-38-3"><a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.datasets.supergpqa</span><span class="w"> </span><span class="kn">import</span> <span class="n">SuperGPQADataset</span>
+</span><span id="__span-38-4"><a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.backends.jarvis_direct</span><span class="w"> </span><span class="kn">import</span> <span class="n">JarvisDirectBackend</span>
+</span><span id="__span-38-5"><a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.scorers.supergpqa_mcq</span><span class="w"> </span><span class="kn">import</span> <span class="n">SuperGPQAScorer</span>
+</span><span id="__span-38-6"><a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a>
+</span><span id="__span-38-7"><a id="__codelineno-38-7" name="__codelineno-38-7" href="#__codelineno-38-7"></a><span class="n">config</span> <span class="o">=</span> <span class="n">RunConfig</span><span class="p">(</span>
+</span><span id="__span-38-8"><a id="__codelineno-38-8" name="__codelineno-38-8" href="#__codelineno-38-8"></a>    <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;supergpqa&quot;</span><span class="p">,</span>
+</span><span id="__span-38-9"><a id="__codelineno-38-9" name="__codelineno-38-9" href="#__codelineno-38-9"></a>    <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;jarvis-direct&quot;</span><span class="p">,</span>
+</span><span id="__span-38-10"><a id="__codelineno-38-10" name="__codelineno-38-10" href="#__codelineno-38-10"></a>    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;qwen3:8b&quot;</span><span class="p">,</span>
+</span><span id="__span-38-11"><a id="__codelineno-38-11" name="__codelineno-38-11" href="#__codelineno-38-11"></a>    <span class="n">max_samples</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+</span><span id="__span-38-12"><a id="__codelineno-38-12" name="__codelineno-38-12" href="#__codelineno-38-12"></a>    <span class="n">engine_key</span><span class="o">=</span><span class="s2">&quot;ollama&quot;</span><span class="p">,</span>
+</span><span id="__span-38-13"><a id="__codelineno-38-13" name="__codelineno-38-13" href="#__codelineno-38-13"></a><span class="p">)</span>
+</span><span id="__span-38-14"><a id="__codelineno-38-14" name="__codelineno-38-14" href="#__codelineno-38-14"></a>
+</span><span id="__span-38-15"><a id="__codelineno-38-15" name="__codelineno-38-15" href="#__codelineno-38-15"></a><span class="n">dataset</span> <span class="o">=</span> <span class="n">SuperGPQADataset</span><span class="p">()</span>
+</span><span id="__span-38-16"><a id="__codelineno-38-16" name="__codelineno-38-16" href="#__codelineno-38-16"></a><span class="n">backend</span> <span class="o">=</span> <span class="n">JarvisDirectBackend</span><span class="p">(</span><span class="n">engine_key</span><span class="o">=</span><span class="s2">&quot;ollama&quot;</span><span class="p">)</span>
+</span><span id="__span-38-17"><a id="__codelineno-38-17" name="__codelineno-38-17" href="#__codelineno-38-17"></a><span class="n">judge_backend</span> <span class="o">=</span> <span class="n">JarvisDirectBackend</span><span class="p">(</span><span class="n">engine_key</span><span class="o">=</span><span class="s2">&quot;cloud&quot;</span><span class="p">)</span>
+</span><span id="__span-38-18"><a id="__codelineno-38-18" name="__codelineno-38-18" href="#__codelineno-38-18"></a><span class="n">scorer</span> <span class="o">=</span> <span class="n">SuperGPQAScorer</span><span class="p">(</span><span class="n">judge_backend</span><span class="o">=</span><span class="n">judge_backend</span><span class="p">,</span> <span class="n">judge_model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">)</span>
+</span><span id="__span-38-19"><a id="__codelineno-38-19" name="__codelineno-38-19" href="#__codelineno-38-19"></a>
+</span><span id="__span-38-20"><a id="__codelineno-38-20" name="__codelineno-38-20" href="#__codelineno-38-20"></a><span class="n">runner</span> <span class="o">=</span> <span class="n">EvalRunner</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">scorer</span><span class="p">)</span>
+</span><span id="__span-38-21"><a id="__codelineno-38-21" name="__codelineno-38-21" href="#__codelineno-38-21"></a><span class="n">summary</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</span><span id="__span-38-22"><a id="__codelineno-38-22" name="__codelineno-38-22" href="#__codelineno-38-22"></a>
+</span><span id="__span-38-23"><a id="__codelineno-38-23" name="__codelineno-38-23" href="#__codelineno-38-23"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Accuracy: </span><span class="si">{</span><span class="n">summary</span><span class="o">.</span><span class="n">accuracy</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">summary</span><span class="o">.</span><span class="n">correct</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">summary</span><span class="o">.</span><span class="n">scored_samples</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+</span><span id="__span-38-24"><a id="__codelineno-38-24" name="__codelineno-38-24" href="#__codelineno-38-24"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mean latency: </span><span class="si">{</span><span class="n">summary</span><span class="o">.</span><span class="n">mean_latency_seconds</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+</span><span id="__span-38-25"><a id="__codelineno-38-25" name="__codelineno-38-25" href="#__codelineno-38-25"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total cost: $</span><span class="si">{</span><span class="n">summary</span><span class="o">.</span><span class="n">total_cost_usd</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-38-26"><a id="__codelineno-38-26" name="__codelineno-38-26" href="#__codelineno-38-26"></a>
+</span><span id="__span-38-27"><a id="__codelineno-38-27" name="__codelineno-38-27" href="#__codelineno-38-27"></a><span class="n">backend</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span id="__span-38-28"><a id="__codelineno-38-28" name="__codelineno-38-28" href="#__codelineno-38-28"></a><span class="n">judge_backend</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span></code></pre></div>
+<hr />
+<h2 id="backends">Backends<a class="headerlink" href="#backends" title="Permanent link">&para;</a></h2>
+<h3 id="jarvisdirectbackend-evalsbackendsjarvis_direct">JarvisDirectBackend (<code>evals.backends.jarvis_direct</code>)<a class="headerlink" href="#jarvisdirectbackend-evalsbackendsjarvis_direct" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-39-1"><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.backends.jarvis_direct</span><span class="w"> </span><span class="kn">import</span> <span class="n">JarvisDirectBackend</span>
+</span></code></pre></div>
+<p>Engine-level inference via <code>SystemBuilder</code>. Routes directly to the configured
+<code>InferenceEngine</code> without an agent loop, making it the fastest backend and
+appropriate for benchmarks that do not require tool use.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-40-1"><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">JarvisDirectBackend</span><span class="p">(</span><span class="n">InferenceBackend</span><span class="p">):</span>
+</span><span id="__span-40-2"><a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a>    <span class="n">backend_id</span> <span class="o">=</span> <span class="s2">&quot;jarvis-direct&quot;</span>
+</span><span id="__span-40-3"><a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a>
+</span><span id="__span-40-4"><a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">engine_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>engine_key</code></td>
+<td><code>Optional[str]</code></td>
+<td><code>None</code></td>
+<td>OpenJarvis engine identifier. <code>None</code> uses the auto-discovered engine from <code>~/.openjarvis/config.toml</code></td>
+</tr>
+</tbody>
+</table>
+<p>Telemetry and traces are disabled for eval runs. The backend calls
+<code>SystemBuilder().engine(engine_key).telemetry(False).traces(False).build()</code>.</p>
+<p><strong>Compatible benchmarks:</strong> <code>supergpqa</code>, <code>frames</code>, <code>wildchat</code> (any benchmark that
+does not require multi-step tool calling).</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Local model</label><label for="__tabbed_1_2">Cloud model</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="language-python highlight"><pre><span></span><code><span id="__span-41-1"><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="n">backend</span> <span class="o">=</span> <span class="n">JarvisDirectBackend</span><span class="p">(</span><span class="n">engine_key</span><span class="o">=</span><span class="s2">&quot;ollama&quot;</span><span class="p">)</span>
+</span><span id="__span-41-2"><a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a><span class="n">text</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="s2">&quot;What is 2+2?&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;qwen3:8b&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-python highlight"><pre><span></span><code><span id="__span-42-1"><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="n">backend</span> <span class="o">=</span> <span class="n">JarvisDirectBackend</span><span class="p">(</span><span class="n">engine_key</span><span class="o">=</span><span class="s2">&quot;cloud&quot;</span><span class="p">)</span>
+</span><span id="__span-42-2"><a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="n">text</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="s2">&quot;What is 2+2?&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<hr />
+<h3 id="jarvisagentbackend-evalsbackendsjarvis_agent">JarvisAgentBackend (<code>evals.backends.jarvis_agent</code>)<a class="headerlink" href="#jarvisagentbackend-evalsbackendsjarvis_agent" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-43-1"><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.backends.jarvis_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">JarvisAgentBackend</span>
+</span></code></pre></div>
+<p>Agent-level inference via <code>JarvisSystem.ask()</code>. Wraps the full OpenJarvis agent
+harness, enabling multi-turn tool-calling loops for agentic benchmarks.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-44-1"><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">JarvisAgentBackend</span><span class="p">(</span><span class="n">InferenceBackend</span><span class="p">):</span>
+</span><span id="__span-44-2"><a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>    <span class="n">backend_id</span> <span class="o">=</span> <span class="s2">&quot;jarvis-agent&quot;</span>
+</span><span id="__span-44-3"><a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a>
+</span><span id="__span-44-4"><a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+</span><span id="__span-44-5"><a id="__codelineno-44-5" name="__codelineno-44-5" href="#__codelineno-44-5"></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-44-6"><a id="__codelineno-44-6" name="__codelineno-44-6" href="#__codelineno-44-6"></a>        <span class="n">engine_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-44-7"><a id="__codelineno-44-7" name="__codelineno-44-7" href="#__codelineno-44-7"></a>        <span class="n">agent_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;orchestrator&quot;</span><span class="p">,</span>
+</span><span id="__span-44-8"><a id="__codelineno-44-8" name="__codelineno-44-8" href="#__codelineno-44-8"></a>        <span class="n">tools</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-44-9"><a id="__codelineno-44-9" name="__codelineno-44-9" href="#__codelineno-44-9"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>engine_key</code></td>
+<td><code>Optional[str]</code></td>
+<td><code>None</code></td>
+<td>OpenJarvis engine identifier</td>
+</tr>
+<tr>
+<td><code>agent_name</code></td>
+<td><code>str</code></td>
+<td><code>"orchestrator"</code></td>
+<td>Agent to use (<code>"orchestrator"</code>, <code>"react"</code>, etc.)</td>
+</tr>
+<tr>
+<td><code>tools</code></td>
+<td><code>Optional[List[str]]</code></td>
+<td><code>None</code></td>
+<td>Tool names to enable (e.g., <code>["calculator", "file_read"]</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>generate_full()</code> return dict includes two additional keys beyond the standard
+<code>InferenceBackend</code> contract:</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>turns</code></td>
+<td><code>int</code></td>
+<td>Number of agent turns completed</td>
+</tr>
+<tr>
+<td><code>tool_results</code></td>
+<td><code>list</code></td>
+<td>Tool call results from the agent loop</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Compatible benchmarks:</strong> <code>gaia</code> (requires file reading and multi-step reasoning).</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-45-1"><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="n">backend</span> <span class="o">=</span> <span class="n">JarvisAgentBackend</span><span class="p">(</span>
+</span><span id="__span-45-2"><a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a>    <span class="n">engine_key</span><span class="o">=</span><span class="s2">&quot;ollama&quot;</span><span class="p">,</span>
+</span><span id="__span-45-3"><a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a>    <span class="n">agent_name</span><span class="o">=</span><span class="s2">&quot;orchestrator&quot;</span><span class="p">,</span>
+</span><span id="__span-45-4"><a id="__codelineno-45-4" name="__codelineno-45-4" href="#__codelineno-45-4"></a>    <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;file_read&quot;</span><span class="p">,</span> <span class="s2">&quot;calculator&quot;</span><span class="p">],</span>
+</span><span id="__span-45-5"><a id="__codelineno-45-5" name="__codelineno-45-5" href="#__codelineno-45-5"></a><span class="p">)</span>
+</span><span id="__span-45-6"><a id="__codelineno-45-6" name="__codelineno-45-6" href="#__codelineno-45-6"></a><span class="n">result</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">generate_full</span><span class="p">(</span>
+</span><span id="__span-45-7"><a id="__codelineno-45-7" name="__codelineno-45-7" href="#__codelineno-45-7"></a>    <span class="s2">&quot;How many pages is the attached PDF?&quot;</span><span class="p">,</span>
+</span><span id="__span-45-8"><a id="__codelineno-45-8" name="__codelineno-45-8" href="#__codelineno-45-8"></a>    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;qwen3:8b&quot;</span><span class="p">,</span>
+</span><span id="__span-45-9"><a id="__codelineno-45-9" name="__codelineno-45-9" href="#__codelineno-45-9"></a><span class="p">)</span>
+</span><span id="__span-45-10"><a id="__codelineno-45-10" name="__codelineno-45-10" href="#__codelineno-45-10"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">])</span>
+</span><span id="__span-45-11"><a id="__codelineno-45-11" name="__codelineno-45-11" href="#__codelineno-45-11"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Completed in </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;turns&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> turn(s)&quot;</span><span class="p">)</span>
+</span><span id="__span-45-12"><a id="__codelineno-45-12" name="__codelineno-45-12" href="#__codelineno-45-12"></a><span class="n">backend</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span></code></pre></div>
+<hr />
+<h2 id="dataset-providers">Dataset Providers<a class="headerlink" href="#dataset-providers" title="Permanent link">&para;</a></h2>
+<h3 id="supergpqadataset-evalsdatasetssupergpqa">SuperGPQADataset (<code>evals.datasets.supergpqa</code>)<a class="headerlink" href="#supergpqadataset-evalsdatasetssupergpqa" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-46-1"><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.datasets.supergpqa</span><span class="w"> </span><span class="kn">import</span> <span class="n">SuperGPQADataset</span>
+</span></code></pre></div>
+<p>Loads the SuperGPQA multiple-choice benchmark from HuggingFace (<code>m-a-p/SuperGPQA</code>).
+Records have <code>category="reasoning"</code> and <code>subject</code> set to the discipline subfield.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-47-1"><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">SuperGPQADataset</span><span class="p">(</span><span class="n">DatasetProvider</span><span class="p">):</span>
+</span><span id="__span-47-2"><a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a>    <span class="n">dataset_id</span> <span class="o">=</span> <span class="s2">&quot;supergpqa&quot;</span>
+</span><span id="__span-47-3"><a id="__codelineno-47-3" name="__codelineno-47-3" href="#__codelineno-47-3"></a>    <span class="n">dataset_name</span> <span class="o">=</span> <span class="s2">&quot;SuperGPQA&quot;</span>
+</span></code></pre></div>
+<ul>
+<li><strong>Default split:</strong> <code>"train"</code></li>
+<li><strong>HuggingFace path:</strong> <code>m-a-p/SuperGPQA</code></li>
+<li>Each problem is formatted with lettered options (A, B, C, ...) and the instruction
+  "Respond with the correct letter only."</li>
+<li><code>record.reference</code> is the correct answer letter (e.g., <code>"B"</code>).</li>
+</ul>
+<hr />
+<h3 id="gaiadataset-evalsdatasetsgaia">GAIADataset (<code>evals.datasets.gaia</code>)<a class="headerlink" href="#gaiadataset-evalsdatasetsgaia" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-48-1"><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.datasets.gaia</span><span class="w"> </span><span class="kn">import</span> <span class="n">GAIADataset</span>
+</span></code></pre></div>
+<p>Loads the GAIA agentic benchmark from HuggingFace (<code>gaia-benchmark/GAIA</code>).
+Records have <code>category="agentic"</code> and <code>subject</code> set to <code>level_1</code>, <code>level_2</code>, or
+<code>level_3</code>.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-49-1"><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">GAIADataset</span><span class="p">(</span><span class="n">DatasetProvider</span><span class="p">):</span>
+</span><span id="__span-49-2"><a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a>    <span class="n">dataset_id</span> <span class="o">=</span> <span class="s2">&quot;gaia&quot;</span>
+</span><span id="__span-49-3"><a id="__codelineno-49-3" name="__codelineno-49-3" href="#__codelineno-49-3"></a>    <span class="n">dataset_name</span> <span class="o">=</span> <span class="s2">&quot;GAIA&quot;</span>
+</span><span id="__span-49-4"><a id="__codelineno-49-4" name="__codelineno-49-4" href="#__codelineno-49-4"></a>
+</span><span id="__span-49-5"><a id="__codelineno-49-5" name="__codelineno-49-5" href="#__codelineno-49-5"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cache_dir</code></td>
+<td><code>Optional[str]</code></td>
+<td><code>~/.cache/gaia_benchmark</code></td>
+<td>Local directory for HuggingFace snapshot download</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Default split:</strong> <code>"validation"</code></li>
+<li><strong>Default subset:</strong> <code>"2023_all"</code></li>
+<li>Downloads the full dataset snapshot including associated files (PDFs, images, CSVs)
+  referenced in questions. File paths are embedded in the problem prompt.</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Dataset access</p>
+<p>GAIA requires accepting the HuggingFace dataset terms of service and being logged
+in with <code>huggingface-cli login</code> before the snapshot download can proceed.</p>
+</div>
+<hr />
+<h3 id="framesdataset-evalsdatasetsframes">FRAMESDataset (<code>evals.datasets.frames</code>)<a class="headerlink" href="#framesdataset-evalsdatasetsframes" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-50-1"><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.datasets.frames</span><span class="w"> </span><span class="kn">import</span> <span class="n">FRAMESDataset</span>
+</span></code></pre></div>
+<p>Loads the FRAMES multi-hop factual retrieval benchmark from HuggingFace
+(<code>google/frames-benchmark</code>). Records have <code>category="rag"</code> and <code>subject</code> set to
+the reasoning type(s) (e.g., <code>"multi-hop, temporal"</code>).</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-51-1"><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">FRAMESDataset</span><span class="p">(</span><span class="n">DatasetProvider</span><span class="p">):</span>
+</span><span id="__span-51-2"><a id="__codelineno-51-2" name="__codelineno-51-2" href="#__codelineno-51-2"></a>    <span class="n">dataset_id</span> <span class="o">=</span> <span class="s2">&quot;frames&quot;</span>
+</span><span id="__span-51-3"><a id="__codelineno-51-3" name="__codelineno-51-3" href="#__codelineno-51-3"></a>    <span class="n">dataset_name</span> <span class="o">=</span> <span class="s2">&quot;FRAMES&quot;</span>
+</span></code></pre></div>
+<ul>
+<li><strong>Default split:</strong> <code>"test"</code></li>
+<li>Wikipedia article links referenced in each question are included in the problem prompt.</li>
+</ul>
+<hr />
+<h3 id="wildchatdataset-evalsdatasetswildchat">WildChatDataset (<code>evals.datasets.wildchat</code>)<a class="headerlink" href="#wildchatdataset-evalsdatasetswildchat" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-52-1"><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.datasets.wildchat</span><span class="w"> </span><span class="kn">import</span> <span class="n">WildChatDataset</span>
+</span></code></pre></div>
+<p>Loads the WildChat-1M dataset (<code>allenai/WildChat-1M</code>) and filters to English
+single-turn conversations for chat quality evaluation. Records have
+<code>category="chat"</code> and <code>subject="conversation"</code>.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-53-1"><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">WildChatDataset</span><span class="p">(</span><span class="n">DatasetProvider</span><span class="p">):</span>
+</span><span id="__span-53-2"><a id="__codelineno-53-2" name="__codelineno-53-2" href="#__codelineno-53-2"></a>    <span class="n">dataset_id</span> <span class="o">=</span> <span class="s2">&quot;wildchat&quot;</span>
+</span><span id="__span-53-3"><a id="__codelineno-53-3" name="__codelineno-53-3" href="#__codelineno-53-3"></a>    <span class="n">dataset_name</span> <span class="o">=</span> <span class="s2">&quot;WildChat&quot;</span>
+</span></code></pre></div>
+<ul>
+<li><strong>Default split:</strong> <code>"train"</code></li>
+<li>Filters by <code>language == "english"</code> and exactly two turns (one user + one assistant).</li>
+<li><code>record.problem</code> is the user message; <code>record.reference</code> is the original assistant
+  response used as the quality baseline by the judge scorer.</li>
+</ul>
+<hr />
+<h2 id="scorers">Scorers<a class="headerlink" href="#scorers" title="Permanent link">&para;</a></h2>
+<h3 id="supergpqascorer-evalsscorerssupergpqa_mcq">SuperGPQAScorer (<code>evals.scorers.supergpqa_mcq</code>)<a class="headerlink" href="#supergpqascorer-evalsscorerssupergpqa_mcq" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-54-1"><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.scorers.supergpqa_mcq</span><span class="w"> </span><span class="kn">import</span> <span class="n">SuperGPQAScorer</span>
+</span></code></pre></div>
+<p><abbr title="Large Language Model">LLM</abbr>-based letter extraction followed by exact match against the reference letter.
+The judge <abbr title="Large Language Model">LLM</abbr> extracts the final answer letter from potentially verbose model
+responses, then compares it to <code>record.reference</code>.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-55-1"><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">SuperGPQAScorer</span><span class="p">(</span><span class="n">LLMJudgeScorer</span><span class="p">):</span>
+</span><span id="__span-55-2"><a id="__codelineno-55-2" name="__codelineno-55-2" href="#__codelineno-55-2"></a>    <span class="n">scorer_id</span> <span class="o">=</span> <span class="s2">&quot;supergpqa&quot;</span>
+</span></code></pre></div>
+<p><strong>Scoring metadata keys:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>reference_letter</code></td>
+<td>Correct answer letter from the dataset</td>
+</tr>
+<tr>
+<td><code>candidate_letter</code></td>
+<td>Letter extracted by the judge <abbr title="Large Language Model">LLM</abbr></td>
+</tr>
+<tr>
+<td><code>valid_letters</code></td>
+<td>Valid answer letters for this question (e.g., <code>"ABCD"</code>)</td>
+</tr>
+<tr>
+<td><code>reason</code></td>
+<td>Set to <code>"missing_reference_letter"</code> or <code>"no_choice_letter_extracted"</code> on failure</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="gaiascorer-evalsscorersgaia_exact">GAIAScorer (<code>evals.scorers.gaia_exact</code>)<a class="headerlink" href="#gaiascorer-evalsscorersgaia_exact" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-56-1"><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.scorers.gaia_exact</span><span class="w"> </span><span class="kn">import</span> <span class="n">GAIAScorer</span><span class="p">,</span> <span class="n">exact_match</span>
+</span></code></pre></div>
+<p>Normalized exact match with an <abbr title="Large Language Model">LLM</abbr> fallback for semantic comparison. Tries exact
+match first (no <abbr title="Application Programming Interface">API</abbr> call); falls back to the judge <abbr title="Large Language Model">LLM</abbr> only when exact match fails.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-57-1"><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">GAIAScorer</span><span class="p">(</span><span class="n">LLMJudgeScorer</span><span class="p">):</span>
+</span><span id="__span-57-2"><a id="__codelineno-57-2" name="__codelineno-57-2" href="#__codelineno-57-2"></a>    <span class="n">scorer_id</span> <span class="o">=</span> <span class="s2">&quot;gaia&quot;</span>
+</span></code></pre></div>
+<p><strong>Normalization rules for exact match:</strong></p>
+<ul>
+<li>Numbers: strips <code>$</code>, <code>%</code>, <code>,</code> then compares as <code>float</code></li>
+<li>Lists (comma- or semicolon-separated): splits and compares element-by-element</li>
+<li>Strings: lowercases, strips whitespace and punctuation</li>
+</ul>
+<p><strong>Scoring metadata keys:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>match_type</code></td>
+<td><code>"exact"</code> or <code>"llm_fallback"</code></td>
+</tr>
+<tr>
+<td><code>raw_judge_output</code></td>
+<td>Full <abbr title="Large Language Model">LLM</abbr> judge response (llm_fallback only)</td>
+</tr>
+<tr>
+<td><code>extracted_answer</code></td>
+<td>Answer extracted by the judge (llm_fallback only)</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>exact_match</code> helper function is also exported and can be used independently:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-58-1"><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.scorers.gaia_exact</span><span class="w"> </span><span class="kn">import</span> <span class="n">exact_match</span>
+</span><span id="__span-58-2"><a id="__codelineno-58-2" name="__codelineno-58-2" href="#__codelineno-58-2"></a>
+</span><span id="__span-58-3"><a id="__codelineno-58-3" name="__codelineno-58-3" href="#__codelineno-58-3"></a><span class="k">assert</span> <span class="n">exact_match</span><span class="p">(</span><span class="s2">&quot;$1,000&quot;</span><span class="p">,</span> <span class="s2">&quot;1000&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+</span><span id="__span-58-4"><a id="__codelineno-58-4" name="__codelineno-58-4" href="#__codelineno-58-4"></a><span class="k">assert</span> <span class="n">exact_match</span><span class="p">(</span><span class="s2">&quot;paris&quot;</span><span class="p">,</span> <span class="s2">&quot;Paris&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+</span><span id="__span-58-5"><a id="__codelineno-58-5" name="__codelineno-58-5" href="#__codelineno-58-5"></a><span class="k">assert</span> <span class="n">exact_match</span><span class="p">(</span><span class="s2">&quot;3, 5&quot;</span><span class="p">,</span> <span class="s2">&quot;3,5&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+</span></code></pre></div>
+<hr />
+<h3 id="framesscorer-evalsscorersframes_judge">FRAMESScorer (<code>evals.scorers.frames_judge</code>)<a class="headerlink" href="#framesscorer-evalsscorersframes_judge" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-59-1"><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.scorers.frames_judge</span><span class="w"> </span><span class="kn">import</span> <span class="n">FRAMESScorer</span>
+</span></code></pre></div>
+<p><abbr title="Large Language Model">LLM</abbr>-as-judge scorer for FRAMES multi-hop factual retrieval. Uses a structured
+grading rubric that focuses on semantic equivalence, ignoring formatting and
+capitalization differences.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-60-1"><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">FRAMESScorer</span><span class="p">(</span><span class="n">LLMJudgeScorer</span><span class="p">):</span>
+</span><span id="__span-60-2"><a id="__codelineno-60-2" name="__codelineno-60-2" href="#__codelineno-60-2"></a>    <span class="n">scorer_id</span> <span class="o">=</span> <span class="s2">&quot;frames&quot;</span>
+</span></code></pre></div>
+<p><strong>Scoring metadata keys:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>raw_judge_output</code></td>
+<td>Full <abbr title="Large Language Model">LLM</abbr> judge response</td>
+</tr>
+<tr>
+<td><code>extracted_answer</code></td>
+<td>Answer extracted by the judge</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="wildchatscorer-evalsscorerswildchat_judge">WildChatScorer (<code>evals.scorers.wildchat_judge</code>)<a class="headerlink" href="#wildchatscorer-evalsscorerswildchat_judge" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-61-1"><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evals.scorers.wildchat_judge</span><span class="w"> </span><span class="kn">import</span> <span class="n">WildChatScorer</span>
+</span></code></pre></div>
+<p>Dual-comparison <abbr title="Large Language Model">LLM</abbr>-as-judge for chat quality. Runs two comparisons — once with
+the model answer as Assistant A and once as Assistant B — to reduce position bias.
+The model answer is considered correct if it wins or ties in either comparison.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-62-1"><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">WildChatScorer</span><span class="p">(</span><span class="n">LLMJudgeScorer</span><span class="p">):</span>
+</span><span id="__span-62-2"><a id="__codelineno-62-2" name="__codelineno-62-2" href="#__codelineno-62-2"></a>    <span class="n">scorer_id</span> <span class="o">=</span> <span class="s2">&quot;wildchat&quot;</span>
+</span></code></pre></div>
+<p>The judge uses a five-point verdict scale: <code>[[A&gt;&gt;B]]</code>, <code>[[A&gt;B]]</code>, <code>[[A=B]]</code>,
+<code>[[B&gt;A]]</code>, <code>[[B&gt;&gt;A]]</code>. A tie (<code>A=B</code>) is counted as correct.</p>
+<p><strong>Scoring metadata keys:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>generated_as_a</code></td>
+<td><code>{verdict, response}</code> from the first comparison pass</td>
+</tr>
+<tr>
+<td><code>generated_as_b</code></td>
+<td><code>{verdict, response}</code> from the second comparison pass</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="cli-reference"><abbr title="Command-Line Interface">CLI</abbr> Reference<a class="headerlink" href="#cli-reference" title="Permanent link">&para;</a></h2>
+<p>The evaluation framework ships a <code>openjarvis-eval</code> <abbr title="Command-Line Interface">CLI</abbr> built with Click.</p>
+<h3 id="openjarvis-eval-run">openjarvis-eval run<a class="headerlink" href="#openjarvis-eval-run" title="Permanent link">&para;</a></h3>
+<p>Run a single benchmark or a full suite from a TOML config.</p>
+<div class="language-bash highlight"><span class="filename">Single run</span><pre><span></span><code><span id="__span-63-1"><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a>openjarvis-eval<span class="w"> </span>run<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-63-2"><a id="__codelineno-63-2" name="__codelineno-63-2" href="#__codelineno-63-2"></a><span class="w">  </span>--benchmark<span class="w"> </span>supergpqa<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-63-3"><a id="__codelineno-63-3" name="__codelineno-63-3" href="#__codelineno-63-3"></a><span class="w">  </span>--model<span class="w"> </span>qwen3:8b<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-63-4"><a id="__codelineno-63-4" name="__codelineno-63-4" href="#__codelineno-63-4"></a><span class="w">  </span>--engine<span class="w"> </span>ollama<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-63-5"><a id="__codelineno-63-5" name="__codelineno-63-5" href="#__codelineno-63-5"></a><span class="w">  </span>--max-samples<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-63-6"><a id="__codelineno-63-6" name="__codelineno-63-6" href="#__codelineno-63-6"></a><span class="w">  </span>--max-workers<span class="w"> </span><span class="m">8</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-63-7"><a id="__codelineno-63-7" name="__codelineno-63-7" href="#__codelineno-63-7"></a><span class="w">  </span>--output<span class="w"> </span>results/supergpqa_qwen3-8b.jsonl
+</span></code></pre></div>
+<div class="language-bash highlight"><span class="filename">Suite run from TOML</span><pre><span></span><code><span id="__span-64-1"><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a>openjarvis-eval<span class="w"> </span>run<span class="w"> </span>--config<span class="w"> </span>evals/configs/full-suite.toml
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Short</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--config</code></td>
+<td><code>-c</code></td>
+<td><code>None</code></td>
+<td>TOML suite config file; enables suite mode</td>
+</tr>
+<tr>
+<td><code>--benchmark</code></td>
+<td><code>-b</code></td>
+<td>—</td>
+<td>Benchmark name (required in single-run mode)</td>
+</tr>
+<tr>
+<td><code>--backend</code></td>
+<td></td>
+<td><code>jarvis-direct</code></td>
+<td><code>jarvis-direct</code> or <code>jarvis-agent</code></td>
+</tr>
+<tr>
+<td><code>--model</code></td>
+<td><code>-m</code></td>
+<td>—</td>
+<td>Model identifier (required in single-run mode)</td>
+</tr>
+<tr>
+<td><code>--engine</code></td>
+<td><code>-e</code></td>
+<td><code>None</code></td>
+<td>Engine key override</td>
+</tr>
+<tr>
+<td><code>--agent</code></td>
+<td></td>
+<td><code>orchestrator</code></td>
+<td>Agent name for <code>jarvis-agent</code> backend</td>
+</tr>
+<tr>
+<td><code>--tools</code></td>
+<td></td>
+<td><code>""</code></td>
+<td>Comma-separated tool names</td>
+</tr>
+<tr>
+<td><code>--max-samples</code></td>
+<td><code>-n</code></td>
+<td><code>None</code></td>
+<td>Sample limit</td>
+</tr>
+<tr>
+<td><code>--max-workers</code></td>
+<td><code>-w</code></td>
+<td><code>4</code></td>
+<td>Parallel threads</td>
+</tr>
+<tr>
+<td><code>--judge-model</code></td>
+<td></td>
+<td><code>gpt-4o</code></td>
+<td><abbr title="Large Language Model">LLM</abbr> judge model</td>
+</tr>
+<tr>
+<td><code>--output</code></td>
+<td><code>-o</code></td>
+<td>auto</td>
+<td>JSONL output path</td>
+</tr>
+<tr>
+<td><code>--seed</code></td>
+<td></td>
+<td><code>42</code></td>
+<td>Shuffle seed</td>
+</tr>
+<tr>
+<td><code>--split</code></td>
+<td></td>
+<td><code>None</code></td>
+<td>Dataset split override</td>
+</tr>
+<tr>
+<td><code>--temperature</code></td>
+<td></td>
+<td><code>0.0</code></td>
+<td>Sampling temperature</td>
+</tr>
+<tr>
+<td><code>--max-tokens</code></td>
+<td></td>
+<td><code>2048</code></td>
+<td>Maximum output tokens</td>
+</tr>
+<tr>
+<td><code>--verbose</code></td>
+<td><code>-v</code></td>
+<td><code>False</code></td>
+<td>Enable debug logging</td>
+</tr>
+</tbody>
+</table>
+<h3 id="openjarvis-eval-run-all">openjarvis-eval run-all<a class="headerlink" href="#openjarvis-eval-run-all" title="Permanent link">&para;</a></h3>
+<p>Run all four benchmarks against a single model.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-65-1"><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a>openjarvis-eval<span class="w"> </span>run-all<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-65-2"><a id="__codelineno-65-2" name="__codelineno-65-2" href="#__codelineno-65-2"></a><span class="w">  </span>--model<span class="w"> </span>qwen3:8b<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-65-3"><a id="__codelineno-65-3" name="__codelineno-65-3" href="#__codelineno-65-3"></a><span class="w">  </span>--engine<span class="w"> </span>ollama<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-65-4"><a id="__codelineno-65-4" name="__codelineno-65-4" href="#__codelineno-65-4"></a><span class="w">  </span>--max-samples<span class="w"> </span><span class="m">50</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-65-5"><a id="__codelineno-65-5" name="__codelineno-65-5" href="#__codelineno-65-5"></a><span class="w">  </span>--output-dir<span class="w"> </span>results/
+</span></code></pre></div>
+<h3 id="openjarvis-eval-summarize">openjarvis-eval summarize<a class="headerlink" href="#openjarvis-eval-summarize" title="Permanent link">&para;</a></h3>
+<p>Recompute summary statistics from an existing JSONL output file.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-66-1"><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a>openjarvis-eval<span class="w"> </span>summarize<span class="w"> </span>results/supergpqa_qwen3-8b.jsonl
+</span></code></pre></div>
+<h3 id="openjarvis-eval-list">openjarvis-eval list<a class="headerlink" href="#openjarvis-eval-list" title="Permanent link">&para;</a></h3>
+<p>List all available benchmarks and backends.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-67-1"><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a>openjarvis-eval<span class="w"> </span>list
+</span></code></pre></div>
+<hr />
+<h2 id="toml-suite-config-format">TOML Suite Config Format<a class="headerlink" href="#toml-suite-config-format" title="Permanent link">&para;</a></h2>
+<p>A suite config drives a full <code>models x benchmarks</code> comparison matrix with a single
+command. All sections except <code>[[models]]</code> and <code>[[benchmarks]]</code> are optional.</p>
+<div class="language-toml highlight"><span class="filename">evals/configs/full-suite.toml</span><pre><span></span><code><span id="__span-68-1"><a id="__codelineno-68-1" name="__codelineno-68-1" href="#__codelineno-68-1"></a><span class="k">[meta]</span>
+</span><span id="__span-68-2"><a id="__codelineno-68-2" name="__codelineno-68-2" href="#__codelineno-68-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;full-suite-v1&quot;</span>
+</span><span id="__span-68-3"><a id="__codelineno-68-3" name="__codelineno-68-3" href="#__codelineno-68-3"></a><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Evaluate all benchmarks against production models&quot;</span>
+</span><span id="__span-68-4"><a id="__codelineno-68-4" name="__codelineno-68-4" href="#__codelineno-68-4"></a>
+</span><span id="__span-68-5"><a id="__codelineno-68-5" name="__codelineno-68-5" href="#__codelineno-68-5"></a><span class="k">[defaults]</span>
+</span><span id="__span-68-6"><a id="__codelineno-68-6" name="__codelineno-68-6" href="#__codelineno-68-6"></a><span class="n">temperature</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span>
+</span><span id="__span-68-7"><a id="__codelineno-68-7" name="__codelineno-68-7" href="#__codelineno-68-7"></a><span class="n">max_tokens</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2048</span>
+</span><span id="__span-68-8"><a id="__codelineno-68-8" name="__codelineno-68-8" href="#__codelineno-68-8"></a>
+</span><span id="__span-68-9"><a id="__codelineno-68-9" name="__codelineno-68-9" href="#__codelineno-68-9"></a><span class="k">[judge]</span>
+</span><span id="__span-68-10"><a id="__codelineno-68-10" name="__codelineno-68-10" href="#__codelineno-68-10"></a><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;gpt-4o&quot;</span>
+</span><span id="__span-68-11"><a id="__codelineno-68-11" name="__codelineno-68-11" href="#__codelineno-68-11"></a><span class="n">temperature</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span>
+</span><span id="__span-68-12"><a id="__codelineno-68-12" name="__codelineno-68-12" href="#__codelineno-68-12"></a><span class="n">max_tokens</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1024</span>
+</span><span id="__span-68-13"><a id="__codelineno-68-13" name="__codelineno-68-13" href="#__codelineno-68-13"></a>
+</span><span id="__span-68-14"><a id="__codelineno-68-14" name="__codelineno-68-14" href="#__codelineno-68-14"></a><span class="k">[run]</span>
+</span><span id="__span-68-15"><a id="__codelineno-68-15" name="__codelineno-68-15" href="#__codelineno-68-15"></a><span class="n">max_workers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span>
+</span><span id="__span-68-16"><a id="__codelineno-68-16" name="__codelineno-68-16" href="#__codelineno-68-16"></a><span class="n">output_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;results/&quot;</span>
+</span><span id="__span-68-17"><a id="__codelineno-68-17" name="__codelineno-68-17" href="#__codelineno-68-17"></a><span class="n">seed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">42</span>
+</span><span id="__span-68-18"><a id="__codelineno-68-18" name="__codelineno-68-18" href="#__codelineno-68-18"></a>
+</span><span id="__span-68-19"><a id="__codelineno-68-19" name="__codelineno-68-19" href="#__codelineno-68-19"></a><span class="c1"># One [[models]] entry per model to evaluate</span>
+</span><span id="__span-68-20"><a id="__codelineno-68-20" name="__codelineno-68-20" href="#__codelineno-68-20"></a><span class="k">[[models]]</span>
+</span><span id="__span-68-21"><a id="__codelineno-68-21" name="__codelineno-68-21" href="#__codelineno-68-21"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;qwen3:8b&quot;</span>
+</span><span id="__span-68-22"><a id="__codelineno-68-22" name="__codelineno-68-22" href="#__codelineno-68-22"></a><span class="n">engine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ollama&quot;</span>
+</span><span id="__span-68-23"><a id="__codelineno-68-23" name="__codelineno-68-23" href="#__codelineno-68-23"></a><span class="n">temperature</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.3</span>
+</span><span id="__span-68-24"><a id="__codelineno-68-24" name="__codelineno-68-24" href="#__codelineno-68-24"></a>
+</span><span id="__span-68-25"><a id="__codelineno-68-25" name="__codelineno-68-25" href="#__codelineno-68-25"></a><span class="k">[[models]]</span>
+</span><span id="__span-68-26"><a id="__codelineno-68-26" name="__codelineno-68-26" href="#__codelineno-68-26"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;gpt-4o&quot;</span>
+</span><span id="__span-68-27"><a id="__codelineno-68-27" name="__codelineno-68-27" href="#__codelineno-68-27"></a><span class="n">provider</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;openai&quot;</span>
+</span><span id="__span-68-28"><a id="__codelineno-68-28" name="__codelineno-68-28" href="#__codelineno-68-28"></a>
+</span><span id="__span-68-29"><a id="__codelineno-68-29" name="__codelineno-68-29" href="#__codelineno-68-29"></a><span class="c1"># One [[benchmarks]] entry per benchmark</span>
+</span><span id="__span-68-30"><a id="__codelineno-68-30" name="__codelineno-68-30" href="#__codelineno-68-30"></a><span class="k">[[benchmarks]]</span>
+</span><span id="__span-68-31"><a id="__codelineno-68-31" name="__codelineno-68-31" href="#__codelineno-68-31"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;supergpqa&quot;</span>
+</span><span id="__span-68-32"><a id="__codelineno-68-32" name="__codelineno-68-32" href="#__codelineno-68-32"></a><span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;jarvis-direct&quot;</span>
+</span><span id="__span-68-33"><a id="__codelineno-68-33" name="__codelineno-68-33" href="#__codelineno-68-33"></a><span class="n">max_samples</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">200</span>
+</span><span id="__span-68-34"><a id="__codelineno-68-34" name="__codelineno-68-34" href="#__codelineno-68-34"></a>
+</span><span id="__span-68-35"><a id="__codelineno-68-35" name="__codelineno-68-35" href="#__codelineno-68-35"></a><span class="k">[[benchmarks]]</span>
+</span><span id="__span-68-36"><a id="__codelineno-68-36" name="__codelineno-68-36" href="#__codelineno-68-36"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;gaia&quot;</span>
+</span><span id="__span-68-37"><a id="__codelineno-68-37" name="__codelineno-68-37" href="#__codelineno-68-37"></a><span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;jarvis-agent&quot;</span>
+</span><span id="__span-68-38"><a id="__codelineno-68-38" name="__codelineno-68-38" href="#__codelineno-68-38"></a><span class="n">agent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;orchestrator&quot;</span>
+</span><span id="__span-68-39"><a id="__codelineno-68-39" name="__codelineno-68-39" href="#__codelineno-68-39"></a><span class="n">tools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;file_read&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;calculator&quot;</span><span class="p">]</span>
+</span><span id="__span-68-40"><a id="__codelineno-68-40" name="__codelineno-68-40" href="#__codelineno-68-40"></a><span class="n">max_samples</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">50</span>
+</span><span id="__span-68-41"><a id="__codelineno-68-41" name="__codelineno-68-41" href="#__codelineno-68-41"></a><span class="n">judge_model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude-sonnet-4-20250514&quot;</span><span class="w">  </span><span class="c1"># override judge for this benchmark</span>
+</span><span id="__span-68-42"><a id="__codelineno-68-42" name="__codelineno-68-42" href="#__codelineno-68-42"></a>
+</span><span id="__span-68-43"><a id="__codelineno-68-43" name="__codelineno-68-43" href="#__codelineno-68-43"></a><span class="k">[[benchmarks]]</span>
+</span><span id="__span-68-44"><a id="__codelineno-68-44" name="__codelineno-68-44" href="#__codelineno-68-44"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;frames&quot;</span>
+</span><span id="__span-68-45"><a id="__codelineno-68-45" name="__codelineno-68-45" href="#__codelineno-68-45"></a><span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;jarvis-direct&quot;</span>
+</span><span id="__span-68-46"><a id="__codelineno-68-46" name="__codelineno-68-46" href="#__codelineno-68-46"></a><span class="n">max_samples</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span>
+</span><span id="__span-68-47"><a id="__codelineno-68-47" name="__codelineno-68-47" href="#__codelineno-68-47"></a>
+</span><span id="__span-68-48"><a id="__codelineno-68-48" name="__codelineno-68-48" href="#__codelineno-68-48"></a><span class="k">[[benchmarks]]</span>
+</span><span id="__span-68-49"><a id="__codelineno-68-49" name="__codelineno-68-49" href="#__codelineno-68-49"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;wildchat&quot;</span>
+</span><span id="__span-68-50"><a id="__codelineno-68-50" name="__codelineno-68-50" href="#__codelineno-68-50"></a><span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;jarvis-direct&quot;</span>
+</span><span id="__span-68-51"><a id="__codelineno-68-51" name="__codelineno-68-51" href="#__codelineno-68-51"></a><span class="n">max_samples</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">150</span>
+</span><span id="__span-68-52"><a id="__codelineno-68-52" name="__codelineno-68-52" href="#__codelineno-68-52"></a><span class="n">temperature</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.7</span>
+</span></code></pre></div>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-69-1"><a id="__codelineno-69-1" name="__codelineno-69-1" href="#__codelineno-69-1"></a>openjarvis-eval<span class="w"> </span>run<span class="w"> </span>--config<span class="w"> </span>evals/configs/full-suite.toml
+</span><span id="__span-69-2"><a id="__codelineno-69-2" name="__codelineno-69-2" href="#__codelineno-69-2"></a><span class="c1"># Suite: full-suite-v1</span>
+</span><span id="__span-69-3"><a id="__codelineno-69-3" name="__codelineno-69-3" href="#__codelineno-69-3"></a><span class="c1">#   2 model(s) x 4 benchmark(s) = 8 run(s)</span>
+</span></code></pre></div>
+<hr />
+<h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../bench/">Benchmarks Module</a> — <code>openjarvis.bench</code> performance benchmarks (latency, throughput) for the inference engine, separate from the eval framework</li>
+<li><a href="../telemetry/">Telemetry &amp; Traces</a> — <code>openjarvis.telemetry</code> and <code>openjarvis.traces</code> for production monitoring</li>
+<li><a href="../../user-guide/python-sdk/">Python <abbr title="Software Development Kit">SDK</abbr></a> — <code>Jarvis</code> class used internally by eval backends</li>
+<li><a href="../../user-guide/agents/">Agents</a> — Agent implementations invoked by <code>JarvisAgentBackend</code></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../bench/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Benchmarks">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Benchmarks
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../server/" class="md-footer__link md-footer__link--next" aria-label="Next: Server">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Server
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 OpenJarvis Contributors
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/HazyResearch/OpenJarvis" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.indexes", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

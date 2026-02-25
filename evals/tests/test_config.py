@@ -50,7 +50,7 @@ class TestDataclassDefaults:
 
     def test_judge_config_defaults(self):
         j = JudgeConfig()
-        assert j.model == "gpt-4o"
+        assert j.model == "gpt-5-mini-2025-08-07"
         assert j.provider is None
         assert j.temperature == 0.0
         assert j.max_tokens == 1024
@@ -83,7 +83,7 @@ class TestDataclassDefaults:
         s = EvalSuiteConfig()
         assert s.meta.name == ""
         assert s.defaults.temperature == 0.0
-        assert s.judge.model == "gpt-4o"
+        assert s.judge.model == "gpt-5-mini-2025-08-07"
         assert s.run.max_workers == 4
         assert s.models == []
         assert s.benchmarks == []
@@ -110,7 +110,7 @@ class TestLoadEvalConfig:
         assert suite.benchmarks[0].name == "supergpqa"
         # Defaults should be applied
         assert suite.defaults.temperature == 0.0
-        assert suite.judge.model == "gpt-4o"
+        assert suite.judge.model == "gpt-5-mini-2025-08-07"
 
     def test_full_config(self, tmp_path):
         p = _write_toml(tmp_path, """\
@@ -280,7 +280,7 @@ class TestLoadEvalConfig:
 
 
 class TestExampleConfigs:
-    @pytest.fixture(params=["minimal.toml", "single-run.toml", "full-suite.toml"])
+    @pytest.fixture(params=["minimal.toml", "single-run.toml", "full-suite.toml", "glm-4.7-flash-openhands.toml"])
     def example_config(self, request):
         configs_dir = Path(__file__).resolve().parent.parent / "configs"
         return configs_dir / request.param

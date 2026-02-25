@@ -20,6 +20,10 @@ class ModelStats:
     total_latency: float = 0.0
     avg_latency: float = 0.0
     total_cost: float = 0.0
+    avg_ttft: float = 0.0
+    total_energy_joules: float = 0.0
+    avg_gpu_utilization_pct: float = 0.0
+    avg_throughput_tok_per_sec: float = 0.0
 
 
 @dataclass(slots=True)
@@ -32,6 +36,10 @@ class EngineStats:
     total_latency: float = 0.0
     avg_latency: float = 0.0
     total_cost: float = 0.0
+    avg_ttft: float = 0.0
+    total_energy_joules: float = 0.0
+    avg_gpu_utilization_pct: float = 0.0
+    avg_throughput_tok_per_sec: float = 0.0
 
 
 @dataclass(slots=True)
@@ -87,7 +95,11 @@ class TelemetryAggregator:
             " SUM(completion_tokens) AS completion_tokens,"
             " SUM(latency_seconds) AS total_latency,"
             " AVG(latency_seconds) AS avg_latency,"
-            " SUM(cost_usd) AS total_cost"
+            " SUM(cost_usd) AS total_cost,"
+            " AVG(ttft) AS avg_ttft,"
+            " SUM(energy_joules) AS total_energy_joules,"
+            " AVG(gpu_utilization_pct) AS avg_gpu_utilization_pct,"
+            " AVG(throughput_tok_per_sec) AS avg_throughput_tok_per_sec"
             f" FROM telemetry{where}"
             " GROUP BY model_id ORDER BY call_count DESC"
         )
@@ -102,6 +114,10 @@ class TelemetryAggregator:
                 total_latency=r["total_latency"] or 0.0,
                 avg_latency=r["avg_latency"] or 0.0,
                 total_cost=r["total_cost"] or 0.0,
+                avg_ttft=r["avg_ttft"] or 0.0,
+                total_energy_joules=r["total_energy_joules"] or 0.0,
+                avg_gpu_utilization_pct=r["avg_gpu_utilization_pct"] or 0.0,
+                avg_throughput_tok_per_sec=r["avg_throughput_tok_per_sec"] or 0.0,
             )
             for r in rows
         ]
@@ -119,7 +135,11 @@ class TelemetryAggregator:
             " SUM(total_tokens) AS total_tokens,"
             " SUM(latency_seconds) AS total_latency,"
             " AVG(latency_seconds) AS avg_latency,"
-            " SUM(cost_usd) AS total_cost"
+            " SUM(cost_usd) AS total_cost,"
+            " AVG(ttft) AS avg_ttft,"
+            " SUM(energy_joules) AS total_energy_joules,"
+            " AVG(gpu_utilization_pct) AS avg_gpu_utilization_pct,"
+            " AVG(throughput_tok_per_sec) AS avg_throughput_tok_per_sec"
             f" FROM telemetry{where}"
             " GROUP BY engine ORDER BY call_count DESC"
         )
@@ -132,6 +152,10 @@ class TelemetryAggregator:
                 total_latency=r["total_latency"] or 0.0,
                 avg_latency=r["avg_latency"] or 0.0,
                 total_cost=r["total_cost"] or 0.0,
+                avg_ttft=r["avg_ttft"] or 0.0,
+                total_energy_joules=r["total_energy_joules"] or 0.0,
+                avg_gpu_utilization_pct=r["avg_gpu_utilization_pct"] or 0.0,
+                avg_throughput_tok_per_sec=r["avg_throughput_tok_per_sec"] or 0.0,
             )
             for r in rows
         ]

@@ -136,6 +136,12 @@ class TelemetryRecord:
     cost_usd: float = 0.0
     energy_joules: float = 0.0
     power_watts: float = 0.0
+    gpu_utilization_pct: float = 0.0
+    gpu_memory_used_gb: float = 0.0
+    gpu_temperature_c: float = 0.0
+    throughput_tok_per_sec: float = 0.0
+    prefill_latency_seconds: float = 0.0
+    decode_latency_seconds: float = 0.0
     engine: str = ""
     agent: str = ""
     metadata: Dict[str, Any] = field(default_factory=dict)

@@ -154,6 +154,24 @@ class TestNativeReActParsing:
         assert result["action"] == "calculator"
         assert result["action_input"] == ""
 
+    def test_parse_case_insensitive_thought_action(self):
+        parse = self._parser()
+        text = (
+            'thought: I need to calculate 2+2.\n'
+            'action: calculator\n'
+            'action input: {"expression": "2+2"}'
+        )
+        result = parse(text)
+        assert result["thought"] == "I need to calculate 2+2."
+        assert result["action"] == "calculator"
+        assert "expression" in result["action_input"]
+
+    def test_parse_case_insensitive_final_answer(self):
+        parse = self._parser()
+        text = "thought: I know the answer.\nfinal answer: 42"
+        result = parse(text)
+        assert result["final_answer"] == "42"
+
 
 # ---------------------------------------------------------------------------
 # Agent execution tests
@@ -190,7 +208,10 @@ class TestNativeReActAgent:
             ),
         ]
         bus = EventBus(record_history=True)
-        agent = NativeReActAgent(engine, "test-model", tools=[_CalculatorStub()], bus=bus)
+        agent = NativeReActAgent(
+            engine, "test-model",
+            tools=[_CalculatorStub()], bus=bus,
+        )
         result = agent.run("What is 2+2?")
         assert result.content == "4"
         assert result.turns == 2
@@ -306,7 +327,10 @@ class TestNativeReActAgent:
             ),
             _engine_response("Thought: Done.\nFinal Answer: 2"),
         ]
-        agent = NativeReActAgent(engine, "test-model", tools=[_CalculatorStub()], bus=bus)
+        agent = NativeReActAgent(
+            engine, "test-model",
+            tools=[_CalculatorStub()], bus=bus,
+        )
         agent.run("Calc")
         event_types = [e.event_type for e in bus.history]
         assert EventType.TOOL_CALL_START in event_types
@@ -414,7 +438,7 @@ class TestNativeReActAgent:
         assert "think" in system_msg.content
 
     def test_system_prompt_no_tools(self):
-        """System prompt should say 'none' when no tools are available."""
+        """System prompt should say 'No tools available.' when no tools."""
         engine = MagicMock()
         engine.engine_id = "mock"
         engine.generate.return_value = _engine_response(
@@ -424,7 +448,7 @@ class TestNativeReActAgent:
         agent.run("Hello")
         call_args = engine.generate.call_args
         messages = call_args[0][0]
-        assert "none" in messages[0].content
+        assert "No tools available." in messages[0].content
 
     def test_max_turns_1(self):
         """With max_turns=1 and an action, should stop after 1 turn."""
@@ -460,6 +484,51 @@ class TestNativeReActAgent:
         assert len(start_events) == 1
         assert start_events[0].data["agent"] == "native_react"
         assert start_events[0].data["input"] == "test input"
+
+
+    def test_system_prompt_enriched_descriptions(self):
+        """System prompt should include parameter schemas, not just names."""
+        engine = MagicMock()
+        engine.engine_id = "mock"
+        engine.generate.return_value = _engine_response(
+            "Thought: Done.\nFinal Answer: ok"
+        )
+        agent = NativeReActAgent(
+            engine, "test-model",
+            tools=[_CalculatorStub(), _ThinkStub()],
+        )
+        agent.run("Hello")
+        call_args = engine.generate.call_args
+        messages = call_args[0][0]
+        system_content = messages[0].content
+        # Should contain tool name as header
+        assert "### calculator" in system_content
+        assert "### think" in system_content
+        # Should contain parameter info
+        assert "expression" in system_content
+        assert "string" in system_content
+
+    def test_case_insensitive_execution(self):
+        """Agent handles lowercase action/thought/final answer from the LLM."""
+        engine = MagicMock()
+        engine.engine_id = "mock"
+        engine.generate.side_effect = [
+            _engine_response(
+                'thought: I need to calculate.\n'
+                'action: calculator\n'
+                'action input: {"expression": "2+2"}'
+            ),
+            _engine_response(
+                "thought: The result is 4.\nfinal answer: 4"
+            ),
+        ]
+        agent = NativeReActAgent(
+            engine, "test-model",
+            tools=[_CalculatorStub()],
+        )
+        result = agent.run("What is 2+2?")
+        assert result.content == "4"
+        assert result.turns == 2
 
 
 @pytest.mark.parametrize("model", ["qwen3:8b", "gpt-oss:120b"])

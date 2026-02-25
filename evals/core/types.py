@@ -32,6 +32,15 @@ class EvalResult:
     cost_usd: float = 0.0
     error: Optional[str] = None
     scoring_metadata: Dict[str, Any] = field(default_factory=dict)
+    ttft: float = 0.0
+    energy_joules: float = 0.0
+    power_watts: float = 0.0
+    gpu_utilization_pct: float = 0.0
+    throughput_tok_per_sec: float = 0.0
+    mfu_pct: float = 0.0
+    mbu_pct: float = 0.0
+    ipw: float = 0.0  # Intelligence Per Watt
+    ipj: float = 0.0  # Intelligence Per Joule
 
 
 @dataclass(slots=True)
@@ -45,13 +54,26 @@ class RunConfig:
     max_workers: int = 4
     temperature: float = 0.0
     max_tokens: int = 2048
-    judge_model: str = "gpt-4o"
+    judge_model: str = "gpt-5-mini-2025-08-07"
     engine_key: Optional[str] = None
     agent_name: Optional[str] = None
     tools: List[str] = field(default_factory=list)
     output_path: Optional[str] = None
     seed: int = 42
     dataset_split: Optional[str] = None
+    telemetry: bool = False
+    gpu_metrics: bool = False
+
+
+@dataclass(slots=True)
+class MetricStats:
+    """Descriptive statistics for a single metric across samples."""
+
+    mean: float = 0.0
+    median: float = 0.0
+    min: float = 0.0
+    max: float = 0.0
+    std: float = 0.0
 
 
 @dataclass(slots=True)
@@ -72,6 +94,18 @@ class RunSummary:
     per_subject: Dict[str, Dict[str, float]] = field(default_factory=dict)
     started_at: float = 0.0
     ended_at: float = 0.0
+    accuracy_stats: Optional[MetricStats] = None
+    latency_stats: Optional[MetricStats] = None
+    ttft_stats: Optional[MetricStats] = None
+    energy_stats: Optional[MetricStats] = None
+    power_stats: Optional[MetricStats] = None
+    gpu_utilization_stats: Optional[MetricStats] = None
+    throughput_stats: Optional[MetricStats] = None
+    mfu_stats: Optional[MetricStats] = None
+    mbu_stats: Optional[MetricStats] = None
+    ipw_stats: Optional[MetricStats] = None
+    ipj_stats: Optional[MetricStats] = None
+    total_energy_joules: float = 0.0
 
 
 # ---------------------------------------------------------------------------
@@ -99,7 +133,7 @@ class DefaultsConfig:
 class JudgeConfig:
     """Configuration for the LLM judge."""
 
-    model: str = "gpt-4o"
+    model: str = "gpt-5-mini-2025-08-07"
     provider: Optional[str] = None
     temperature: float = 0.0
     max_tokens: int = 1024
@@ -112,6 +146,8 @@ class ExecutionConfig:
     max_workers: int = 4
     output_dir: str = "results/"
     seed: int = 42
+    telemetry: bool = False
+    gpu_metrics: bool = False
 
 
 @dataclass(slots=True)
@@ -155,6 +191,7 @@ class EvalSuiteConfig:
 __all__ = [
     "EvalRecord",
     "EvalResult",
+    "MetricStats",
     "RunConfig",
     "RunSummary",
     "MetaConfig",

@@ -185,4 +185,66 @@ class ToolExecutor:
         return [t.to_openai_function() for t in self._tools.values()]
 
 
-__all__ = ["BaseTool", "ToolExecutor", "ToolSpec"]
+def build_tool_descriptions(
+    tools: List[BaseTool],
+    *,
+    include_category: bool = True,
+    include_cost: bool = False,
+) -> str:
+    """Build rich text descriptions from a list of tools.
+
+    This is the single source of truth for all text-based agents that need
+    to describe available tools in their system prompts.
+
+    Parameters
+    ----------
+    tools:
+        List of tool instances.
+    include_category:
+        Whether to include the ``Category:`` line.
+    include_cost:
+        Whether to include ``Cost estimate:`` and ``Latency estimate:`` lines.
+
+    Returns
+    -------
+    str
+        Formatted multi-tool description, or ``"No tools available."`` if
+        *tools* is empty.
+    """
+    if not tools:
+        return "No tools available."
+
+    sections: list[str] = []
+    for t in tools:
+        s = t.spec
+        lines = [f"### {s.name}", s.description]
+
+        if include_category and s.category:
+            lines.append(f"Category: {s.category}")
+
+        if include_cost:
+            if s.cost_estimate:
+                lines.append(f"Cost estimate: ${s.cost_estimate:.4f}")
+            if s.latency_estimate:
+                lines.append(f"Latency estimate: {s.latency_estimate:.1f}s")
+
+        # Parameter descriptions
+        props = s.parameters.get("properties", {})
+        required = set(s.parameters.get("required", []))
+        if props:
+            lines.append("Parameters:")
+            for pname, pinfo in props.items():
+                ptype = pinfo.get("type", "any")
+                req_mark = ", required" if pname in required else ""
+                desc = pinfo.get("description", "")
+                if desc:
+                    lines.append(f"  - {pname} ({ptype}{req_mark}): {desc}")
+                else:
+                    lines.append(f"  - {pname} ({ptype}{req_mark})")
+
+        sections.append("\n".join(lines))
+
+    return "\n\n".join(sections)
+
+
+__all__ = ["BaseTool", "ToolExecutor", "ToolSpec", "build_tool_descriptions"]

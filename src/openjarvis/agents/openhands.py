@@ -51,7 +51,11 @@ class OpenHandsAgent(BaseAgent):
         **kwargs: Any,
     ) -> AgentResult:
         try:
-            from openhands.sdk import Agent, Conversation, LLM  # type: ignore[import-untyped]
+            from openhands.sdk import (  # type: ignore[import-untyped]
+                LLM,
+                Agent,
+                Conversation,
+            )
         except ImportError:
             raise ImportError(
                 "OpenHandsAgent requires the openhands-sdk package. "

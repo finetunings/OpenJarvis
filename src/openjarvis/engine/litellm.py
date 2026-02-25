@@ -76,16 +76,13 @@ class LiteLLMEngine(InferenceEngine):
             "finish_reason": choice.finish_reason or "stop",
         }
 
-        # Extract tool_calls in OpenAI format
+        # Extract tool_calls in flat format (id, name, arguments)
         if hasattr(choice.message, "tool_calls") and choice.message.tool_calls:
             result["tool_calls"] = [
                 {
                     "id": tc.id,
-                    "type": "function",
-                    "function": {
-                        "name": tc.function.name,
-                        "arguments": tc.function.arguments,
-                    },
+                    "name": tc.function.name,
+                    "arguments": tc.function.arguments,
                 }
                 for tc in choice.message.tool_calls
             ]

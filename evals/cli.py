@@ -33,7 +33,8 @@ def _setup_logging(verbose: bool) -> None:
 
 
 def _build_backend(backend_name: str, engine_key: Optional[str],
-                    agent_name: str, tools: list[str]):
+                    agent_name: str, tools: list[str],
+                    telemetry: bool = False, gpu_metrics: bool = False):
     """Construct the appropriate backend."""
     if backend_name == "jarvis-agent":
         from evals.backends.jarvis_agent import JarvisAgentBackend
@@ -41,10 +42,16 @@ def _build_backend(backend_name: str, engine_key: Optional[str],
             engine_key=engine_key,
             agent_name=agent_name,
             tools=tools,
+            telemetry=telemetry,
+            gpu_metrics=gpu_metrics,
         )
     else:
         from evals.backends.jarvis_direct import JarvisDirectBackend
-        return JarvisDirectBackend(engine_key=engine_key)
+        return JarvisDirectBackend(
+            engine_key=engine_key,
+            telemetry=telemetry,
+            gpu_metrics=gpu_metrics,
+        )
 
 
 def _build_dataset(benchmark: str):
@@ -107,6 +114,34 @@ def _print_summary(summary) -> None:
         for subj, stats in sorted(summary.per_subject.items()):
             click.echo(f"  {subj}: {stats['accuracy']:.4f} "
                        f"({int(stats['correct'])}/{int(stats['scored'])})")
+    # GPU telemetry stats
+    _stats_rows = []
+    for label, stats_field in [
+        ("Accuracy", "accuracy_stats"),
+        ("Latency (s)", "latency_stats"),
+        ("TTFT (s)", "ttft_stats"),
+        ("Energy (J)", "energy_stats"),
+        ("Power (W)", "power_stats"),
+        ("GPU Util (%)", "gpu_utilization_stats"),
+        ("Throughput (tok/s)", "throughput_stats"),
+        ("MFU (%)", "mfu_stats"),
+        ("MBU (%)", "mbu_stats"),
+        ("IPW", "ipw_stats"),
+        ("IPJ", "ipj_stats"),
+    ]:
+        ms = getattr(summary, stats_field, None)
+        if ms is not None:
+            _stats_rows.append((label, ms))
+    if _stats_rows:
+        click.echo(f"\n{'Metric':20s} {'Mean':>10s} {'Median':>10s} "
+                   f"{'Min':>10s} {'Max':>10s} {'Std':>10s}")
+        click.echo(f"{'-' * 20} {'-' * 10} {'-' * 10} "
+                   f"{'-' * 10} {'-' * 10} {'-' * 10}")
+        for label, ms in _stats_rows:
+            click.echo(f"{label:20s} {ms.mean:10.4f} {ms.median:10.4f} "
+                       f"{ms.min:10.4f} {ms.max:10.4f} {ms.std:10.4f}")
+    if getattr(summary, "total_energy_joules", 0.0) > 0:
+        click.echo(f"\nTotal Energy: {summary.total_energy_joules:.4f} J")
     click.echo(f"{'=' * 60}")
 
 
@@ -119,6 +154,8 @@ def _run_single(config) -> object:
         config.engine_key,
         config.agent_name or "orchestrator",
         config.tools,
+        telemetry=getattr(config, "telemetry", False),
+        gpu_metrics=getattr(config, "gpu_metrics", False),
     )
     dataset = _build_dataset(config.benchmark)
     judge_backend = _build_judge_backend(config.judge_model)
@@ -200,7 +237,7 @@ def main():
               help="Maximum samples to evaluate")
 @click.option("-w", "--max-workers", type=int, default=4,
               help="Parallel workers")
-@click.option("--judge-model", default="gpt-4o",
+@click.option("--judge-model", default="gpt-5-mini-2025-08-07",
               help="LLM judge model")
 @click.option("-o", "--output", "output_path", default=None,
               help="Output JSONL path")
@@ -211,11 +248,15 @@ def main():
               help="Generation temperature")
 @click.option("--max-tokens", type=int, default=2048,
               help="Max output tokens")
+@click.option("--telemetry/--no-telemetry", default=False,
+              help="Enable telemetry collection during eval")
+@click.option("--gpu-metrics/--no-gpu-metrics", default=False,
+              help="Enable GPU metrics collection")
 @click.option("-v", "--verbose", is_flag=True, help="Verbose logging")
 @click.pass_context
 def run(ctx, config_path, benchmark, backend, model, engine_key, agent_name,
         tools, max_samples, max_workers, judge_model, output_path, seed,
-        dataset_split, temperature, max_tokens, verbose):
+        dataset_split, temperature, max_tokens, telemetry, gpu_metrics, verbose):
     """Run a single benchmark evaluation, or a full suite from a TOML config."""
     _setup_logging(verbose)
 
@@ -255,6 +296,8 @@ def run(ctx, config_path, benchmark, backend, model, engine_key, agent_name,
         output_path=output_path,
         seed=seed,
         dataset_split=dataset_split,
+        telemetry=telemetry,
+        gpu_metrics=gpu_metrics,
     )
 
     summary = _run_single(config)
@@ -269,7 +312,7 @@ def run(ctx, config_path, benchmark, backend, model, engine_key, agent_name,
               help="Max samples per benchmark")
 @click.option("-w", "--max-workers", type=int, default=4,
               help="Parallel workers")
-@click.option("--judge-model", default="gpt-4o", help="LLM judge model")
+@click.option("--judge-model", default="gpt-5-mini-2025-08-07", help="LLM judge model")
 @click.option("--output-dir", default="results/",
               help="Output directory for results")
 @click.option("--seed", type=int, default=42, help="Random seed")

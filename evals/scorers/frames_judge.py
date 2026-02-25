@@ -63,7 +63,7 @@ class FRAMESScorer(LLMJudgeScorer):
         )
 
         try:
-            raw = self._ask_judge(prompt, temperature=0.0, max_tokens=1024)
+            raw = self._ask_judge(prompt, temperature=0.0, max_tokens=2048)
 
             structured_match = re.search(
                 r"^correct:\s*(yes|no)", raw, re.MULTILINE | re.IGNORECASE,

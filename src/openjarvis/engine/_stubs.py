@@ -56,6 +56,9 @@ class InferenceEngine(ABC):
     def health(self) -> bool:
         """Return ``True`` when the engine is reachable and healthy."""
 
+    def close(self) -> None:
+        """Release resources (HTTP clients, connections, threads, etc.)."""
+
     def prepare(self, model: str) -> None:
         """Optional warm-up hook called before the first request."""
 

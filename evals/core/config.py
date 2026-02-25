@@ -78,7 +78,7 @@ def load_eval_config(path: str | Path) -> EvalSuiteConfig:
     # Parse [judge]
     judge_raw = raw.get("judge", {})
     judge = JudgeConfig(
-        model=judge_raw.get("model", "gpt-4o"),
+        model=judge_raw.get("model", "gpt-5-mini-2025-08-07"),
         provider=judge_raw.get("provider"),
         temperature=float(judge_raw.get("temperature", 0.0)),
         max_tokens=int(judge_raw.get("max_tokens", 1024)),
@@ -90,6 +90,8 @@ def load_eval_config(path: str | Path) -> EvalSuiteConfig:
         max_workers=int(run_raw.get("max_workers", 4)),
         output_dir=run_raw.get("output_dir", "results/"),
         seed=int(run_raw.get("seed", 42)),
+        telemetry=bool(run_raw.get("telemetry", False)),
+        gpu_metrics=bool(run_raw.get("gpu_metrics", False)),
     )
 
     # Parse [[models]]
@@ -212,6 +214,8 @@ def expand_suite(suite: EvalSuiteConfig) -> List[RunConfig]:
                 output_path=output_path,
                 seed=suite.run.seed,
                 dataset_split=bench.split,
+                telemetry=suite.run.telemetry,
+                gpu_metrics=suite.run.gpu_metrics,
             ))
 
     return configs

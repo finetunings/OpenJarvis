@@ -17,13 +17,21 @@ class JarvisDirectBackend(InferenceBackend):
 
     backend_id = "jarvis-direct"
 
-    def __init__(self, engine_key: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        engine_key: Optional[str] = None,
+        telemetry: bool = False,
+        gpu_metrics: bool = False,
+    ) -> None:
         from openjarvis.system import SystemBuilder
+
+        self._telemetry = telemetry
+        self._gpu_metrics = gpu_metrics
 
         builder = SystemBuilder()
         if engine_key:
             builder.engine(engine_key)
-        self._system = builder.telemetry(False).traces(False).build()
+        self._system = builder.telemetry(telemetry).traces(telemetry).build()
 
     def generate(
         self,
@@ -64,12 +72,18 @@ class JarvisDirectBackend(InferenceBackend):
         elapsed = time.monotonic() - t0
 
         usage = result.get("usage", {})
+        telemetry_data = result.get("_telemetry", {})
         return {
             "content": result.get("content", ""),
             "usage": usage,
             "model": result.get("model", model),
             "latency_seconds": elapsed,
             "cost_usd": result.get("cost_usd", 0.0),
+            "ttft": result.get("ttft", telemetry_data.get("ttft", 0.0)),
+            "energy_joules": telemetry_data.get("energy_joules", 0.0),
+            "power_watts": telemetry_data.get("power_watts", 0.0),
+            "gpu_utilization_pct": telemetry_data.get("gpu_utilization_pct", 0.0),
+            "throughput_tok_per_sec": telemetry_data.get("throughput_tok_per_sec", 0.0),
         }
 
     def close(self) -> None:

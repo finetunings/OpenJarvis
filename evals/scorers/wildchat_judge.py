@@ -118,7 +118,7 @@ class WildChatScorer(LLMJudgeScorer):
         try:
             raw = self._ask_judge(
                 prompt, system=SYSTEM_PROMPT,
-                temperature=0.0, max_tokens=1024,
+                temperature=0.0, max_tokens=2048,
             )
         except Exception as exc:
             LOGGER.error("WildChat judge call failed: %s", exc)

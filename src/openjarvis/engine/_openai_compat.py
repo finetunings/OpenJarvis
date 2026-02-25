@@ -138,5 +138,8 @@ class _OpenAICompatibleEngine(InferenceEngine):
         except Exception:
             return False
 
+    def close(self) -> None:
+        self._client.close()
+
 
 __all__ = ["_OpenAICompatibleEngine"]

@@ -16,54 +16,37 @@ from openjarvis.core.events import EventBus
 from openjarvis.core.registry import AgentRegistry
 from openjarvis.core.types import Message, Role, ToolCall, ToolResult
 from openjarvis.engine._stubs import InferenceEngine
-from openjarvis.tools._stubs import BaseTool
+from openjarvis.tools._stubs import BaseTool, build_tool_descriptions
 
-OPENHANDS_SYSTEM_PROMPT = """\
-You are an AI assistant with access to tools. You MUST use tools when they would help answer the user's question.
-
-## How to use tools
-
-To call a tool, write on its own lines:
-
-Action: <tool_name>
-Action Input: <json_arguments>
-
-You will receive the result, then continue your response.
-
-## Available tools
-
-{tool_descriptions}
-
-## Important rules
-
-- When the user asks you to look up, search, fetch, or summarize a URL or topic, you MUST use web_search. Do NOT say you cannot browse the web.
-- When the user provides a URL, pass the FULL URL (including https://) as the query to web_search. Do NOT rewrite URLs into search keywords.
-- When the user asks a math question, use calculator.
-- When the user asks to read a file, use file_read.
-- You CAN write Python code in ```python blocks and it will be executed. Use this for computation, data processing, or when no specific tool fits.
-- If no tool or code is needed, respond directly with your answer.
-- Do NOT include <think> tags or internal reasoning in your response. Respond directly.\
-"""
-
-
-def _build_tool_descriptions(tools: list) -> str:
-    """Build detailed tool descriptions from ToolSpec objects."""
-    if not tools:
-        return "No tools available."
-    lines = []
-    for t in tools:
-        s = t.spec
-        params = s.parameters.get("properties", {})
-        required = s.parameters.get("required", [])
-        param_parts = []
-        for pname, pinfo in params.items():
-            req_mark = " (required)" if pname in required else ""
-            param_parts.append(
-                f"    - {pname}{req_mark}: {pinfo.get('description', pinfo.get('type', ''))}"
-            )
-        param_str = "\n".join(param_parts) if param_parts else "    (no parameters)"
-        lines.append(f"### {s.name}\n{s.description}\nParameters:\n{param_str}")
-    return "\n\n".join(lines)
+OPENHANDS_SYSTEM_PROMPT = (  # noqa: E501
+    "You are an AI assistant with access to tools. "
+    "You MUST use tools when they would help answer "
+    "the user's question.\n\n"
+    "## How to use tools\n\n"
+    "To call a tool, write on its own lines:\n\n"
+    "Action: <tool_name>\n"
+    "Action Input: <json_arguments>\n\n"
+    "You will receive the result, then continue your "
+    "response.\n\n"
+    "## Available tools\n\n"
+    "{tool_descriptions}\n\n"
+    "## Important rules\n\n"
+    "- When the user asks you to look up, search, fetch, "
+    "or summarize a URL or topic, you MUST use web_search. "
+    "Do NOT say you cannot browse the web.\n"
+    "- When the user provides a URL, pass the FULL URL "
+    "(including https://) as the query to web_search. "
+    "Do NOT rewrite URLs into search keywords.\n"
+    "- When the user asks a math question, use calculator.\n"
+    "- When the user asks to read a file, use file_read.\n"
+    "- You CAN write Python code in ```python blocks and "
+    "it will be executed. Use this for computation, data "
+    "processing, or when no specific tool fits.\n"
+    "- If no tool or code is needed, respond directly "
+    "with your answer.\n"
+    "- Do NOT include <think> tags or internal reasoning "
+    "in your response. Respond directly."
+)
 
 
 @AgentRegistry.register("native_openhands")
@@ -105,12 +88,20 @@ class NativeOpenHandsAgent(ToolUsingAgent):
             from openjarvis.tools.web_search import WebSearchTool
 
             content = WebSearchTool._fetch_url(url, max_chars=4000)
-            expanded = text.replace(url, f"\n\n--- Content from {url} ---\n{content}\n--- End of content ---\n")
+            header = f"\n\n--- Content from {url} ---\n"
+            footer = "\n--- End of content ---\n"
+            expanded = text.replace(
+                url, f"{header}{content}{footer}"
+            )
             return expanded, True
         except Exception:
             return text, False
 
-    def _truncate_if_needed(self, messages: list[Message], max_prompt_tokens: int = 3000) -> list[Message]:
+    def _truncate_if_needed(
+        self,
+        messages: list[Message],
+        max_prompt_tokens: int = 3000,
+    ) -> list[Message]:
         """Truncate messages if estimated token count exceeds limit."""
         total_chars = sum(len(m.content) for m in messages)
         estimated_tokens = total_chars // 4
@@ -126,7 +117,11 @@ class NativeOpenHandsAgent(ToolUsingAgent):
                     truncated = original[: len(original) - excess_chars]
                     messages[i] = Message(
                         role=Role.USER,
-                        content=truncated + "\n\n[Input truncated to fit context window]",
+                        content=(
+                            truncated
+                            + "\n\n[Input truncated"
+                            " to fit context window]"
+                        ),
                     )
                 break
         return messages
@@ -146,9 +141,9 @@ class NativeOpenHandsAgent(ToolUsingAgent):
         2. <tool_call>tool_name\\n$key=value</tool_call> (XML-style)
         """
         # Format 1: Action / Action Input
-        action_match = re.search(r"Action:\s*(.+)", text)
+        action_match = re.search(r"Action:\s*(.+)", text, re.IGNORECASE)
         input_match = re.search(
-            r"Action Input:\s*(.+?)(?=\n\n|\Z)", text, re.DOTALL
+            r"Action Input:\s*(.+?)(?=\n\n|\Z)", text, re.DOTALL | re.IGNORECASE
         )
         if action_match:
             return (
@@ -168,7 +163,8 @@ class NativeOpenHandsAgent(ToolUsingAgent):
             # Parse $key=value or <key>value</key> params into JSON
             params: dict[str, Any] = {}
             # $key=value format
-            for m in re.finditer(r"\$(\w+)=(.+?)(?=\$|\n<|</|$)", raw_params, re.DOTALL):
+            pat = r"\$(\w+)=(.+?)(?=\$|\n<|</|$)"
+            for m in re.finditer(pat, raw_params, re.DOTALL):
                 params[m.group(1)] = m.group(2).strip().rstrip("</>\n")
             # <key>value</key> format
             for m in re.finditer(r"<(\w+)>(.*?)</\1>", raw_params, re.DOTALL):
@@ -192,8 +188,10 @@ class NativeOpenHandsAgent(ToolUsingAgent):
     ) -> AgentResult:
         self._emit_turn_start(input)
 
-        tool_descriptions = _build_tool_descriptions(self._tools)
-        system_prompt = OPENHANDS_SYSTEM_PROMPT.format(tool_descriptions=tool_descriptions)
+        tool_descriptions = build_tool_descriptions(self._tools)
+        system_prompt = OPENHANDS_SYSTEM_PROMPT.format(
+            tool_descriptions=tool_descriptions,
+        )
 
         # Pre-fetch any URLs in the input so the LLM gets the content directly
         input, url_expanded = self._expand_urls(input)
@@ -201,7 +199,15 @@ class NativeOpenHandsAgent(ToolUsingAgent):
         # If URL content was inlined, skip the tool loop -- just summarize directly
         if url_expanded:
             direct_messages: list[Message] = [
-                Message(role=Role.SYSTEM, content="You are a helpful assistant. Respond directly to the user's request using the provided content. Do NOT include <think> tags."),
+                Message(
+                    role=Role.SYSTEM,
+                    content=(
+                        "You are a helpful assistant. "
+                        "Respond directly to the user's "
+                        "request using the provided content."
+                        " Do NOT include <think> tags."
+                    ),
+                ),
                 Message(role=Role.USER, content=input),
             ]
             direct_messages = self._truncate_if_needed(direct_messages)
@@ -212,13 +218,24 @@ class NativeOpenHandsAgent(ToolUsingAgent):
                 return AgentResult(content=content, tool_results=[], turns=1)
             except Exception as exc:
                 error_str = str(exc)
-                error_msg = (
-                    "The input is too long for the model's context window. Please try a shorter message."
-                    if "400" in error_str
-                    else f"The model returned an error: {error_str}"
-                )
+                if "400" in error_str:
+                    error_msg = (
+                        "The input is too long for the "
+                        "model's context window. "
+                        "Please try a shorter message."
+                    )
+                else:
+                    error_msg = (
+                        "The model returned an error: "
+                        + error_str
+                    )
                 self._emit_turn_end(turns=1, error=True)
-                return AgentResult(content=error_msg, tool_results=[], turns=1, metadata={"error": True})
+                return AgentResult(
+                    content=error_msg,
+                    tool_results=[],
+                    turns=1,
+                    metadata={"error": True},
+                )
 
         messages = self._build_messages(input, context, system_prompt=system_prompt)
         messages = self._truncate_if_needed(messages)

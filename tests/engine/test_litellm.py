@@ -103,9 +103,8 @@ class TestLiteLLMEngineGenerate:
         assert len(result["tool_calls"]) == 1
         tc = result["tool_calls"][0]
         assert tc["id"] == "call_123"
-        assert tc["type"] == "function"
-        assert tc["function"]["name"] == "calculator"
-        assert tc["function"]["arguments"] == '{"expression": "2+2"}'
+        assert tc["name"] == "calculator"
+        assert tc["arguments"] == '{"expression": "2+2"}'
 
     def test_generate_with_api_base(self) -> None:
         fake_usage = SimpleNamespace(

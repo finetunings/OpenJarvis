@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import json
 import os
+import time
 from collections.abc import AsyncIterator, Sequence
 from typing import Any, Dict, List
 
@@ -59,6 +61,13 @@ def _is_google_model(model: str) -> bool:
     return "gemini" in model.lower()
 
 
+def _is_openai_reasoning_model(model: str) -> bool:
+    """Check if model is an OpenAI reasoning model that restricts temperature."""
+    m = model.lower()
+    # o1/o3 series and gpt-5-mini dated snapshots are reasoning models
+    return m.startswith(("o1", "o3")) or "gpt-5-mini-" in m
+
+
 def estimate_cost(model: str, prompt_tokens: int, completion_tokens: int) -> float:
     """Estimate USD cost based on the hardcoded pricing table."""
     # Try exact match first, then prefix match
@@ -73,6 +82,36 @@ def estimate_cost(model: str, prompt_tokens: int, completion_tokens: int) -> flo
     input_cost = (prompt_tokens / 1_000_000) * prices[0]
     output_cost = (completion_tokens / 1_000_000) * prices[1]
     return input_cost + output_cost
+
+
+def _convert_tools_to_anthropic(
+    openai_tools: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Convert OpenAI function-calling tools to Anthropic tool format."""
+    result = []
+    for tool in openai_tools:
+        func = tool.get("function", {})
+        result.append({
+            "name": func.get("name", ""),
+            "description": func.get("description", ""),
+            "input_schema": func.get("parameters", {}),
+        })
+    return result
+
+
+def _convert_tools_to_google(
+    openai_tools: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Convert OpenAI function-calling tools to Google function declarations."""
+    declarations = []
+    for tool in openai_tools:
+        func = tool.get("function", {})
+        declarations.append({
+            "name": func.get("name", ""),
+            "description": func.get("description", ""),
+            "parameters": func.get("parameters", {}),
+        })
+    return declarations
 
 
 @EngineRegistry.register("cloud")
@@ -126,18 +165,22 @@ class CloudEngine(InferenceEngine):
                 "OPENAI_API_KEY and install "
                 "openjarvis[inference-cloud]"
             )
-        resp = self._openai_client.chat.completions.create(
-            model=model,
-            messages=messages_to_dicts(messages),
-            temperature=temperature,
-            max_tokens=max_tokens,
+        create_kwargs: Dict[str, Any] = {
+            "model": model,
+            "messages": messages_to_dicts(messages),
+            "max_completion_tokens": max_tokens,
             **kwargs,
-        )
+        }
+        if not _is_openai_reasoning_model(model):
+            create_kwargs["temperature"] = temperature
+        t0 = time.monotonic()
+        resp = self._openai_client.chat.completions.create(**create_kwargs)
+        elapsed = time.monotonic() - t0
         choice = resp.choices[0]
         usage = resp.usage
         prompt_tokens = usage.prompt_tokens if usage else 0
         completion_tokens = usage.completion_tokens if usage else 0
-        return {
+        result = {
             "content": choice.message.content or "",
             "usage": {
                 "prompt_tokens": prompt_tokens,
@@ -147,7 +190,21 @@ class CloudEngine(InferenceEngine):
             "model": resp.model,
             "finish_reason": choice.finish_reason or "stop",
             "cost_usd": estimate_cost(model, prompt_tokens, completion_tokens),
+            "ttft": elapsed,
         }
+
+        # Extract tool_calls if present
+        if hasattr(choice.message, "tool_calls") and choice.message.tool_calls:
+            result["tool_calls"] = [
+                {
+                    "id": tc.id,
+                    "name": tc.function.name,
+                    "arguments": tc.function.arguments,
+                }
+                for tc in choice.message.tool_calls
+            ]
+
+        return result
 
     def _generate_anthropic(
         self,
@@ -180,11 +237,36 @@ class CloudEngine(InferenceEngine):
         }
         if system_text:
             create_kwargs["system"] = system_text
+
+        # Convert and pass tools in Anthropic format
+        raw_tools = kwargs.pop("tools", None)
+        if raw_tools:
+            create_kwargs["tools"] = _convert_tools_to_anthropic(raw_tools)
+
+        t0 = time.monotonic()
         resp = self._anthropic_client.messages.create(**create_kwargs)
-        content = resp.content[0].text if resp.content else ""
+        elapsed = time.monotonic() - t0
+
+        # Extract text and tool_use blocks from response content
+        content_parts: list[str] = []
+        tool_calls: list[Dict[str, Any]] = []
+        for block in resp.content:
+            if getattr(block, "type", None) == "tool_use":
+                tool_calls.append({
+                    "id": block.id,
+                    "name": block.name,
+                    "arguments": json.dumps(block.input)
+                    if isinstance(block.input, dict)
+                    else str(block.input),
+                })
+            elif hasattr(block, "text"):
+                content_parts.append(block.text)
+
+        content = "\n".join(content_parts) if content_parts else ""
         prompt_tokens = resp.usage.input_tokens if resp.usage else 0
         completion_tokens = resp.usage.output_tokens if resp.usage else 0
-        return {
+
+        result: Dict[str, Any] = {
             "content": content,
             "usage": {
                 "prompt_tokens": prompt_tokens,
@@ -194,7 +276,13 @@ class CloudEngine(InferenceEngine):
             "model": resp.model,
             "finish_reason": resp.stop_reason or "stop",
             "cost_usd": estimate_cost(model, prompt_tokens, completion_tokens),
+            "ttft": elapsed,
         }
+
+        if tool_calls:
+            result["tool_calls"] = tool_calls
+
+        return result
 
     def _generate_google(
         self,
@@ -231,12 +319,49 @@ class CloudEngine(InferenceEngine):
         if system_text:
             config.system_instruction = system_text
 
+        # Convert and pass tools in Google format
+        raw_tools = kwargs.pop("tools", None)
+        if raw_tools:
+            declarations = _convert_tools_to_google(raw_tools)
+            config.tools = [{"function_declarations": declarations}]
+
+        t0 = time.monotonic()
         resp = self._google_client.models.generate_content(
             model=model,
             contents=contents,
             config=config,
         )
-        content = resp.text or ""
+        elapsed = time.monotonic() - t0
+
+        # Extract text and function_call parts from response
+        text_parts: list[str] = []
+        tool_calls: list[Dict[str, Any]] = []
+        candidates = getattr(resp, "candidates", None)
+        if candidates:
+            parts = getattr(candidates[0].content, "parts", [])
+            for part in parts:
+                if hasattr(part, "function_call") and part.function_call:
+                    fc = part.function_call
+                    fc_args = (
+                        dict(fc.args) if hasattr(fc.args, "items") else {}
+                    )
+                    tool_calls.append({
+                        "id": f"google_{fc.name}",
+                        "name": fc.name,
+                        "arguments": json.dumps(fc_args),
+                    })
+                elif hasattr(part, "text") and part.text:
+                    text_parts.append(part.text)
+
+        # Guard against resp.text ValueError when only function_call parts
+        if text_parts:
+            content = "\n".join(text_parts)
+        else:
+            try:
+                content = resp.text or ""
+            except (ValueError, AttributeError):
+                content = ""
+
         um = resp.usage_metadata
         prompt_tokens = (
             getattr(um, "prompt_token_count", 0) if um else 0
@@ -244,7 +369,8 @@ class CloudEngine(InferenceEngine):
         completion_tokens = (
             getattr(um, "candidates_token_count", 0) if um else 0
         )
-        return {
+
+        result: Dict[str, Any] = {
             "content": content,
             "usage": {
                 "prompt_tokens": prompt_tokens,
@@ -254,7 +380,13 @@ class CloudEngine(InferenceEngine):
             "model": model,
             "finish_reason": "stop",
             "cost_usd": estimate_cost(model, prompt_tokens, completion_tokens),
+            "ttft": elapsed,
         }
+
+        if tool_calls:
+            result["tool_calls"] = tool_calls
+
+        return result
 
     def generate(
         self,
@@ -319,14 +451,16 @@ class CloudEngine(InferenceEngine):
     ) -> AsyncIterator[str]:
         if self._openai_client is None:
             raise EngineConnectionError("OpenAI client not available")
-        resp = self._openai_client.chat.completions.create(
-            model=model,
-            messages=messages_to_dicts(messages),
-            temperature=temperature,
-            max_tokens=max_tokens,
-            stream=True,
+        create_kwargs: Dict[str, Any] = {
+            "model": model,
+            "messages": messages_to_dicts(messages),
+            "max_completion_tokens": max_tokens,
+            "stream": True,
             **kwargs,
-        )
+        }
+        if not _is_openai_reasoning_model(model):
+            create_kwargs["temperature"] = temperature
+        resp = self._openai_client.chat.completions.create(**create_kwargs)
         for chunk in resp:
             delta = chunk.choices[0].delta if chunk.choices else None
             if delta and delta.content:
@@ -416,6 +550,18 @@ class CloudEngine(InferenceEngine):
             or self._anthropic_client is not None
             or self._google_client is not None
         )
+
+    def close(self) -> None:
+        if self._openai_client is not None:
+            if hasattr(self._openai_client, "close"):
+                self._openai_client.close()
+            self._openai_client = None
+        if self._anthropic_client is not None:
+            if hasattr(self._anthropic_client, "close"):
+                self._anthropic_client.close()
+            self._anthropic_client = None
+        if self._google_client is not None:
+            self._google_client = None
 
 
 __all__ = ["CloudEngine", "PRICING", "estimate_cost"]

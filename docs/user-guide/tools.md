@@ -135,6 +135,47 @@ If the tool name is unknown, a `ToolResult` with `success=False` is returned. If
 
 ---
 
+## build_tool_descriptions()
+
+The `build_tool_descriptions()` function is the **single source of truth** for generating enriched tool descriptions used in agent system prompts. All text-based agents (`NativeReActAgent`, `NativeOpenHandsAgent`, `RLMAgent`, `OrchestratorAgent` in structured mode) use this function to produce Markdown-formatted tool sections.
+
+### Parameters
+
+| Parameter          | Type             | Default | Description                                          |
+|--------------------|------------------|---------|------------------------------------------------------|
+| `tools`            | `list[BaseTool]` | --      | List of tool instances to describe                   |
+| `include_category` | `bool`           | `True`  | Whether to include the `Category:` line              |
+| `include_cost`     | `bool`           | `False` | Whether to include cost and latency estimate lines   |
+
+### Usage
+
+```python
+from openjarvis.tools._stubs import build_tool_descriptions
+from openjarvis.tools.calculator import CalculatorTool
+from openjarvis.tools.think import ThinkTool
+
+tools = [CalculatorTool(), ThinkTool()]
+desc = build_tool_descriptions(tools)
+print(desc)
+# ### calculator
+# Evaluate a mathematical expression safely.
+# Category: math
+# Parameters:
+#   - expression (string, required): Math expression to evaluate
+#
+# ### think
+# Reasoning scratchpad ...
+```
+
+### Agents using this builder
+
+- **NativeReActAgent** -- Injects descriptions into the ReAct system prompt
+- **NativeOpenHandsAgent** -- Injects descriptions into the CodeAct system prompt
+- **RLMAgent** -- Adds an `## Available Tools` section to the REPL system prompt
+- **OrchestratorAgent** (structured mode) -- Passes `tools=` to `build_system_prompt()` which delegates to this builder
+
+---
+
 ## Built-in Tools
 
 ### Calculator

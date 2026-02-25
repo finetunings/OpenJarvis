@@ -14,7 +14,7 @@ from openjarvis.core.events import EventBus
 from openjarvis.core.registry import AgentRegistry
 from openjarvis.core.types import Message, Role, ToolCall, ToolResult
 from openjarvis.engine._stubs import InferenceEngine
-from openjarvis.tools._stubs import BaseTool
+from openjarvis.tools._stubs import BaseTool, build_tool_descriptions
 
 REACT_SYSTEM_PROMPT = """\
 You are a ReAct agent. For each step, respond with exactly one of:
@@ -28,7 +28,7 @@ Action Input: <json arguments>
 Thought: <your reasoning>
 Final Answer: <your answer>
 
-Available tools: {tool_names}"""
+{tool_descriptions}"""
 
 
 @AgentRegistry.register("native_react")
@@ -60,24 +60,30 @@ class NativeReActAgent(ToolUsingAgent):
 
         # Extract Thought
         thought_match = re.search(
-            r"Thought:\s*(.+?)(?=\nAction:|\nFinal Answer:|\Z)", text, re.DOTALL
+            r"Thought:\s*(.+?)(?=\nAction:|\nFinal Answer:|\Z)",
+            text,
+            re.DOTALL | re.IGNORECASE,
         )
         if thought_match:
             result["thought"] = thought_match.group(1).strip()
 
         # Check for Final Answer
-        final_match = re.search(r"Final Answer:\s*(.+)", text, re.DOTALL)
+        final_match = re.search(
+            r"Final Answer:\s*(.+)", text, re.DOTALL | re.IGNORECASE
+        )
         if final_match:
             result["final_answer"] = final_match.group(1).strip()
             return result
 
         # Extract Action and Action Input
-        action_match = re.search(r"Action:\s*(.+)", text)
+        action_match = re.search(r"Action:\s*(.+)", text, re.IGNORECASE)
         if action_match:
             result["action"] = action_match.group(1).strip()
 
         input_match = re.search(
-            r"Action Input:\s*(.+?)(?=\n\n|\nThought:|\Z)", text, re.DOTALL
+            r"Action Input:\s*(.+?)(?=\n\n|\nThought:|\Z)",
+            text,
+            re.DOTALL | re.IGNORECASE,
         )
         if input_match:
             result["action_input"] = input_match.group(1).strip()
@@ -92,11 +98,9 @@ class NativeReActAgent(ToolUsingAgent):
     ) -> AgentResult:
         self._emit_turn_start(input)
 
-        # Build system prompt with available tools
-        tool_names = (
-            ", ".join(t.spec.name for t in self._tools) if self._tools else "none"
-        )
-        system_prompt = REACT_SYSTEM_PROMPT.format(tool_names=tool_names)
+        # Build system prompt with rich tool descriptions
+        tool_desc = build_tool_descriptions(self._tools)
+        system_prompt = REACT_SYSTEM_PROMPT.format(tool_descriptions=tool_desc)
 
         messages = self._build_messages(input, context, system_prompt=system_prompt)
 

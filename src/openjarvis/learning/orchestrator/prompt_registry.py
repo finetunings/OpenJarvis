@@ -7,7 +7,10 @@ prompt template and tool descriptions used by the structured-mode
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional
+
+if TYPE_CHECKING:
+    from openjarvis.tools._stubs import BaseTool
 
 PROMPT_VERSION = "1.0"
 
@@ -204,16 +207,61 @@ TOOL_DESCRIPTIONS: Dict[str, dict] = {
 }
 
 
-def build_system_prompt(tool_names: Optional[List[str]] = None) -> str:
+# Category labels for tool selection guide auto-generation
+_CAT_LABELS: Dict[str, str] = {
+    "math": "MATH PROBLEMS",
+    "utility": "UTILITY / CODING TASKS",
+    "memory": "GENERAL Q&A / FACTUAL",
+    "llm": "REASONING/LOGIC",
+}
+
+
+def build_system_prompt(
+    tool_names: Optional[List[str]] = None,
+    *,
+    tools: Optional[List["BaseTool"]] = None,
+) -> str:
     """Build the complete system prompt for the given tools.
 
     Args:
         tool_names: Tool names to include.  If ``None``, uses all
-            tools from :data:`TOOL_DESCRIPTIONS`.
+            tools from :data:`TOOL_DESCRIPTIONS`.  This path is kept for
+            backward compatibility with training pipelines.
+        tools: Optional list of ``BaseTool`` instances.  When provided,
+            rich descriptions are auto-generated from ``ToolSpec``,
+            replacing the hardcoded :data:`TOOL_DESCRIPTIONS` lookup.
+            Unknown / MCP tools get full descriptions instead of
+            ``"Tool: {name}"``.
 
     Returns:
         Complete system prompt string.
     """
+    # When BaseTool instances are provided, generate descriptions from spec
+    if tools is not None:
+        from openjarvis.tools._stubs import build_tool_descriptions
+
+        desc_text = build_tool_descriptions(tools, include_cost=True)
+
+        # Auto-generate tool selection guide by grouping tools by category
+        by_cat: Dict[str, List[str]] = {}
+        for t in tools:
+            cat = t.spec.category or "llm"
+            by_cat.setdefault(cat, []).append(t.spec.name)
+
+        guide: list[str] = ["Choose tools based on task type:\n"]
+        for cat, names in by_cat.items():
+            label = _CAT_LABELS.get(cat, cat.upper())
+            guide.append(f"{label}:")
+            for n in names:
+                guide.append(f"- {n}")
+            guide.append("")
+
+        return SYSTEM_PROMPT_TEMPLATE.format(
+            tools_description=desc_text,
+            tool_selection_guide="\n".join(guide),
+        )
+
+    # Backward-compat: tool_names-only path (used by training pipelines)
     if tool_names is None:
         tool_names = list(TOOL_DESCRIPTIONS)
 
@@ -227,16 +275,16 @@ def build_system_prompt(tool_names: Optional[List[str]] = None) -> str:
         desc_lines.append(f"- {name}: {desc}")
 
     # Group tools by category
-    by_cat: Dict[str, List[str]] = {}
+    by_cat_names: Dict[str, List[str]] = {}
     for name in tool_names:
         cat = (
             TOOL_DESCRIPTIONS[name]["category"]
             if name in TOOL_DESCRIPTIONS
             else "llm"
         )
-        by_cat.setdefault(cat, []).append(name)
+        by_cat_names.setdefault(cat, []).append(name)
 
-    guide: list[str] = [
+    guide = [
         "Choose tools based on task type:\n",
     ]
 
@@ -272,7 +320,7 @@ def build_system_prompt(tool_names: Optional[List[str]] = None) -> str:
         reasoning_lines.append(
             "- Step-by-step analysis -> think (organize thoughts first)"
         )
-    llm_tools = by_cat.get("llm", [])
+    llm_tools = by_cat_names.get("llm", [])
     if llm_tools:
         reasoning_lines.append(
             f"- Complex reasoning -> {', '.join(llm_tools)}"
@@ -286,7 +334,7 @@ def build_system_prompt(tool_names: Optional[List[str]] = None) -> str:
     general_lines: list[str] = []
     if "web_search" in tool_names:
         general_lines.append("- Current events/recent info -> web_search")
-    memory_tools = by_cat.get("memory", [])
+    memory_tools = by_cat_names.get("memory", [])
     if memory_tools:
         general_lines.append(
             f"- Stored knowledge -> {', '.join(memory_tools)}"

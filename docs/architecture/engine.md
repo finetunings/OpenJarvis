@@ -80,6 +80,28 @@ When the model requests tool calls, they are extracted and passed through in Ope
 }
 ```
 
+### Multi-Provider Tool Call Extraction
+
+Engine backends normalize tool calls from different providers into the standard flat format used by agents:
+
+| Provider | Source Format | Extraction Logic |
+|----------|-------------|-----------------|
+| **OpenAI** | `choices[0].message.tool_calls[].function.{name, arguments}` | Direct extraction, add `id` from `tool_calls[].id` |
+| **Anthropic** | `content[]` blocks with `type: "tool_use"` | Filter `tool_use` blocks, map `input` dict to JSON `arguments` |
+| **Google** | `candidates[0].content.parts[]` with `function_call` | Extract `function_call.name` and `function_call.args`, serialize args to JSON |
+| **LiteLLM** | Flat `{id, name, arguments}` dicts (proxy pre-normalizes) | Pass through directly |
+| **Ollama** | `message.tool_calls[].function.{name, arguments}` | Extract from Ollama native format, serialize arguments dict to JSON |
+
+All providers produce the same output format consumed by agents:
+
+```python
+{
+    "tool_calls": [
+        {"id": "call_abc", "name": "calculator", "arguments": "{\"expression\": \"2+2\"}"}
+    ]
+}
+```
+
 ---
 
 ## Backend Comparison

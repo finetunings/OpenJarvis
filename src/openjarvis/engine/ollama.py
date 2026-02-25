@@ -71,6 +71,11 @@ class OllamaEngine(InferenceEngine):
             "model": data.get("model", model),
             "finish_reason": "stop",
         }
+        # Extract timing from Ollama response (nanoseconds → seconds)
+        result["ttft"] = data.get("prompt_eval_duration", 0) / 1e9
+        result["engine_timing"] = {k: data[k] for k in
+            ("total_duration", "load_duration", "prompt_eval_duration", "eval_duration")
+            if k in data}
         # Extract tool calls if present
         raw_tool_calls = data.get("message", {}).get("tool_calls", [])
         if raw_tool_calls:
@@ -134,6 +139,9 @@ class OllamaEngine(InferenceEngine):
             return resp.status_code == 200
         except Exception:
             return False
+
+    def close(self) -> None:
+        self._client.close()
 
 
 __all__ = ["OllamaEngine"]

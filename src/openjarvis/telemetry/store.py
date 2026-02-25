@@ -24,6 +24,12 @@ CREATE TABLE IF NOT EXISTS telemetry (
     cost_usd        REAL    NOT NULL DEFAULT 0.0,
     energy_joules   REAL    NOT NULL DEFAULT 0.0,
     power_watts     REAL    NOT NULL DEFAULT 0.0,
+    gpu_utilization_pct  REAL NOT NULL DEFAULT 0.0,
+    gpu_memory_used_gb   REAL NOT NULL DEFAULT 0.0,
+    gpu_temperature_c    REAL NOT NULL DEFAULT 0.0,
+    throughput_tok_per_sec REAL NOT NULL DEFAULT 0.0,
+    prefill_latency_seconds REAL NOT NULL DEFAULT 0.0,
+    decode_latency_seconds  REAL NOT NULL DEFAULT 0.0,
     metadata        TEXT    NOT NULL DEFAULT '{}'
 );
 """
@@ -32,9 +38,21 @@ _INSERT = """\
 INSERT INTO telemetry (
     timestamp, model_id, engine, agent,
     prompt_tokens, completion_tokens, total_tokens,
-    latency_seconds, ttft, cost_usd, energy_joules, power_watts, metadata
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    latency_seconds, ttft, cost_usd, energy_joules, power_watts,
+    gpu_utilization_pct, gpu_memory_used_gb, gpu_temperature_c,
+    throughput_tok_per_sec, prefill_latency_seconds, decode_latency_seconds,
+    metadata
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
+
+_MIGRATE_COLUMNS = [
+    ("gpu_utilization_pct", "REAL NOT NULL DEFAULT 0.0"),
+    ("gpu_memory_used_gb", "REAL NOT NULL DEFAULT 0.0"),
+    ("gpu_temperature_c", "REAL NOT NULL DEFAULT 0.0"),
+    ("throughput_tok_per_sec", "REAL NOT NULL DEFAULT 0.0"),
+    ("prefill_latency_seconds", "REAL NOT NULL DEFAULT 0.0"),
+    ("decode_latency_seconds", "REAL NOT NULL DEFAULT 0.0"),
+]
 
 
 class TelemetryStore:
@@ -44,6 +62,18 @@ class TelemetryStore:
         self._db_path = str(db_path)
         self._conn = sqlite3.connect(self._db_path, check_same_thread=False)
         self._conn.execute(_CREATE_TABLE)
+        self._conn.commit()
+        self._migrate_schema()
+
+    def _migrate_schema(self) -> None:
+        """Add new columns to existing databases (idempotent)."""
+        for col_name, col_def in _MIGRATE_COLUMNS:
+            try:
+                self._conn.execute(
+                    f"ALTER TABLE telemetry ADD COLUMN {col_name} {col_def}",
+                )
+            except sqlite3.OperationalError:
+                pass  # Column already exists
         self._conn.commit()
 
     def record(self, rec: TelemetryRecord) -> None:
@@ -63,6 +93,12 @@ class TelemetryStore:
                 rec.cost_usd,
                 rec.energy_joules,
                 rec.power_watts,
+                rec.gpu_utilization_pct,
+                rec.gpu_memory_used_gb,
+                rec.gpu_temperature_c,
+                rec.throughput_tok_per_sec,
+                rec.prefill_latency_seconds,
+                rec.decode_latency_seconds,
                 json.dumps(rec.metadata),
             ),
         )

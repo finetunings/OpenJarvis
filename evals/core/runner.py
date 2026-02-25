@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import statistics
 import time
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -13,7 +14,7 @@ from typing import Any, Dict, List, Optional
 from evals.core.backend import InferenceBackend
 from evals.core.dataset import DatasetProvider
 from evals.core.scorer import Scorer
-from evals.core.types import EvalRecord, EvalResult, RunConfig, RunSummary
+from evals.core.types import EvalRecord, EvalResult, MetricStats, RunConfig, RunSummary
 
 LOGGER = logging.getLogger(__name__)
 
@@ -111,6 +112,11 @@ class EvalRunner:
                 completion_tokens=usage.get("completion_tokens", 0),
                 cost_usd=cost,
                 scoring_metadata=scoring_meta,
+                ttft=full.get("ttft", 0.0),
+                energy_joules=full.get("energy_joules", 0.0),
+                power_watts=full.get("power_watts", 0.0),
+                gpu_utilization_pct=full.get("gpu_utilization_pct", 0.0),
+                throughput_tok_per_sec=full.get("throughput_tok_per_sec", 0.0),
             )
         except Exception as exc:
             LOGGER.error("Error processing %s: %s", record.record_id, exc)
@@ -138,6 +144,15 @@ class EvalRunner:
             "cost_usd": result.cost_usd,
             "error": result.error,
             "scoring_metadata": result.scoring_metadata,
+            "ttft": result.ttft,
+            "energy_joules": result.energy_joules,
+            "power_watts": result.power_watts,
+            "gpu_utilization_pct": result.gpu_utilization_pct,
+            "throughput_tok_per_sec": result.throughput_tok_per_sec,
+            "mfu_pct": result.mfu_pct,
+            "mbu_pct": result.mbu_pct,
+            "ipw": result.ipw,
+            "ipj": result.ipj,
         }
         self._output_file.write(json.dumps(record_dict) + "\n")
         self._output_file.flush()
@@ -195,6 +210,21 @@ class EvalRunner:
 
         accuracy = len(correct) / len(scored) if scored else 0.0
 
+        # Compute MetricStats for each metric
+        accuracy_vals = [1.0 if r.is_correct else 0.0 for r in scored]
+        latency_vals = [r.latency_seconds for r in results if r.latency_seconds > 0]
+        ttft_vals = [r.ttft for r in results if r.ttft > 0]
+        energy_vals = [r.energy_joules for r in results if r.energy_joules > 0]
+        power_vals = [r.power_watts for r in results if r.power_watts > 0]
+        gpu_util_vals = [r.gpu_utilization_pct for r in results if r.gpu_utilization_pct > 0]
+        throughput_vals = [r.throughput_tok_per_sec for r in results if r.throughput_tok_per_sec > 0]
+        mfu_vals = [r.mfu_pct for r in results if r.mfu_pct > 0]
+        mbu_vals = [r.mbu_pct for r in results if r.mbu_pct > 0]
+        ipw_vals = [r.ipw for r in results if r.ipw > 0]
+        ipj_vals = [r.ipj for r in results if r.ipj > 0]
+
+        total_energy = sum(r.energy_joules for r in results)
+
         return RunSummary(
             benchmark=cfg.benchmark,
             category=category,
@@ -210,7 +240,45 @@ class EvalRunner:
             per_subject=per_subject,
             started_at=started_at,
             ended_at=ended_at,
+            accuracy_stats=_metric_stats(accuracy_vals),
+            latency_stats=_metric_stats(latency_vals),
+            ttft_stats=_metric_stats(ttft_vals),
+            energy_stats=_metric_stats(energy_vals),
+            power_stats=_metric_stats(power_vals),
+            gpu_utilization_stats=_metric_stats(gpu_util_vals),
+            throughput_stats=_metric_stats(throughput_vals),
+            mfu_stats=_metric_stats(mfu_vals),
+            mbu_stats=_metric_stats(mbu_vals),
+            ipw_stats=_metric_stats(ipw_vals),
+            ipj_stats=_metric_stats(ipj_vals),
+            total_energy_joules=round(total_energy, 6),
         )
+
+
+def _metric_stats(values: List[float]) -> Optional[MetricStats]:
+    """Compute MetricStats from a list of float values."""
+    if not values:
+        return None
+    return MetricStats(
+        mean=statistics.mean(values),
+        median=statistics.median(values),
+        min=min(values),
+        max=max(values),
+        std=statistics.stdev(values) if len(values) > 1 else 0.0,
+    )
+
+
+def _metric_stats_to_dict(ms: Optional[MetricStats]) -> Optional[Dict[str, float]]:
+    """Convert MetricStats to a JSON-serializable dict."""
+    if ms is None:
+        return None
+    return {
+        "mean": ms.mean,
+        "median": ms.median,
+        "min": ms.min,
+        "max": ms.max,
+        "std": ms.std,
+    }
 
 
 def _summary_to_dict(s: RunSummary) -> Dict[str, Any]:
@@ -230,6 +298,18 @@ def _summary_to_dict(s: RunSummary) -> Dict[str, Any]:
         "per_subject": s.per_subject,
         "started_at": s.started_at,
         "ended_at": s.ended_at,
+        "accuracy_stats": _metric_stats_to_dict(s.accuracy_stats),
+        "latency_stats": _metric_stats_to_dict(s.latency_stats),
+        "ttft_stats": _metric_stats_to_dict(s.ttft_stats),
+        "energy_stats": _metric_stats_to_dict(s.energy_stats),
+        "power_stats": _metric_stats_to_dict(s.power_stats),
+        "gpu_utilization_stats": _metric_stats_to_dict(s.gpu_utilization_stats),
+        "throughput_stats": _metric_stats_to_dict(s.throughput_stats),
+        "mfu_stats": _metric_stats_to_dict(s.mfu_stats),
+        "mbu_stats": _metric_stats_to_dict(s.mbu_stats),
+        "ipw_stats": _metric_stats_to_dict(s.ipw_stats),
+        "ipj_stats": _metric_stats_to_dict(s.ipj_stats),
+        "total_energy_joules": s.total_energy_joules,
     }
 
 

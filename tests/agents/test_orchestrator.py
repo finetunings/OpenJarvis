@@ -440,3 +440,92 @@ class TestOrchestratorAgent:
         result = agent.run("Calc")
         # Should use the partial content if available
         assert result.content == "partial"
+
+
+class TestOrchestratorStructuredMode:
+    """Tests for the structured (THOUGHT/TOOL/INPUT/FINAL_ANSWER) mode."""
+
+    def test_structured_mode_final_answer(self):
+        """Structured mode should parse FINAL_ANSWER: correctly."""
+        engine = MagicMock()
+        engine.engine_id = "mock"
+        engine.generate.return_value = {
+            "content": "THOUGHT: Easy question.\nFINAL_ANSWER: Paris",
+            "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
+            "model": "test-model",
+            "finish_reason": "stop",
+        }
+        agent = OrchestratorAgent(
+            engine, "test-model", mode="structured",
+        )
+        result = agent.run("What is the capital of France?")
+        assert result.content == "Paris"
+        assert result.turns == 1
+        assert result.tool_results == []
+
+    def test_structured_mode_tool_call(self):
+        """Parse TOOL:/INPUT:, execute tool, return final answer."""
+        engine = MagicMock()
+        engine.engine_id = "mock"
+        engine.generate.side_effect = [
+            {
+                "content": (
+                    "THOUGHT: Need to calculate.\n"
+                    'TOOL: calculator\n'
+                    'INPUT: {"expression":"2+2"}'
+                ),
+                "usage": {
+                    "prompt_tokens": 10,
+                    "completion_tokens": 10,
+                    "total_tokens": 20,
+                },
+                "model": "test-model",
+                "finish_reason": "stop",
+            },
+            {
+                "content": (
+                    "THOUGHT: Got 4.\n"
+                    "FINAL_ANSWER: The answer is 4."
+                ),
+                "usage": {
+                    "prompt_tokens": 20,
+                    "completion_tokens": 10,
+                    "total_tokens": 30,
+                },
+                "model": "test-model",
+                "finish_reason": "stop",
+            },
+        ]
+        agent = OrchestratorAgent(
+            engine, "test-model",
+            tools=[_CalculatorStub()],
+            mode="structured",
+        )
+        result = agent.run("What is 2+2?")
+        assert result.content == "The answer is 4."
+        assert result.turns == 2
+        assert len(result.tool_results) == 1
+        assert result.tool_results[0].tool_name == "calculator"
+        assert result.tool_results[0].content == "4"
+
+    def test_structured_mode_enriched_descriptions(self):
+        """Structured mode system prompt should contain enriched tool descriptions."""
+        engine = MagicMock()
+        engine.engine_id = "mock"
+        engine.generate.return_value = {
+            "content": "FINAL_ANSWER: ok",
+            "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
+            "model": "test-model",
+            "finish_reason": "stop",
+        }
+        agent = OrchestratorAgent(
+            engine, "test-model",
+            tools=[_CalculatorStub()],
+            mode="structured",
+        )
+        agent.run("Hello")
+        call_args = engine.generate.call_args
+        messages = call_args[0][0]
+        system_msg = messages[0].content
+        assert "### calculator" in system_msg
+        assert "expression" in system_msg

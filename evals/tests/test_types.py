@@ -71,7 +71,7 @@ class TestRunConfig:
         assert c.max_workers == 4
         assert c.temperature == 0.0
         assert c.max_tokens == 2048
-        assert c.judge_model == "gpt-4o"
+        assert c.judge_model == "gpt-5-mini-2025-08-07"
         assert c.seed == 42
         assert c.tools == []
 
@@ -132,7 +132,7 @@ class TestDefaultsConfig:
 class TestJudgeConfig:
     def test_defaults(self):
         j = JudgeConfig()
-        assert j.model == "gpt-4o"
+        assert j.model == "gpt-5-mini-2025-08-07"
         assert j.provider is None
         assert j.temperature == 0.0
         assert j.max_tokens == 1024

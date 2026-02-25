@@ -4,6 +4,49 @@ All notable changes to OpenJarvis are documented in this file.
 
 ---
 
+## Unreleased
+
+### Added
+
+- **`build_tool_descriptions()` shared builder** -- Single source of truth for
+  generating enriched tool descriptions in agent system prompts. Produces
+  Markdown sections with name, description, category, and parameter schemas.
+- **Enriched agent prompts** -- `NativeReActAgent`, `NativeOpenHandsAgent`,
+  `RLMAgent`, and `OrchestratorAgent` (structured mode) now inject detailed
+  tool descriptions into their system prompts via the shared builder.
+- **Case-insensitive parsing** -- ReAct (`Action:` / `Final Answer:`) and
+  Orchestrator structured-mode parsing (`TOOL:` / `FINAL_ANSWER:`) are now
+  case-insensitive.
+- **Multi-provider tool_calls extraction** -- `CloudEngine` now extracts
+  `tool_calls` from Anthropic (`tool_use` content blocks) and Google
+  (`function_call` parts), normalizing to the flat `{id, name, arguments}`
+  format. `LiteLLM` engine handles the flat-format tool calls returned by
+  the LiteLLM proxy.
+- **RLM tool awareness** -- `RLMAgent` injects an `## Available Tools`
+  section into its system prompt when tools are provided.
+- **Orchestrator structured tool descriptions** -- Structured mode passes
+  `tools=self._tools` to `build_system_prompt()` for enriched descriptions.
+- **Telemetry modules** -- `EfficiencyMetrics`, `GPUMonitor`, `VLLMMetrics`
+  for energy, GPU utilization, and vLLM server-side metrics collection.
+- **Eval TOML config** -- TOML-based eval suite configuration system for
+  defining models x benchmarks matrices.
+
+### Changed
+
+- Agent prompt generation now uses `build_tool_descriptions()` instead of
+  inline tool name listing.
+- `build_system_prompt()` in `prompt_registry.py` accepts an optional `tools`
+  parameter for enriched descriptions from `BaseTool` instances.
+- ReAct and OpenHands regex patterns updated for case-insensitive matching.
+
+### Fixed
+
+- Engine `tool_calls` normalization -- Anthropic `tool_use` blocks and Google
+  `function_call` parts are now correctly extracted and converted to the
+  standard flat format used by agents.
+
+---
+
 ## v1.0.0
 
 *Phase 5 -- SDK, Production Readiness, and Documentation*

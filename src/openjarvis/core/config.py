@@ -480,6 +480,8 @@ class TelemetryConfig:
 
     enabled: bool = True
     db_path: str = str(DEFAULT_CONFIG_DIR / "telemetry.db")
+    gpu_metrics: bool = False
+    gpu_poll_interval_ms: int = 50
 
 
 @dataclass(slots=True)
@@ -871,6 +873,8 @@ policy = "heuristic"
 
 [telemetry]
 enabled = true
+# gpu_metrics = false
+# gpu_poll_interval_ms = 50
 
 [traces]
 enabled = false

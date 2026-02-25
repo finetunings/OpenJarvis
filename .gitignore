@@ -35,9 +35,14 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
+# Secrets
+.env
+.env.*
+
 # Project
 *.sqlite
 *.db
+results/
 
 # MkDocs build output
 site/

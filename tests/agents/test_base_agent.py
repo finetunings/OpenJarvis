@@ -2,10 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
 from unittest.mock import MagicMock
-
-import pytest
 
 from openjarvis.agents._stubs import (
     AgentContext,
@@ -16,7 +13,6 @@ from openjarvis.agents._stubs import (
 from openjarvis.core.events import EventBus, EventType
 from openjarvis.core.types import Conversation, Message, Role, ToolResult
 from openjarvis.tools._stubs import BaseTool, ToolSpec
-
 
 # ---------------------------------------------------------------------------
 # Concrete subclass for testing

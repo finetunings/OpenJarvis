@@ -4,19 +4,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Status
 
-OpenJarvis is a research framework for studying on-device AI systems. Phase 9 (Pillar-aligned config) complete. Five composable pillars: Intelligence, Engine, Agents, Tools (with storage + MCP), and Learning — with trace-driven learning as a cross-cutting concern. Python SDK (`Jarvis` class), composition layer (`SystemBuilder`/`JarvisSystem`), OpenClaw agent infrastructure, benchmarking framework, Docker deployment all ready. ~1780 tests pass (37 skipped for optional deps).
+OpenJarvis is a research framework for studying on-device AI systems. Phase 10 (Agent restructuring) complete. Five composable pillars: Intelligence, Engine, Agents, Tools (with storage + MCP), and Learning — with trace-driven learning as a cross-cutting concern. Python SDK (`Jarvis` class), composition layer (`SystemBuilder`/`JarvisSystem`), OpenClaw agent infrastructure, benchmarking framework, Docker deployment all ready. Agent hierarchy refactored: `BaseAgent` (with shared helpers) → `ToolUsingAgent` (tool-using agents), `accepts_tools` introspection, real OpenHands SDK integration. ~1910 tests pass (36 skipped for optional deps). Eval framework with 4 benchmarks (SuperGPQA, GAIA, FRAMES, WildChat) and LLM-as-judge scoring via `gpt-5-mini-2025-08-07`. Tool system enriched with shared `build_tool_descriptions()` builder; engine tool_calls normalized across OpenAI, Anthropic, Google, and LiteLLM.
 
 ## Build & Development Commands
 
 ```bash
 uv sync --extra dev          # Install deps + dev tools
-uv run pytest tests/ -v      # Run ~1780 tests (37 skipped if optional deps missing)
+uv run pytest tests/ -v      # Run ~1910 tests (36 skipped if optional deps missing)
 uv run ruff check src/ tests/ # Lint
 uv run jarvis --version      # 1.0.0
 uv run jarvis ask "Hello"    # Query via discovered engine (direct mode)
 uv run jarvis ask --agent simple "Hello"           # SimpleAgent route
 uv run jarvis ask --agent orchestrator "Hello"     # OrchestratorAgent route
 uv run jarvis ask --agent orchestrator --tools calculator,think "What is 2+2?"
+uv run jarvis ask --agent native_react --tools calculator "What is 2+2?"  # NativeReActAgent
+uv run jarvis ask --agent react "Hello"            # Alias for native_react
+uv run jarvis ask --agent native_openhands "Hello" # NativeOpenHandsAgent (CodeAct)
+uv run jarvis ask --agent openhands "Hello"        # Real OpenHands SDK (requires openhands-sdk)
 uv run jarvis ask --router heuristic "Hello"       # Explicit heuristic policy
 uv run jarvis ask --no-context "Hello"  # Query without memory context injection
 uv run jarvis model list     # List models from running engines
@@ -37,7 +41,19 @@ uv run jarvis bench run -b latency -o results.jsonl  # Specific benchmark to fil
 uv run jarvis serve --port 8000      # OpenAI-compatible API server (requires openjarvis[server])
 uv run jarvis --help         # Show all subcommands
 uv run jarvis init --force   # Detect hardware, write ~/.openjarvis/config.toml
+# Eval framework
+source .env                  # Load API keys before running evals
+uv run python -m evals run -c evals/configs/glm-4.7-flash-openhands.toml -v  # Run eval suite from TOML config
+uv run python -m evals run -b supergpqa -m "qwen3:8b" -n 50                  # Run single benchmark
+uv run python -m evals summarize results/supergpqa_qwen3-8b.jsonl            # Summarize results
 ```
+
+### Config File Conventions
+
+- **Runtime config (source of truth):** `configs/openjarvis/config.toml` — Pillar-aligned OpenJarvis config. Copied to `~/.openjarvis/config.toml` at runtime (which is where `load_config()` reads from).
+- **Eval suite configs:** `evals/configs/*.toml` — TOML configs defining models x benchmarks matrices.
+- **API keys:** `.env` file in project root (gitignored). Source with `source .env` before running evals or cloud operations.
+- **Never save configs to `~/.openjarvis/` directly** — always maintain the canonical copy in `configs/openjarvis/` and copy/symlink to `~/.openjarvis/`.
 
 ### Python SDK
 
@@ -75,7 +91,7 @@ OpenJarvis is a research framework for on-device AI organized around **five comp
 
 1. **Intelligence** (`src/openjarvis/intelligence/`) — The model definition, catalog, and generation defaults. `ModelRegistry` maps model keys to `ModelSpec`. `IntelligenceConfig` holds model identity (default/fallback model, model_path, checkpoint_path, quantization, preferred_engine, provider) and generation defaults (temperature, max_tokens, top_p, top_k, repetition_penalty, stop_sequences). Model catalog (`model_catalog.py`) maintains `BUILTIN_MODELS` list with auto-discovery via `merge_discovered_models()`. Backward-compat shims in `intelligence/_stubs.py` and `intelligence/router.py` re-export from `learning/` for old import paths.
 2. **Engine** (`src/openjarvis/engine/`) — The inference runtime. Backends: vLLM, SGLang, Ollama, llama.cpp, MLX. All implement `InferenceEngine` ABC with `generate()`, `stream()`, `list_models()`, `health()`. Engines extract and pass through `tool_calls` in OpenAI format.
-3. **Agents** (`src/openjarvis/agents/`) — Pluggable logic for handling queries, making tool/API calls, managing memory. `SimpleAgent` (single-turn, no tools), `OrchestratorAgent` (multi-turn tool-calling loop with `ToolExecutor`), `ReActAgent` (Thought-Action-Observation loop), `OpenHandsAgent` (CodeAct-style), `CustomAgent` (template for user-defined agents), `OpenClawAgent` (HTTP/subprocess transport). All implement `BaseAgent` ABC with `run()`. Agents call `engine.generate()` directly — telemetry is handled by the `InstrumentedEngine` wrapper when enabled.
+3. **Agents** (`src/openjarvis/agents/`) — Pluggable logic for handling queries, making tool/API calls, managing memory. Class hierarchy: `BaseAgent` ABC (with concrete helpers: `_emit_turn_start/end`, `_build_messages`, `_generate`, `_max_turns_result`, `_strip_think_tags`) → `ToolUsingAgent` (adds `tools`, `ToolExecutor`, `max_turns`). Agents: `SimpleAgent` (single-turn, no tools, extends `BaseAgent`), `OrchestratorAgent` (multi-turn tool-calling loop, extends `ToolUsingAgent`), `NativeReActAgent` (Thought-Action-Observation loop, extends `ToolUsingAgent`, registry key `"native_react"`, alias `"react"`), `NativeOpenHandsAgent` (CodeAct-style code execution, extends `ToolUsingAgent`, registry key `"native_openhands"`), `RLMAgent` (recursive LM with code gen, extends `ToolUsingAgent`), `OpenHandsAgent` (wraps real `openhands-sdk`, extends `BaseAgent`, registry key `"openhands"`, requires `openjarvis[openhands]` + Python 3.12+), `OpenClawAgent` (HTTP/subprocess transport). `accepts_tools` class attribute enables CLI/SDK to auto-detect tool-using agents. Backward-compat: `from openjarvis.agents.react import ReActAgent` still works (shim). Agents call `engine.generate()` directly — telemetry is handled by the `InstrumentedEngine` wrapper when enabled.
 4. **Tools** (`src/openjarvis/tools/`) — All tools managed via MCP (Model Context Protocol).
    - **API tools**: `CalculatorTool`, `ThinkTool`, `FileReadTool`, `WebSearchTool`, `CodeInterpreterTool` — all implement `BaseTool` ABC
    - **Storage tools** (`tools/storage_tools.py`): `MemoryStoreTool`, `MemoryRetrieveTool`, `MemorySearchTool`, `MemoryIndexTool` — wrap `MemoryBackend` operations as MCP-discoverable tools
@@ -194,7 +210,7 @@ OpenAI-compatible server via `jarvis serve`: `POST /v1/chat/completions`, `GET /
 - **Offline-first:** Cloud APIs are optional. All core functionality works without network.
 - **Hardware-aware:** Auto-detect GPU vendor/model/VRAM via `nvidia-smi`, `rocm-smi`, `system_profiler`, `/proc/cpuinfo`. Recommend engine accordingly.
 - **Telemetry opt-in:** When enabled, `InstrumentedEngine` wraps the inference engine to transparently record timing, tokens, energy, cost to SQLite via event bus. Agents call `engine.generate()` without awareness of telemetry. `TelemetryAggregator` provides read-only query/aggregation over stored records.
-- **Backward-compat shims:** `memory/` re-exports from `tools/storage/`, `intelligence/_stubs.py` re-exports `RouterPolicy`/`QueryAnalyzer` from `learning/_stubs.py`, `intelligence/router.py` re-exports `HeuristicRouter`/`build_routing_context`/`DefaultQueryAnalyzer` from `learning/router.py`. Old import paths continue to work. Config backward-compat: `engine.ollama_host` → `engine.ollama.host`, `agent.default_tools` → `agent.tools`, `learning.default_policy` → `learning.routing.policy`, etc. TOML migration: `agent.temperature` → `intelligence.temperature`, `memory.context_injection` → `agent.context_from_memory`.
+- **Backward-compat shims:** `memory/` re-exports from `tools/storage/`, `intelligence/_stubs.py` re-exports `RouterPolicy`/`QueryAnalyzer` from `learning/_stubs.py`, `intelligence/router.py` re-exports `HeuristicRouter`/`build_routing_context`/`DefaultQueryAnalyzer` from `learning/router.py`, `agents/react.py` re-exports `NativeReActAgent` as `ReActAgent` (old import path still works), registry alias `"react"` → `NativeReActAgent`. Old import paths continue to work. Config backward-compat: `engine.ollama_host` → `engine.ollama.host`, `agent.default_tools` → `agent.tools`, `learning.default_policy` → `learning.routing.policy`, etc. TOML migration: `agent.temperature` → `intelligence.temperature`, `memory.context_injection` → `agent.context_from_memory`.
 - **`ensure_registered()` pattern:** Benchmark and learning modules use lazy registration via `ensure_registered()` to survive registry clearing in tests.
 
 ## Development Phases
@@ -211,3 +227,4 @@ OpenAI-compatible server via `jarvis serve`: `POST /v1/chat/completions`, `GET /
 | v1.2 | Phase 7 | 5-pillar restructuring: Intelligence ABCs, memory→tools/storage, MCP tool management, composition layer (SystemBuilder/JarvisSystem), InstrumentedEngine, structured learning (SFT/AgentAdvisor/ICL), config schema update |
 | v1.3 | Phase 8 | Intelligence = "The Model": routing moved to Learning, enriched IntelligenceConfig (model_path, checkpoint_path, quantization, preferred_engine, provider), intelligence-driven engine selection, backward-compat shims |
 | v1.4 | Phase 9 | Pillar-aligned config: generation params in Intelligence, nested engine/learning configs, agent objective/system_prompt/context_from_memory, structured learning sub-policies (routing/intelligence/agent/metrics), TOML migration layer |
+| v1.5 | Phase 10 | Agent restructuring: BaseAgent helpers (`_emit_turn_start/end`, `_build_messages`, `_generate`, `_max_turns_result`), ToolUsingAgent intermediate base, `accepts_tools` introspection, NativeReActAgent/NativeOpenHandsAgent renames, real OpenHands SDK integration, CLI/SDK tool-passing bug fix, backward-compat shims |

@@ -32,6 +32,7 @@ class JarvisSystem:
     telemetry_store: Optional[Any] = None
     trace_store: Optional[Any] = None
     trace_collector: Optional[Any] = None
+    gpu_monitor: Optional[Any] = None
 
     def ask(
         self,
@@ -94,6 +95,7 @@ class JarvisSystem:
     ) -> Dict[str, Any]:
         """Run through an agent."""
         from openjarvis.agents._stubs import AgentContext
+        from openjarvis.core.events import EventType
         from openjarvis.core.registry import AgentRegistry
 
         # Resolve agent
@@ -134,8 +136,40 @@ class JarvisSystem:
             except TypeError:
                 ag = agent_cls()
 
+        # Collect telemetry from all engine calls during agent run
+        telemetry_events: List[Dict[str, Any]] = []
+
+        def _on_inference_end(event: Any) -> None:
+            telemetry_events.append(event.data if hasattr(event, "data") else event)
+
+        self.bus.subscribe(EventType.INFERENCE_END, _on_inference_end)
+
         # Run
-        result = ag.run(query, context=ctx)
+        try:
+            result = ag.run(query, context=ctx)
+        finally:
+            self.bus.unsubscribe(EventType.INFERENCE_END, _on_inference_end)
+
+        # Aggregate telemetry across all engine calls
+        _telemetry: Dict[str, Any] = {}
+        if telemetry_events:
+            total_energy = sum(e.get("energy_joules", 0.0) for e in telemetry_events)
+            total_latency = sum(e.get("latency", 0.0) for e in telemetry_events)
+            power_vals = [e.get("power_watts", 0.0) for e in telemetry_events if e.get("power_watts", 0.0) > 0]
+            util_vals = [e.get("gpu_utilization_pct", 0.0) for e in telemetry_events if e.get("gpu_utilization_pct", 0.0) > 0]
+            throughput_vals = [e.get("throughput_tok_per_sec", 0.0) for e in telemetry_events if e.get("throughput_tok_per_sec", 0.0) > 0]
+            _telemetry = {
+                "ttft": telemetry_events[0].get("ttft", 0.0),
+                "energy_joules": total_energy,
+                "power_watts": sum(power_vals) / len(power_vals) if power_vals else 0.0,
+                "gpu_utilization_pct": sum(util_vals) / len(util_vals) if util_vals else 0.0,
+                "throughput_tok_per_sec": sum(throughput_vals) / len(throughput_vals) if throughput_vals else 0.0,
+                "gpu_memory_used_gb": max((e.get("gpu_memory_used_gb", 0.0) for e in telemetry_events), default=0.0),
+                "gpu_temperature_c": max((e.get("gpu_temperature_c", 0.0) for e in telemetry_events), default=0.0),
+                "inference_calls": len(telemetry_events),
+                "total_inference_latency": total_latency,
+            }
+
         return {
             "content": result.content,
             "usage": getattr(result, "usage", {}),
@@ -150,6 +184,7 @@ class JarvisSystem:
             "turns": getattr(result, "turns", 1),
             "model": self.model,
             "engine": self.engine_key,
+            "_telemetry": _telemetry,
         }
 
     def _build_tools(self, tool_names: List[str]) -> List[BaseTool]:
@@ -175,6 +210,10 @@ class JarvisSystem:
 
     def close(self) -> None:
         """Release resources."""
+        if self.engine and hasattr(self.engine, "close"):
+            self.engine.close()
+        if self.gpu_monitor and hasattr(self.gpu_monitor, "close"):
+            self.gpu_monitor.close()
         if self.telemetry_store and hasattr(self.telemetry_store, "close"):
             self.telemetry_store.close()
         if self.trace_store and hasattr(self.trace_store, "close"):
@@ -251,9 +290,21 @@ class SystemBuilder:
             self._telemetry if self._telemetry is not None
             else config.telemetry.enabled
         )
+        gpu_monitor = None
         if telemetry_enabled:
             from openjarvis.telemetry.instrumented_engine import InstrumentedEngine
-            engine = InstrumentedEngine(engine, bus)
+
+            if config.telemetry.gpu_metrics:
+                try:
+                    from openjarvis.telemetry.gpu_monitor import GpuMonitor
+
+                    if GpuMonitor.available():
+                        gpu_monitor = GpuMonitor(
+                            poll_interval_ms=config.telemetry.gpu_poll_interval_ms,
+                        )
+                except ImportError:
+                    pass
+            engine = InstrumentedEngine(engine, bus, gpu_monitor=gpu_monitor)
 
         # Apply security guardrails to engine
         engine = self._apply_security(config, engine, bus)
@@ -295,6 +346,7 @@ class SystemBuilder:
             memory_backend=memory_backend,
             channel_backend=channel_backend,
             telemetry_store=telemetry_store,
+            gpu_monitor=gpu_monitor,
         )
 
     def _resolve_engine(self, config: JarvisConfig):

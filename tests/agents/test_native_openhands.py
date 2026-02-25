@@ -295,6 +295,24 @@ class TestNativeOpenHandsAgent:
         assert "code_interpreter" in system_msg.content
         assert "calculator" in system_msg.content
 
+    def test_system_prompt_enriched_descriptions(self):
+        """System prompt has enriched descriptions with param schemas."""
+        engine = MagicMock()
+        engine.engine_id = "mock"
+        engine.generate.return_value = _engine_response("Ok")
+        agent = NativeOpenHandsAgent(
+            engine, "test-model",
+            tools=[_CodeInterpreterStub(), _CalculatorStub()],
+        )
+        agent.run("Hello")
+        call_args = engine.generate.call_args
+        messages = call_args[0][0]
+        system_msg = messages[0].content
+        assert "### calculator" in system_msg
+        assert "### code_interpreter" in system_msg
+        assert "expression" in system_msg
+        assert "string" in system_msg
+
     def test_max_turns_content_preserved(self):
         """When max turns exceeded, last content should be preserved."""
         engine = MagicMock()

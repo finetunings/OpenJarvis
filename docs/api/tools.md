@@ -29,6 +29,12 @@ with JSON argument parsing, latency tracking, and event bus integration.
       show_source: true
       members_order: source
 
+### build_tool_descriptions
+
+::: openjarvis.tools._stubs.build_tool_descriptions
+    options:
+      show_source: true
+
 ---
 
 ## Built-in Tools

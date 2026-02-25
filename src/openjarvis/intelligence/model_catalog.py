@@ -188,6 +188,16 @@ BUILTIN_MODELS: List[ModelSpec] = [
         requires_api_key=True,
         metadata={"pricing_input": 0.25, "pricing_output": 2.00},
     ),
+    ModelSpec(
+        model_id="gpt-5-mini-2025-08-07",
+        name="GPT-5 Mini (2025-08-07)",
+        parameter_count_b=0.0,
+        context_length=400000,
+        supported_engines=("cloud",),
+        provider="openai",
+        requires_api_key=True,
+        metadata={"pricing_input": 0.25, "pricing_output": 2.00},
+    ),
     # -----------------------------------------------------------------------
     # Cloud models — Anthropic
     # -----------------------------------------------------------------------

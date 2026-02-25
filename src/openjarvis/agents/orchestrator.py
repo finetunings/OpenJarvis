@@ -91,8 +91,7 @@ class OrchestratorAgent(ToolUsingAgent):
             from openjarvis.learning.orchestrator.prompt_registry import (
                 build_system_prompt,
             )
-            tool_names = [t.spec.name for t in self._tools]
-            sys_prompt = build_system_prompt(tool_names)
+            sys_prompt = build_system_prompt(tools=self._tools)
 
         messages = self._build_messages(input, context, system_prompt=sys_prompt)
 

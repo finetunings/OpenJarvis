@@ -50,7 +50,7 @@ class SuperGPQAScorer(LLMJudgeScorer):
         try:
             raw_response = self._ask_judge(
                 user_prompt, system=system_prompt,
-                temperature=0.0, max_tokens=5,
+                temperature=0.0, max_tokens=2048,
             )
 
             extracted = raw_response.strip().upper()

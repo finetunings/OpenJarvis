@@ -17,7 +17,7 @@ from openjarvis.core.events import EventBus
 from openjarvis.core.registry import AgentRegistry
 from openjarvis.core.types import Message, Role, ToolCall, ToolResult
 from openjarvis.engine._stubs import InferenceEngine
-from openjarvis.tools._stubs import BaseTool, ToolExecutor
+from openjarvis.tools._stubs import BaseTool, build_tool_descriptions
 
 # ---------------------------------------------------------------------------
 # System prompt
@@ -37,6 +37,7 @@ RLM_SYSTEM_PROMPT = (
     "value of variable `var_name`.\n"
     "- `answer` dict — Set `answer[\"value\"] = ...` and "
     "`answer[\"ready\"] = True` to terminate.\n\n"
+    "{tool_section}"
     "## Available Modules\n\n"
     "json, re, math, collections, itertools, functools, "
     "textwrap, string, copy, datetime\n\n"
@@ -112,7 +113,7 @@ class RLMAgent(ToolUsingAgent):
         self._sub_temperature = sub_temperature
         self._sub_max_tokens = sub_max_tokens
         self._max_output_chars = max_output_chars
-        self._system_prompt = system_prompt or RLM_SYSTEM_PROMPT
+        self._custom_system_prompt = system_prompt
 
     # ------------------------------------------------------------------
     # Main run loop
@@ -125,6 +126,30 @@ class RLMAgent(ToolUsingAgent):
         **kwargs: Any,
     ) -> AgentResult:
         self._emit_turn_start(input)
+
+        # Build system prompt with tool section
+        if self._tools:
+            tool_section = (
+                "## Available Tools\n\n"
+                "These tools are available to the sub-LM via "
+                "llm_query(). When writing prompts for llm_query(), "
+                "you can instruct it to use these tools:\n\n"
+                + build_tool_descriptions(self._tools)
+                + "\n\n"
+            )
+        else:
+            tool_section = ""
+
+        if self._custom_system_prompt:
+            system_prompt = self._custom_system_prompt
+        else:
+            try:
+                system_prompt = RLM_SYSTEM_PROMPT.format(
+                    tool_section=tool_section,
+                )
+            except KeyError:
+                # Custom system_prompt override without {tool_section}
+                system_prompt = RLM_SYSTEM_PROMPT
 
         # Create REPL with sub-LM callbacks
         repl = RLMRepl(
@@ -140,7 +165,7 @@ class RLMAgent(ToolUsingAgent):
 
         # Build conversation
         messages = self._build_messages(
-            input, context, system_prompt=self._system_prompt,
+            input, context, system_prompt=system_prompt,
         )
 
         all_tool_results: list[ToolResult] = []

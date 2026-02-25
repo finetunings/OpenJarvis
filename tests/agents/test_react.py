@@ -9,8 +9,8 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-from openjarvis.agents.react import ReActAgent
 from openjarvis.agents.native_react import NativeReActAgent
+from openjarvis.agents.react import ReActAgent
 
 
 def _engine_response(content):

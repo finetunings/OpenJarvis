@@ -367,6 +367,32 @@ class TestRLMBlockedCode:
         assert "Blocked" in result.tool_results[0].content
 
 
+class TestRLMToolSectionInjection:
+    """Verify that tool descriptions are injected into the RLM system prompt."""
+
+    def test_system_prompt_includes_tool_section(self):
+        """Tools provided -> system prompt includes descriptions."""
+        engine = _make_engine("Direct answer.")
+        agent = RLMAgent(engine, "test-model", tools=[_CalcStub()])
+        agent.run("Hello")
+        call_args = engine.generate.call_args
+        messages = call_args[0][0]
+        system_msg = messages[0].content
+        assert "## Available Tools" in system_msg
+        assert "### calculator" in system_msg
+        assert "expression" in system_msg
+
+    def test_system_prompt_no_tool_section_without_tools(self):
+        """No tools -> system prompt has no tool section."""
+        engine = _make_engine("Direct answer.")
+        agent = RLMAgent(engine, "test-model")
+        agent.run("Hello")
+        call_args = engine.generate.call_args
+        messages = call_args[0][0]
+        system_msg = messages[0].content
+        assert "## Available Tools" not in system_msg
+
+
 class TestRLMReplResults:
     def test_repl_results_in_tool_results(self):
         engine = MagicMock()

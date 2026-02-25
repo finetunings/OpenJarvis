@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import time
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, List, Optional, Sequence
 
 from openjarvis.core.events import EventBus, EventType
 from openjarvis.core.types import Message, TelemetryRecord
 from openjarvis.engine._stubs import InferenceEngine
+from openjarvis.telemetry.gpu_monitor import GpuMonitor, GpuSample
 
 
 class InstrumentedEngine(InferenceEngine):
@@ -20,9 +21,15 @@ class InstrumentedEngine(InferenceEngine):
 
     engine_id = "instrumented"
 
-    def __init__(self, engine: InferenceEngine, bus: EventBus) -> None:
+    def __init__(
+        self,
+        engine: InferenceEngine,
+        bus: EventBus,
+        gpu_monitor: Optional[Any] = None,
+    ) -> None:
         self._inner = engine
         self._bus = bus
+        self._gpu_monitor = gpu_monitor
 
     def generate(
         self,
@@ -38,27 +45,92 @@ class InstrumentedEngine(InferenceEngine):
             "model": model, "message_count": len(messages),
         })
 
+        gpu_sample: Optional[GpuSample] = None
         t0 = time.time()
-        result = self._inner.generate(
-            messages, model=model, temperature=temperature,
-            max_tokens=max_tokens, **kwargs,
-        )
+
+        if self._gpu_monitor is not None:
+            with self._gpu_monitor.sample() as gpu_sample:
+                result = self._inner.generate(
+                    messages, model=model, temperature=temperature,
+                    max_tokens=max_tokens, **kwargs,
+                )
+        else:
+            result = self._inner.generate(
+                messages, model=model, temperature=temperature,
+                max_tokens=max_tokens, **kwargs,
+            )
+
         latency = time.time() - t0
 
         usage = result.get("usage", {})
+        completion_tokens = usage.get("completion_tokens", 0)
+        ttft = result.get("ttft", 0.0)
+        throughput = completion_tokens / latency if latency > 0 else 0.0
+
+        # GPU metrics from sample
+        energy_joules = 0.0
+        power_watts = 0.0
+        gpu_utilization_pct = 0.0
+        gpu_memory_used_gb = 0.0
+        gpu_temperature_c = 0.0
+        prefill_latency = 0.0
+
+        if gpu_sample is not None:
+            energy_joules = gpu_sample.energy_joules
+            power_watts = gpu_sample.mean_power_watts
+            gpu_utilization_pct = gpu_sample.mean_utilization_pct
+            gpu_memory_used_gb = gpu_sample.peak_memory_used_gb
+            gpu_temperature_c = gpu_sample.mean_temperature_c
+
+        if ttft > 0:
+            prefill_latency = ttft
+
         record = TelemetryRecord(
             timestamp=t0,
             model_id=model,
             prompt_tokens=usage.get("prompt_tokens", 0),
-            completion_tokens=usage.get("completion_tokens", 0),
+            completion_tokens=completion_tokens,
             latency_seconds=latency,
+            ttft=ttft,
+            throughput_tok_per_sec=throughput,
+            energy_joules=energy_joules,
+            power_watts=power_watts,
+            gpu_utilization_pct=gpu_utilization_pct,
+            gpu_memory_used_gb=gpu_memory_used_gb,
+            gpu_temperature_c=gpu_temperature_c,
+            prefill_latency_seconds=prefill_latency,
             engine=getattr(self._inner, "engine_id", "unknown"),
         )
 
-        self._bus.publish(EventType.INFERENCE_END, {
-            "model": model, "latency": latency, "usage": usage,
-        })
+        event_data = {
+            "model": model,
+            "latency": latency,
+            "usage": usage,
+            "ttft": ttft,
+            "throughput_tok_per_sec": throughput,
+            "energy_joules": energy_joules,
+            "power_watts": power_watts,
+            "gpu_utilization_pct": gpu_utilization_pct,
+            "gpu_memory_used_gb": gpu_memory_used_gb,
+            "gpu_temperature_c": gpu_temperature_c,
+            "prefill_latency_seconds": prefill_latency,
+        }
+
+        self._bus.publish(EventType.INFERENCE_END, event_data)
         self._bus.publish(EventType.TELEMETRY_RECORD, {"record": record})
+
+        # Inject telemetry dict into result for downstream consumers (eval backend)
+        result["_telemetry"] = {
+            "latency": latency,
+            "ttft": ttft,
+            "throughput_tok_per_sec": throughput,
+            "energy_joules": energy_joules,
+            "power_watts": power_watts,
+            "gpu_utilization_pct": gpu_utilization_pct,
+            "gpu_memory_used_gb": gpu_memory_used_gb,
+            "gpu_temperature_c": gpu_temperature_c,
+            "prefill_latency_seconds": prefill_latency,
+        }
 
         return result
 
@@ -91,6 +163,9 @@ class InstrumentedEngine(InferenceEngine):
 
     def health(self) -> bool:
         return self._inner.health()
+
+    def close(self) -> None:
+        self._inner.close()
 
 
 __all__ = ["InstrumentedEngine"]

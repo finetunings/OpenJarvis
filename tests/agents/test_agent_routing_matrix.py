@@ -51,13 +51,15 @@ AGENT_RESPONSES = {
     "native_openhands": _OPENHANDS_RESPONSE,
 }
 
+_ALL_AGENTS = list(AGENT_RESPONSES)
+
 
 # ---------------------------------------------------------------------------
 # Common agent tests (parametrized)
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("agent_key", ["simple", "orchestrator", "native_react", "native_openhands"])
+@pytest.mark.parametrize("agent_key", _ALL_AGENTS)
 class TestAgentCommon:
     def test_runs_with_mock_engine(self, agent_key):
         """Each agent type can run with a mock engine."""
@@ -129,7 +131,7 @@ def test_agent_id(agent_key, expected_id):
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("agent_key", ["simple", "orchestrator", "native_react", "native_openhands"])
+@pytest.mark.parametrize("agent_key", _ALL_AGENTS)
 @pytest.mark.parametrize("model", ["qwen3:8b", "llama3:70b", "gpt-oss:120b"])
 def test_model_passthrough(agent_key, model):
     """Each agent passes the model name through to the engine."""
@@ -145,7 +147,7 @@ def test_model_passthrough(agent_key, model):
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("agent_key", ["simple", "orchestrator", "native_react", "native_openhands"])
+@pytest.mark.parametrize("agent_key", _ALL_AGENTS)
 def test_no_bus(agent_key):
     """All agents work without an event bus."""
     engine = _make_mock_engine(AGENT_RESPONSES[agent_key])
@@ -160,7 +162,7 @@ def test_no_bus(agent_key):
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("agent_key", ["simple", "orchestrator", "native_react", "native_openhands"])
+@pytest.mark.parametrize("agent_key", _ALL_AGENTS)
 def test_single_turn_count(agent_key):
     """All agents report at least 1 turn for a simple query."""
     engine = _make_mock_engine(AGENT_RESPONSES[agent_key])
@@ -174,7 +176,7 @@ def test_single_turn_count(agent_key):
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("agent_key", ["simple", "orchestrator", "native_react", "native_openhands"])
+@pytest.mark.parametrize("agent_key", _ALL_AGENTS)
 def test_no_tool_results_for_simple_query(agent_key):
     """When no tools are used, tool_results should be empty."""
     engine = _make_mock_engine(AGENT_RESPONSES[agent_key])

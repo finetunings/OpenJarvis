@@ -142,7 +142,7 @@ The `NativeReActAgent` implements a **Thought-Action-Observation** loop followin
 
 **How it works:**
 
-1. Builds a system prompt listing available tool names.
+1. Builds a system prompt with enriched tool descriptions (names, parameter schemas, categories) via `build_tool_descriptions()`. Parsing is case-insensitive.
 2. Generates a response and parses the ReAct-structured output.
 3. If a `Final Answer:` is found, returns it.
 4. If an `Action:` is found, executes the tool and feeds the result back as an `Observation:`.
@@ -173,7 +173,7 @@ The `NativeOpenHandsAgent` is a CodeAct-style agent that generates and executes 
 
 **How it works:**
 
-1. Builds a detailed system prompt with tool descriptions and code execution instructions.
+1. Builds a detailed system prompt with enriched tool descriptions (via shared `build_tool_descriptions()` builder) and code execution instructions.
 2. Pre-fetches any URLs in the user input, inlining the content directly.
 3. For each turn, generates a response and attempts to extract code blocks or tool calls.
 4. Code is executed via `code_interpreter`; tool calls are dispatched via `ToolExecutor`.

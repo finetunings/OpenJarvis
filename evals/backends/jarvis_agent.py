@@ -22,11 +22,15 @@ class JarvisAgentBackend(InferenceBackend):
         engine_key: Optional[str] = None,
         agent_name: str = "orchestrator",
         tools: Optional[List[str]] = None,
+        telemetry: bool = False,
+        gpu_metrics: bool = False,
     ) -> None:
         from openjarvis.system import SystemBuilder
 
         self._agent_name = agent_name
         self._tools = tools or []
+        self._telemetry = telemetry
+        self._gpu_metrics = gpu_metrics
 
         builder = SystemBuilder()
         if engine_key:
@@ -34,7 +38,11 @@ class JarvisAgentBackend(InferenceBackend):
         builder.agent(agent_name)
         if tools:
             builder.tools(tools)
-        self._system = builder.telemetry(False).traces(False).build()
+        # Propagate gpu_metrics to the runtime config so SystemBuilder
+        # creates a GpuMonitor when building the InstrumentedEngine.
+        if gpu_metrics:
+            builder._config.telemetry.gpu_metrics = True
+        self._system = builder.telemetry(telemetry).traces(telemetry).build()
 
     def generate(
         self,
@@ -71,6 +79,7 @@ class JarvisAgentBackend(InferenceBackend):
         elapsed = time.monotonic() - t0
 
         usage = result.get("usage", {})
+        telemetry_data = result.get("_telemetry", {})
         return {
             "content": result.get("content", ""),
             "usage": usage,
@@ -79,6 +88,11 @@ class JarvisAgentBackend(InferenceBackend):
             "cost_usd": result.get("cost_usd", 0.0),
             "turns": result.get("turns", 1),
             "tool_results": result.get("tool_results", []),
+            "ttft": result.get("ttft", telemetry_data.get("ttft", 0.0)),
+            "energy_joules": telemetry_data.get("energy_joules", 0.0),
+            "power_watts": telemetry_data.get("power_watts", 0.0),
+            "gpu_utilization_pct": telemetry_data.get("gpu_utilization_pct", 0.0),
+            "throughput_tok_per_sec": telemetry_data.get("throughput_tok_per_sec", 0.0),
         }
 
     def close(self) -> None:

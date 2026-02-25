@@ -38,7 +38,7 @@ class LLMJudgeScorer(Scorer):
         *,
         system: str = "",
         temperature: float = 0.0,
-        max_tokens: int = 1024,
+        max_tokens: int = 2048,
     ) -> str:
         """Send a prompt to the judge LLM and return the response text."""
         return self._judge_backend.generate(

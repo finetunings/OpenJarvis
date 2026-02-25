@@ -197,14 +197,14 @@ A ReAct (Reasoning + Acting) agent that implements a **Thought-Action-Observatio
 
 ```mermaid
 graph TD
-    Q["User Query"] --> SYS["Build system prompt<br/>with tool names"]
+    Q["User Query"] --> SYS["Build system prompt<br/>with tool descriptions"]
     SYS --> GEN["Generate response"]
     GEN --> PARSE["Parse ReAct output"]
     PARSE --> FINAL{"Final Answer?"}
     FINAL -->|Yes| DONE["Return answer"]
     FINAL -->|No| ACTION{"Has Action?"}
     ACTION -->|No| DONE2["Return content as-is"]
-    ACTION -->|Yes| EXEC["Execute tool<br/>via ToolExecutor"]
+    ACTION -->|Yes| EXEC["Execute tool<br/>via ToolExecutor<br/>(case-insensitive)"]
     EXEC --> OBS["Append Observation"]
     OBS --> MAXCHECK{"Max turns<br/>exceeded?"}
     MAXCHECK -->|No| GEN
@@ -213,7 +213,7 @@ graph TD
 
 How it works:
 
-1. Builds a system prompt listing available tool names
+1. Builds a system prompt with enriched tool descriptions via `build_tool_descriptions()`. Parsing is case-insensitive.
 2. Generates a response and parses the ReAct-structured output
 3. If a `Final Answer:` is found, returns it
 4. If an `Action:` is found, executes the tool and feeds the result back as an `Observation:`
@@ -242,7 +242,7 @@ A CodeAct-style agent that generates and executes Python code. Extends `ToolUsin
 
 How it works:
 
-1. Builds a detailed system prompt with tool descriptions and code execution instructions
+1. Builds a detailed system prompt with enriched tool descriptions (via shared `build_tool_descriptions()` builder) and code execution instructions
 2. Pre-fetches any URLs in the user input, inlining the content directly
 3. For each turn:
     - Generates a response and strips `<think>` tags
@@ -287,7 +287,7 @@ graph TD
 
 How it works:
 
-1. Creates a persistent REPL with `llm_query()` and `llm_batch()` callbacks
+1. Creates a persistent REPL with `llm_query()` and `llm_batch()` callbacks. Tool descriptions are injected via the shared `build_tool_descriptions()` builder when tools are provided.
 2. Injects context from `AgentContext` metadata or memory results into the REPL as a variable
 3. Generates code and executes it in the REPL
 4. If `FINAL(value)` or `FINAL_VAR("name")` is called, returns the final answer

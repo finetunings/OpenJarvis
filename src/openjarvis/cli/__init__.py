@@ -17,6 +17,7 @@ from openjarvis.cli.doctor_cmd import doctor
 from openjarvis.cli.init_cmd import init
 from openjarvis.cli.memory_cmd import memory
 from openjarvis.cli.model import model
+from openjarvis.cli.quickstart_cmd import quickstart
 from openjarvis.cli.scheduler_cmd import scheduler
 from openjarvis.cli.serve import serve
 from openjarvis.cli.skill_cmd import skill
@@ -52,6 +53,7 @@ cli.add_command(status, "status")
 cli.add_command(vault, "vault")
 cli.add_command(add, "add")
 cli.add_command(operators, "operators")
+cli.add_command(quickstart, "quickstart")
 
 
 def main() -> None:

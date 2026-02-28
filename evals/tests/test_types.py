@@ -209,6 +209,35 @@ class TestRunSummary:
 # ---------------------------------------------------------------------------
 
 
+class TestEvalResultTraceFields:
+    def test_trace_fields_exist(self):
+        r = EvalResult(record_id="test", model_answer="hi")
+        assert r.trace_steps == 0
+        assert r.trace_energy_joules == 0.0
+
+    def test_trace_fields_set(self):
+        r = EvalResult(
+            record_id="test", model_answer="hi",
+            trace_steps=5, trace_energy_joules=100.0,
+        )
+        assert r.trace_steps == 5
+        assert r.trace_energy_joules == 100.0
+
+
+class TestRunSummaryTraceFields:
+    def test_trace_aggregate_fields(self):
+        s = RunSummary(
+            benchmark="test", category="test", backend="test",
+            model="test", total_samples=1, scored_samples=1,
+            correct=1, accuracy=1.0, errors=0,
+            mean_latency_seconds=1.0, total_cost_usd=0.0,
+        )
+        assert s.avg_power_watts == 0.0
+        assert s.trace_step_type_stats == {}
+        assert s.total_input_tokens == 0
+        assert s.total_output_tokens == 0
+
+
 class TestMetaConfig:
     def test_defaults(self):
         m = MetaConfig()

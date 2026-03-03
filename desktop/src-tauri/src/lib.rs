@@ -1,157 +1,395 @@
+use std::sync::Arc;
+use std::time::Duration;
 use tauri::Manager;
 use tauri::menu::{MenuBuilder, MenuItemBuilder};
 use tauri::tray::TrayIconBuilder;
 use tauri_plugin_autostart::MacosLauncher;
+use tokio::sync::Mutex;
 
-/// Fetch health status from the OpenJarvis API server.
+const OLLAMA_PORT: u16 = 11434;
+const JARVIS_PORT: u16 = 8222;
+const DEFAULT_MODEL: &str = "qwen3:0.6b";
+
+// ---------------------------------------------------------------------------
+// BackendManager — owns the Ollama + Jarvis server child processes
+// ---------------------------------------------------------------------------
+
+struct ChildHandle {
+    child: tokio::process::Child,
+}
+
+impl ChildHandle {
+    async fn kill(&mut self) {
+        let _ = self.child.kill().await;
+    }
+}
+
+#[derive(Default)]
+struct BackendManager {
+    ollama: Option<ChildHandle>,
+    jarvis: Option<ChildHandle>,
+}
+
+impl BackendManager {
+    async fn stop_all(&mut self) {
+        if let Some(ref mut h) = self.jarvis {
+            h.kill().await;
+        }
+        self.jarvis = None;
+        if let Some(ref mut h) = self.ollama {
+            h.kill().await;
+        }
+        self.ollama = None;
+    }
+}
+
+type SharedBackend = Arc<Mutex<BackendManager>>;
+
+// ---------------------------------------------------------------------------
+// Setup status (reported to frontend)
+// ---------------------------------------------------------------------------
+
+#[derive(serde::Serialize, Clone)]
+struct SetupStatus {
+    phase: String,
+    detail: String,
+    ollama_ready: bool,
+    server_ready: bool,
+    model_ready: bool,
+    error: Option<String>,
+}
+
+impl Default for SetupStatus {
+    fn default() -> Self {
+        Self {
+            phase: "starting".into(),
+            detail: "Initializing...".into(),
+            ollama_ready: false,
+            server_ready: false,
+            model_ready: false,
+            error: None,
+        }
+    }
+}
+
+type SharedStatus = Arc<Mutex<SetupStatus>>;
+
+// ---------------------------------------------------------------------------
+// Health-check helpers
+// ---------------------------------------------------------------------------
+
+async fn wait_for_url(url: &str, timeout: Duration) -> bool {
+    let client = reqwest::Client::builder()
+        .timeout(Duration::from_secs(2))
+        .build()
+        .unwrap();
+    let deadline = tokio::time::Instant::now() + timeout;
+    while tokio::time::Instant::now() < deadline {
+        if let Ok(resp) = client.get(url).send().await {
+            if resp.status().is_success() {
+                return true;
+            }
+        }
+        tokio::time::sleep(Duration::from_millis(500)).await;
+    }
+    false
+}
+
+async fn ollama_has_model(model: &str) -> bool {
+    let url = format!("http://127.0.0.1:{}/api/tags", OLLAMA_PORT);
+    let client = reqwest::Client::builder()
+        .timeout(Duration::from_secs(5))
+        .build()
+        .unwrap();
+    if let Ok(resp) = client.get(&url).send().await {
+        if let Ok(body) = resp.json::<serde_json::Value>().await {
+            if let Some(models) = body.get("models").and_then(|m| m.as_array()) {
+                return models.iter().any(|m| {
+                    m.get("name")
+                        .and_then(|n| n.as_str())
+                        .map(|n| n.starts_with(model.split(':').next().unwrap_or(model)))
+                        .unwrap_or(false)
+                });
+            }
+        }
+    }
+    false
+}
+
+async fn pull_model(model: &str) -> Result<(), String> {
+    let url = format!("http://127.0.0.1:{}/api/pull", OLLAMA_PORT);
+    let client = reqwest::Client::builder()
+        .timeout(Duration::from_secs(600))
+        .build()
+        .map_err(|e| e.to_string())?;
+    let resp = client
+        .post(&url)
+        .json(&serde_json::json!({"name": model, "stream": false}))
+        .send()
+        .await
+        .map_err(|e| format!("Pull request failed: {}", e))?;
+    if !resp.status().is_success() {
+        return Err(format!("Pull returned status {}", resp.status()));
+    }
+    Ok(())
+}
+
+// ---------------------------------------------------------------------------
+// Backend boot sequence (runs in background after app launch)
+// ---------------------------------------------------------------------------
+
+async fn boot_backend(backend: SharedBackend, status: SharedStatus) {
+    // Phase 1: Start Ollama
+    {
+        let mut s = status.lock().await;
+        s.phase = "ollama".into();
+        s.detail = "Starting inference engine...".into();
+    }
+
+    // Try the bundled sidecar first, fall back to system ollama
+    let ollama_child = {
+        let sidecar = tokio::process::Command::new("ollama")
+            .arg("serve")
+            .env("OLLAMA_HOST", format!("127.0.0.1:{}", OLLAMA_PORT))
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .spawn();
+        match sidecar {
+            Ok(child) => Some(child),
+            Err(_) => None,
+        }
+    };
+
+    if let Some(child) = ollama_child {
+        backend.lock().await.ollama = Some(ChildHandle { child });
+    }
+
+    let ollama_url = format!("http://127.0.0.1:{}/api/tags", OLLAMA_PORT);
+    let ollama_ok = wait_for_url(&ollama_url, Duration::from_secs(30)).await;
+
+    if !ollama_ok {
+        let mut s = status.lock().await;
+        s.error = Some("Could not start Ollama. Install it from https://ollama.com".into());
+        return;
+    }
+
+    {
+        let mut s = status.lock().await;
+        s.ollama_ready = true;
+        s.detail = "Inference engine ready.".into();
+    }
+
+    // Phase 2: Ensure a default model exists
+    {
+        let mut s = status.lock().await;
+        s.phase = "model".into();
+        s.detail = format!("Checking for model {}...", DEFAULT_MODEL);
+    }
+
+    if !ollama_has_model(DEFAULT_MODEL).await {
+        {
+            let mut s = status.lock().await;
+            s.detail = format!("Downloading {}... (this may take a minute)", DEFAULT_MODEL);
+        }
+        if let Err(e) = pull_model(DEFAULT_MODEL).await {
+            let mut s = status.lock().await;
+            s.error = Some(format!("Failed to download model: {}", e));
+            return;
+        }
+    }
+
+    {
+        let mut s = status.lock().await;
+        s.model_ready = true;
+        s.detail = "Model ready.".into();
+    }
+
+    // Phase 3: Start jarvis serve
+    {
+        let mut s = status.lock().await;
+        s.phase = "server".into();
+        s.detail = "Starting API server...".into();
+    }
+
+    let jarvis_child = tokio::process::Command::new("jarvis")
+        .args(["serve", "--port", &JARVIS_PORT.to_string()])
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .spawn();
+
+    match jarvis_child {
+        Ok(child) => {
+            backend.lock().await.jarvis = Some(ChildHandle { child });
+        }
+        Err(e) => {
+            let mut s = status.lock().await;
+            s.error = Some(format!(
+                "Could not start jarvis server: {}. \
+                 Install with: pip install 'openjarvis[server]'",
+                e
+            ));
+            return;
+        }
+    }
+
+    let server_url = format!("http://127.0.0.1:{}/health", JARVIS_PORT);
+    let server_ok = wait_for_url(&server_url, Duration::from_secs(30)).await;
+
+    if !server_ok {
+        let mut s = status.lock().await;
+        s.error = Some("Jarvis server did not become healthy in time.".into());
+        return;
+    }
+
+    {
+        let mut s = status.lock().await;
+        s.server_ready = true;
+        s.phase = "ready".into();
+        s.detail = "All systems ready.".into();
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Tauri commands
+// ---------------------------------------------------------------------------
+
+fn api_base() -> String {
+    format!("http://127.0.0.1:{}", JARVIS_PORT)
+}
+
+#[tauri::command]
+async fn get_setup_status(
+    state: tauri::State<'_, SharedStatus>,
+) -> Result<SetupStatus, String> {
+    Ok(state.lock().await.clone())
+}
+
+#[tauri::command]
+async fn start_backend(
+    backend: tauri::State<'_, SharedBackend>,
+    status: tauri::State<'_, SharedStatus>,
+) -> Result<(), String> {
+    let b = backend.inner().clone();
+    let s = status.inner().clone();
+    tauri::async_runtime::spawn(boot_backend(b, s));
+    Ok(())
+}
+
+#[tauri::command]
+async fn stop_backend(
+    backend: tauri::State<'_, SharedBackend>,
+) -> Result<(), String> {
+    backend.lock().await.stop_all().await;
+    Ok(())
+}
+
 #[tauri::command]
 async fn check_health(api_url: String) -> Result<serde_json::Value, String> {
-    let url = format!("{}/health", api_url);
+    let url = format!("{}/health", if api_url.is_empty() { api_base() } else { api_url });
     let resp = reqwest::get(&url)
         .await
         .map_err(|e| format!("Connection failed: {}", e))?;
-    let body: serde_json::Value = resp
-        .json()
-        .await
-        .map_err(|e| format!("Invalid response: {}", e))?;
-    Ok(body)
+    resp.json().await.map_err(|e| format!("Invalid response: {}", e))
 }
 
-/// Fetch energy monitoring data from the API.
 #[tauri::command]
 async fn fetch_energy(api_url: String) -> Result<serde_json::Value, String> {
-    let url = format!("{}/v1/telemetry/energy", api_url);
-    let resp = reqwest::get(&url)
+    let base = if api_url.is_empty() { api_base() } else { api_url };
+    let resp = reqwest::get(format!("{}/v1/telemetry/energy", base))
         .await
         .map_err(|e| format!("Connection failed: {}", e))?;
-    let body: serde_json::Value = resp
-        .json()
-        .await
-        .map_err(|e| format!("Invalid response: {}", e))?;
-    Ok(body)
+    resp.json().await.map_err(|e| format!("Invalid response: {}", e))
 }
 
-/// Fetch telemetry statistics from the API.
 #[tauri::command]
 async fn fetch_telemetry(api_url: String) -> Result<serde_json::Value, String> {
-    let url = format!("{}/v1/telemetry/stats", api_url);
-    let resp = reqwest::get(&url)
+    let base = if api_url.is_empty() { api_base() } else { api_url };
+    let resp = reqwest::get(format!("{}/v1/telemetry/stats", base))
         .await
         .map_err(|e| format!("Connection failed: {}", e))?;
-    let body: serde_json::Value = resp
-        .json()
-        .await
-        .map_err(|e| format!("Invalid response: {}", e))?;
-    Ok(body)
+    resp.json().await.map_err(|e| format!("Invalid response: {}", e))
 }
 
-/// Fetch recent traces from the API.
 #[tauri::command]
 async fn fetch_traces(api_url: String, limit: u32) -> Result<serde_json::Value, String> {
-    let url = format!("{}/v1/traces?limit={}", api_url, limit);
-    let resp = reqwest::get(&url)
+    let base = if api_url.is_empty() { api_base() } else { api_url };
+    let resp = reqwest::get(format!("{}/v1/traces?limit={}", base, limit))
         .await
         .map_err(|e| format!("Connection failed: {}", e))?;
-    let body: serde_json::Value = resp
-        .json()
-        .await
-        .map_err(|e| format!("Invalid response: {}", e))?;
-    Ok(body)
+    resp.json().await.map_err(|e| format!("Invalid response: {}", e))
 }
 
-/// Fetch a single trace by ID.
 #[tauri::command]
 async fn fetch_trace(api_url: String, trace_id: String) -> Result<serde_json::Value, String> {
-    let url = format!("{}/v1/traces/{}", api_url, trace_id);
-    let resp = reqwest::get(&url)
+    let base = if api_url.is_empty() { api_base() } else { api_url };
+    let resp = reqwest::get(format!("{}/v1/traces/{}", base, trace_id))
         .await
         .map_err(|e| format!("Connection failed: {}", e))?;
-    let body: serde_json::Value = resp
-        .json()
-        .await
-        .map_err(|e| format!("Invalid response: {}", e))?;
-    Ok(body)
+    resp.json().await.map_err(|e| format!("Invalid response: {}", e))
 }
 
-/// Fetch learning system statistics.
 #[tauri::command]
 async fn fetch_learning_stats(api_url: String) -> Result<serde_json::Value, String> {
-    let url = format!("{}/v1/learning/stats", api_url);
-    let resp = reqwest::get(&url)
+    let base = if api_url.is_empty() { api_base() } else { api_url };
+    let resp = reqwest::get(format!("{}/v1/learning/stats", base))
         .await
         .map_err(|e| format!("Connection failed: {}", e))?;
-    let body: serde_json::Value = resp
-        .json()
-        .await
-        .map_err(|e| format!("Invalid response: {}", e))?;
-    Ok(body)
+    resp.json().await.map_err(|e| format!("Invalid response: {}", e))
 }
 
-/// Fetch learning policy configuration.
 #[tauri::command]
 async fn fetch_learning_policy(api_url: String) -> Result<serde_json::Value, String> {
-    let url = format!("{}/v1/learning/policy", api_url);
-    let resp = reqwest::get(&url)
+    let base = if api_url.is_empty() { api_base() } else { api_url };
+    let resp = reqwest::get(format!("{}/v1/learning/policy", base))
         .await
         .map_err(|e| format!("Connection failed: {}", e))?;
-    let body: serde_json::Value = resp
-        .json()
-        .await
-        .map_err(|e| format!("Invalid response: {}", e))?;
-    Ok(body)
+    resp.json().await.map_err(|e| format!("Invalid response: {}", e))
 }
 
-/// Fetch memory backend statistics.
 #[tauri::command]
 async fn fetch_memory_stats(api_url: String) -> Result<serde_json::Value, String> {
-    let url = format!("{}/v1/memory/stats", api_url);
-    let resp = reqwest::get(&url)
+    let base = if api_url.is_empty() { api_base() } else { api_url };
+    let resp = reqwest::get(format!("{}/v1/memory/stats", base))
         .await
         .map_err(|e| format!("Connection failed: {}", e))?;
-    let body: serde_json::Value = resp
-        .json()
-        .await
-        .map_err(|e| format!("Invalid response: {}", e))?;
-    Ok(body)
+    resp.json().await.map_err(|e| format!("Invalid response: {}", e))
 }
 
-/// Search memory for relevant chunks.
 #[tauri::command]
 async fn search_memory(
     api_url: String,
     query: String,
     top_k: u32,
 ) -> Result<serde_json::Value, String> {
-    let url = format!("{}/v1/memory/search", api_url);
+    let base = if api_url.is_empty() { api_base() } else { api_url };
     let client = reqwest::Client::new();
     let resp = client
-        .post(&url)
+        .post(format!("{}/v1/memory/search", base))
         .json(&serde_json::json!({"query": query, "top_k": top_k}))
         .send()
         .await
         .map_err(|e| format!("Connection failed: {}", e))?;
-    let body: serde_json::Value = resp
-        .json()
-        .await
-        .map_err(|e| format!("Invalid response: {}", e))?;
-    Ok(body)
+    resp.json().await.map_err(|e| format!("Invalid response: {}", e))
 }
 
-/// Fetch list of available agents.
 #[tauri::command]
 async fn fetch_agents(api_url: String) -> Result<serde_json::Value, String> {
-    let url = format!("{}/v1/agents", api_url);
-    let resp = reqwest::get(&url)
+    let base = if api_url.is_empty() { api_base() } else { api_url };
+    let resp = reqwest::get(format!("{}/v1/agents", base))
         .await
         .map_err(|e| format!("Connection failed: {}", e))?;
-    let body: serde_json::Value = resp
-        .json()
-        .await
-        .map_err(|e| format!("Invalid response: {}", e))?;
-    Ok(body)
+    resp.json().await.map_err(|e| format!("Invalid response: {}", e))
 }
 
-/// Launch the `jarvis` CLI command via shell.
+#[tauri::command]
+async fn fetch_models(api_url: String) -> Result<serde_json::Value, String> {
+    let base = if api_url.is_empty() { api_base() } else { api_url };
+    let resp = reqwest::get(format!("{}/v1/models", base))
+        .await
+        .map_err(|e| format!("Connection failed: {}", e))?;
+    resp.json().await.map_err(|e| format!("Invalid response: {}", e))
+}
+
 #[tauri::command]
 async fn run_jarvis_command(args: Vec<String>) -> Result<String, String> {
     let output = tokio::process::Command::new("jarvis")
@@ -167,9 +405,21 @@ async fn run_jarvis_command(args: Vec<String>) -> Result<String, String> {
     }
 }
 
+// ---------------------------------------------------------------------------
+// App entry point
+// ---------------------------------------------------------------------------
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let backend: SharedBackend = Arc::new(Mutex::new(BackendManager::default()));
+    let status: SharedStatus = Arc::new(Mutex::new(SetupStatus::default()));
+
+    let boot_backend_ref = backend.clone();
+    let boot_status_ref = status.clone();
+
     tauri::Builder::default()
+        .manage(backend.clone())
+        .manage(status.clone())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
@@ -180,15 +430,15 @@ pub fn run() {
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
-            // Focus the main window if another instance is launched
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.set_focus();
             }
         }))
-        .setup(|app| {
+        .setup(move |app| {
+            // System tray
             let show = MenuItemBuilder::with_id("show", "Show / Hide")
                 .build(app)?;
-            let health = MenuItemBuilder::with_id("health", "Health: checking...")
+            let health = MenuItemBuilder::with_id("health", "Health: starting...")
                 .enabled(false)
                 .build(app)?;
             let quit = MenuItemBuilder::with_id("quit", "Quit OpenJarvis")
@@ -226,9 +476,15 @@ pub fn run() {
                 })
                 .build(app)?;
 
+            // Auto-start backend services on launch
+            tauri::async_runtime::spawn(boot_backend(boot_backend_ref, boot_status_ref));
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            get_setup_status,
+            start_backend,
+            stop_backend,
             check_health,
             fetch_energy,
             fetch_telemetry,
@@ -239,8 +495,17 @@ pub fn run() {
             fetch_memory_stats,
             search_memory,
             fetch_agents,
+            fetch_models,
             run_jarvis_command,
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running OpenJarvis Desktop");
+        .build(tauri::generate_context!())
+        .expect("error while building OpenJarvis Desktop")
+        .run(move |_app, event| {
+            if let tauri::RunEvent::ExitRequested { .. } = event {
+                let b = backend.clone();
+                tauri::async_runtime::spawn(async move {
+                    b.lock().await.stop_all().await;
+                });
+            }
+        });
 }

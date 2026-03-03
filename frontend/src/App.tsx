@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Routes, Route } from 'react-router';
 import { Layout } from './components/Layout';
 import { ChatPage } from './pages/ChatPage';
@@ -6,10 +6,13 @@ import { DashboardPage } from './pages/DashboardPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { GetStartedPage } from './pages/GetStartedPage';
 import { CommandPalette } from './components/CommandPalette';
+import { SetupScreen } from './components/SetupScreen';
 import { useAppStore } from './lib/store';
-import { fetchModels, fetchServerInfo, fetchSavings } from './lib/api';
+import { fetchModels, fetchServerInfo, fetchSavings, isTauri } from './lib/api';
 
 export default function App() {
+  const [setupDone, setSetupDone] = useState(!isTauri());
+  const handleSetupReady = useCallback(() => setSetupDone(true), []);
   const setModels = useAppStore((s) => s.setModels);
   const setModelsLoading = useAppStore((s) => s.setModelsLoading);
   const setSelectedModel = useAppStore((s) => s.setSelectedModel);
@@ -69,6 +72,10 @@ export default function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [commandPaletteOpen, setCommandPaletteOpen, toggleSystemPanel]);
+
+  if (!setupDone) {
+    return <SetupScreen onReady={handleSetupReady} />;
+  }
 
   return (
     <>

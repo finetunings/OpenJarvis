@@ -6,15 +6,48 @@ declare global {
   }
 }
 
-const isTauri = () => typeof window !== 'undefined' && !!window.__TAURI_INTERNALS__;
+export const isTauri = () => typeof window !== 'undefined' && !!window.__TAURI_INTERNALS__;
 
-const getBase = () => import.meta.env.VITE_API_URL || '';
+const DESKTOP_API = 'http://127.0.0.1:8222';
+
+const getBase = () => {
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  if (isTauri()) return DESKTOP_API;
+  return '';
+};
 
 async function tauriInvoke<T>(command: string, args: Record<string, unknown> = {}): Promise<T> {
   const { invoke } = await import('@tauri-apps/api/core');
-  const apiUrl = getBase() || 'http://localhost:8000';
+  const apiUrl = getBase();
   return invoke<T>(command, { apiUrl, ...args });
 }
+
+// ---------------------------------------------------------------------------
+// Setup status (desktop only)
+// ---------------------------------------------------------------------------
+
+export interface SetupStatus {
+  phase: string;
+  detail: string;
+  ollama_ready: boolean;
+  server_ready: boolean;
+  model_ready: boolean;
+  error: string | null;
+}
+
+export async function getSetupStatus(): Promise<SetupStatus | null> {
+  if (!isTauri()) return null;
+  try {
+    const { invoke } = await import('@tauri-apps/api/core');
+    return await invoke<SetupStatus>('get_setup_status');
+  } catch {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// API functions
+// ---------------------------------------------------------------------------
 
 export async function fetchModels(): Promise<ModelInfo[]> {
   if (isTauri()) {
@@ -46,8 +79,7 @@ export async function fetchServerInfo(): Promise<ServerInfo> {
 export async function checkHealth(): Promise<boolean> {
   if (isTauri()) {
     try {
-      const apiUrl = getBase() || 'http://localhost:8000';
-      await tauriInvoke('check_health', { apiUrl });
+      await tauriInvoke('check_health', { apiUrl: getBase() });
       return true;
     } catch {
       return false;
@@ -64,8 +96,7 @@ export async function checkHealth(): Promise<boolean> {
 export async function fetchEnergy(): Promise<unknown> {
   if (isTauri()) {
     try {
-      const apiUrl = getBase() || 'http://localhost:8000';
-      return await tauriInvoke('fetch_energy', { apiUrl });
+      return await tauriInvoke('fetch_energy', { apiUrl: getBase() });
     } catch {}
   }
   const res = await fetch(`${getBase()}/v1/telemetry/energy`);
@@ -76,8 +107,7 @@ export async function fetchEnergy(): Promise<unknown> {
 export async function fetchTelemetry(): Promise<unknown> {
   if (isTauri()) {
     try {
-      const apiUrl = getBase() || 'http://localhost:8000';
-      return await tauriInvoke('fetch_telemetry', { apiUrl });
+      return await tauriInvoke('fetch_telemetry', { apiUrl: getBase() });
     } catch {}
   }
   const res = await fetch(`${getBase()}/v1/telemetry/stats`);
@@ -88,8 +118,7 @@ export async function fetchTelemetry(): Promise<unknown> {
 export async function fetchTraces(limit: number = 50): Promise<unknown> {
   if (isTauri()) {
     try {
-      const apiUrl = getBase() || 'http://localhost:8000';
-      return await tauriInvoke('fetch_traces', { apiUrl, limit });
+      return await tauriInvoke('fetch_traces', { apiUrl: getBase(), limit });
     } catch {}
   }
   const res = await fetch(`${getBase()}/v1/traces?limit=${limit}`);

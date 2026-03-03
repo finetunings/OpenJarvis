@@ -1,4 +1,5 @@
 import type { SSEEvent } from '../types';
+import { isTauri } from './api';
 
 export interface ChatRequest {
   model: string;
@@ -6,11 +7,13 @@ export interface ChatRequest {
   stream: true;
 }
 
+const DESKTOP_API = 'http://127.0.0.1:8222';
+
 export async function* streamChat(
   request: ChatRequest,
   signal?: AbortSignal,
 ): AsyncGenerator<SSEEvent> {
-  const base = import.meta.env.VITE_API_URL || '';
+  const base = import.meta.env.VITE_API_URL || (isTauri() ? DESKTOP_API : '');
   const response = await fetch(`${base}/v1/chat/completions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

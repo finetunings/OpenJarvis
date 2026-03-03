@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import platform
-import resource
 import subprocess
 import time
 from contextlib import contextmanager
@@ -145,32 +144,26 @@ class AppleEnergyMonitor(EnergyMonitor):
         workload mix, and thermal state — but it gives useful non-zero
         readings without requiring root or external libraries.
         """
-        ru0 = resource.getrusage(resource.RUSAGE_CHILDREN)
+        _ACTIVE_RATIO = 0.60
         t0 = time.monotonic()
 
         yield result
 
-        ru1 = resource.getrusage(resource.RUSAGE_CHILDREN)
         wall = time.monotonic() - t0
-
-        cpu_user = ru1.ru_utime - ru0.ru_utime
-        cpu_sys = ru1.ru_stime - ru0.ru_stime
-        cpu_total = cpu_user + cpu_sys
-
         if wall <= 0:
             result.duration_seconds = 0.0
             return
 
-        utilization = min(cpu_total / wall, 1.0) if wall > 0 else 0.0
-        power_estimate = utilization * self._tdp_watts
-        energy_j = power_estimate * wall
+        power_w = self._tdp_watts * _ACTIVE_RATIO
+        energy_j = power_w * wall
 
-        result.cpu_energy_joules = energy_j * 0.6
-        result.gpu_energy_joules = energy_j * 0.3
-        result.dram_energy_joules = energy_j * 0.1
+        result.gpu_energy_joules = energy_j * 0.55
+        result.cpu_energy_joules = energy_j * 0.25
+        result.dram_energy_joules = energy_j * 0.15
+        result.ane_energy_joules = energy_j * 0.05
         result.energy_joules = energy_j
         result.duration_seconds = wall
-        result.mean_power_watts = power_estimate
+        result.mean_power_watts = power_w
 
     def close(self) -> None:
         self._monitor = None

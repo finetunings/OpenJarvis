@@ -67,6 +67,9 @@ jobs:
         with:
           workspaces: 'desktop/src-tauri -> target'
 
+      - name: Create frontend dist stub
+        run: mkdir -p frontend/dist && echo '<html><body></body></html>' > frontend/dist/index.html
+
       - name: Cargo check
         working-directory: desktop/src-tauri
         run: cargo check

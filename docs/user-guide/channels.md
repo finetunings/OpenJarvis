@@ -485,6 +485,6 @@ assistant_has_own_number = false
 ## See Also
 
 - [Architecture: Channels](../architecture/channels.md) — listener loop internals and reconnect design
-- [API Reference: Channels](../api/channels.md) — full class and type signatures
+- [API Reference: Channels](../api-reference/openjarvis/channels/index.md) — full class and type signatures
 - [Getting Started: Configuration](../getting-started/configuration.md) — full config reference
 - [OpenClaw Agent](agents.md) — the agent infrastructure that uses OpenClaw transport

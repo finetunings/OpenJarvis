@@ -240,6 +240,6 @@ After registration, the backend is discoverable via `ChannelRegistry.get("slack"
 ## See Also
 
 - [User Guide: Channels](../user-guide/channels.md) — how to use channels in practice
-- [API Reference: Channels](../api/channels.md) — complete class and type signatures
+- [API Reference: Channels](../api-reference/openjarvis/channels/index.md) — complete class and type signatures
 - [Architecture: Overview](overview.md) — where channels fit in the overall system
 - [Architecture: Design Principles](design-principles.md) — registry pattern and ABC conventions

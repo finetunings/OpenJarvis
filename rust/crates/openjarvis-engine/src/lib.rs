@@ -13,7 +13,7 @@ pub mod sglang;
 pub mod traits;
 pub mod vllm;
 
-pub use discovery::{discover_engines, get_engine, get_engine_static};
+pub use discovery::{discover_engines, get_engine_static};
 pub use engine_enum::Engine;
 pub use llamacpp::LlamaCppEngine;
 pub use ollama::OllamaEngine;

@@ -4,7 +4,7 @@
 //! All config structs use `#[serde(default)]` for backward compatibility.
 
 use crate::error::ConfigError;
-use crate::hardware::{detect_hardware, recommend_engine, GpuInfo, HardwareInfo};
+use crate::hardware::{detect_hardware, recommend_engine, HardwareInfo};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 

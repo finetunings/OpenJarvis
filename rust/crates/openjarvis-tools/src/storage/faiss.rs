@@ -32,13 +32,12 @@ impl FAISSMemory {
     pub fn new(db_path: &Path, dim: usize) -> Result<Self, OpenJarvisError> {
         if let Some(parent) = db_path.parent() {
             std::fs::create_dir_all(parent).map_err(|e| {
-                OpenJarvisError::Io(std::io::Error::new(std::io::ErrorKind::Other, e))
+                OpenJarvisError::Io(std::io::Error::other(e))
             })?;
         }
 
         let conn = Connection::open(db_path).map_err(|e| {
-            OpenJarvisError::Io(std::io::Error::new(
-                std::io::ErrorKind::Other,
+            OpenJarvisError::Io(std::io::Error::other(
                 e.to_string(),
             ))
         })?;
@@ -54,8 +53,7 @@ impl FAISSMemory {
             );",
         )
         .map_err(|e| {
-            OpenJarvisError::Io(std::io::Error::new(
-                std::io::ErrorKind::Other,
+            OpenJarvisError::Io(std::io::Error::other(
                 e.to_string(),
             ))
         })?;
@@ -114,8 +112,7 @@ impl FAISSMemory {
             rusqlite::params![doc_id, content, source, meta_str, emb_bytes],
         )
         .map_err(|e| {
-            OpenJarvisError::Io(std::io::Error::new(
-                std::io::ErrorKind::Other,
+            OpenJarvisError::Io(std::io::Error::other(
                 e.to_string(),
             ))
         })?;
@@ -136,8 +133,7 @@ impl FAISSMemory {
                 "SELECT id, content, source, metadata, embedding FROM faiss_documents",
             )
             .map_err(|e| {
-                OpenJarvisError::Io(std::io::Error::new(
-                    std::io::ErrorKind::Other,
+                OpenJarvisError::Io(std::io::Error::other(
                     e.to_string(),
                 ))
             })?;
@@ -151,8 +147,7 @@ impl FAISSMemory {
                 Ok((content, source, meta_str, bytes_to_embedding(&emb_bytes)))
             })
             .map_err(|e| {
-                OpenJarvisError::Io(std::io::Error::new(
-                    std::io::ErrorKind::Other,
+                OpenJarvisError::Io(std::io::Error::other(
                     e.to_string(),
                 ))
             })?
@@ -216,8 +211,7 @@ impl MemoryBackend for FAISSMemory {
                 rusqlite::params![doc_id],
             )
             .map_err(|e| {
-                OpenJarvisError::Io(std::io::Error::new(
-                    std::io::ErrorKind::Other,
+                OpenJarvisError::Io(std::io::Error::other(
                     e.to_string(),
                 ))
             })?;
@@ -228,8 +222,7 @@ impl MemoryBackend for FAISSMemory {
         let conn = self.conn.lock();
         conn.execute_batch("DELETE FROM faiss_documents")
             .map_err(|e| {
-                OpenJarvisError::Io(std::io::Error::new(
-                    std::io::ErrorKind::Other,
+                OpenJarvisError::Io(std::io::Error::other(
                     e.to_string(),
                 ))
             })?;
@@ -241,8 +234,7 @@ impl MemoryBackend for FAISSMemory {
         let count: i64 = conn
             .query_row("SELECT COUNT(*) FROM faiss_documents", [], |row| row.get(0))
             .map_err(|e| {
-                OpenJarvisError::Io(std::io::Error::new(
-                    std::io::ErrorKind::Other,
+                OpenJarvisError::Io(std::io::Error::other(
                     e.to_string(),
                 ))
             })?;

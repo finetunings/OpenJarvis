@@ -306,7 +306,7 @@ impl InferenceEngine for LlamaCppEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use openjarvis_core::{Message, Role};
+    use openjarvis_core::Message;
 
     #[test]
     fn test_llamacpp_default_host() {

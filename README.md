@@ -1,7 +1,7 @@
 <div align="center">
   <img alt="OpenJarvis" src="assets/OpenJarvis_Horizontal_Logo.png" width="400">
 
-  <p><i>Programming abstractions for on-device AI.</i></p>
+  <p><i>Composable, Programmable Systems for On-Device, Personal AI.</i></p>
 
   <p>
     <a href="https://www.intelligence-per-watt.ai/"><img src="https://img.shields.io/badge/project-intelligence--per--watt.ai-blue" alt="Project"></a>

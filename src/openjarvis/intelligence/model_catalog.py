@@ -18,7 +18,10 @@ BUILTIN_MODELS: List[ModelSpec] = [
         context_length=32768,
         supported_engines=("vllm", "ollama", "llamacpp", "sglang"),
         provider="alibaba",
-        metadata={"architecture": "dense"},
+        metadata={
+            "architecture": "dense",
+            "hf_repo": "Qwen/Qwen3-8B",
+        },
     ),
     ModelSpec(
         model_id="qwen3:32b",
@@ -28,7 +31,10 @@ BUILTIN_MODELS: List[ModelSpec] = [
         min_vram_gb=20.0,
         supported_engines=("ollama", "vllm"),
         provider="alibaba",
-        metadata={"architecture": "dense"},
+        metadata={
+            "architecture": "dense",
+            "hf_repo": "Qwen/Qwen3-32B",
+        },
     ),
     ModelSpec(
         model_id="llama3.3:70b",
@@ -38,7 +44,10 @@ BUILTIN_MODELS: List[ModelSpec] = [
         min_vram_gb=40.0,
         supported_engines=("ollama", "vllm"),
         provider="meta",
-        metadata={"architecture": "dense"},
+        metadata={
+            "architecture": "dense",
+            "hf_repo": "meta-llama/Llama-3.3-70B-Instruct",
+        },
     ),
     ModelSpec(
         model_id="llama3.2:3b",
@@ -47,7 +56,10 @@ BUILTIN_MODELS: List[ModelSpec] = [
         context_length=131072,
         supported_engines=("ollama", "vllm", "llamacpp"),
         provider="meta",
-        metadata={"architecture": "dense"},
+        metadata={
+            "architecture": "dense",
+            "hf_repo": "meta-llama/Llama-3.2-3B-Instruct",
+        },
     ),
     ModelSpec(
         model_id="deepseek-coder-v2:16b",
@@ -56,7 +68,10 @@ BUILTIN_MODELS: List[ModelSpec] = [
         context_length=131072,
         supported_engines=("ollama", "vllm"),
         provider="deepseek",
-        metadata={"architecture": "dense"},
+        metadata={
+            "architecture": "dense",
+            "hf_repo": "deepseek-ai/DeepSeek-Coder-V2-Lite-Instruct",
+        },
     ),
     ModelSpec(
         model_id="mistral:7b",
@@ -65,7 +80,10 @@ BUILTIN_MODELS: List[ModelSpec] = [
         context_length=32768,
         supported_engines=("ollama", "vllm", "llamacpp"),
         provider="mistral",
-        metadata={"architecture": "dense"},
+        metadata={
+            "architecture": "dense",
+            "hf_repo": "mistralai/Mistral-7B-Instruct-v0.3",
+        },
     ),
     # -----------------------------------------------------------------------
     # Local models — Mixture of Experts (MoE)
@@ -79,7 +97,10 @@ BUILTIN_MODELS: List[ModelSpec] = [
         min_vram_gb=12.0,
         supported_engines=("vllm", "ollama"),
         provider="open-source",
-        metadata={"architecture": "moe"},
+        metadata={
+            "architecture": "moe",
+            "hf_repo": "OpenBuddy/GPT-OSS-120B",
+        },
     ),
     ModelSpec(
         model_id="glm-4.7-flash",
@@ -90,7 +111,10 @@ BUILTIN_MODELS: List[ModelSpec] = [
         min_vram_gb=8.0,
         supported_engines=("vllm", "sglang", "llamacpp"),
         provider="zhipu",
-        metadata={"architecture": "moe"},
+        metadata={
+            "architecture": "moe",
+            "hf_repo": "THUDM/GLM-4.7-Flash-Chat",
+        },
     ),
     ModelSpec(
         model_id="trinity-mini",
@@ -101,7 +125,10 @@ BUILTIN_MODELS: List[ModelSpec] = [
         min_vram_gb=8.0,
         supported_engines=("vllm", "llamacpp"),
         provider="trinity",
-        metadata={"architecture": "moe"},
+        metadata={
+            "architecture": "moe",
+            "hf_repo": "TrinityAI/Trinity-Mini-26B",
+        },
     ),
     # -----------------------------------------------------------------------
     # Local models — TeichAI Distilled
@@ -169,7 +196,12 @@ BUILTIN_MODELS: List[ModelSpec] = [
         supported_engines=("cloud",),
         provider="openai",
         requires_api_key=True,
-        metadata={"pricing_input": 2.50, "pricing_output": 10.00},
+        metadata={
+            "architecture": "proprietary",
+            "pricing_input": 2.50,
+            "pricing_output": 10.00,
+            "url": "https://platform.openai.com/docs/models/gpt-4o",
+        },
     ),
     ModelSpec(
         model_id="gpt-4o-mini",
@@ -179,7 +211,12 @@ BUILTIN_MODELS: List[ModelSpec] = [
         supported_engines=("cloud",),
         provider="openai",
         requires_api_key=True,
-        metadata={"pricing_input": 0.15, "pricing_output": 0.60},
+        metadata={
+            "architecture": "proprietary",
+            "pricing_input": 0.15,
+            "pricing_output": 0.60,
+            "url": "https://platform.openai.com/docs/models/gpt-4o-mini",
+        },
     ),
     ModelSpec(
         model_id="gpt-5-mini",
@@ -189,7 +226,12 @@ BUILTIN_MODELS: List[ModelSpec] = [
         supported_engines=("cloud",),
         provider="openai",
         requires_api_key=True,
-        metadata={"pricing_input": 0.25, "pricing_output": 2.00},
+        metadata={
+            "architecture": "proprietary",
+            "pricing_input": 0.25,
+            "pricing_output": 2.00,
+            "url": "https://platform.openai.com/docs/models",
+        },
     ),
     ModelSpec(
         model_id="gpt-5-mini-2025-08-07",
@@ -199,7 +241,12 @@ BUILTIN_MODELS: List[ModelSpec] = [
         supported_engines=("cloud",),
         provider="openai",
         requires_api_key=True,
-        metadata={"pricing_input": 0.25, "pricing_output": 2.00},
+        metadata={
+            "architecture": "proprietary",
+            "pricing_input": 0.25,
+            "pricing_output": 2.00,
+            "url": "https://platform.openai.com/docs/models",
+        },
     ),
     # -----------------------------------------------------------------------
     # Cloud models — Anthropic
@@ -212,7 +259,12 @@ BUILTIN_MODELS: List[ModelSpec] = [
         supported_engines=("cloud",),
         provider="anthropic",
         requires_api_key=True,
-        metadata={"pricing_input": 3.00, "pricing_output": 15.00},
+        metadata={
+            "architecture": "proprietary",
+            "pricing_input": 3.00,
+            "pricing_output": 15.00,
+            "url": "https://docs.anthropic.com/en/docs/about-claude/models",
+        },
     ),
     ModelSpec(
         model_id="claude-opus-4-20250514",
@@ -222,7 +274,12 @@ BUILTIN_MODELS: List[ModelSpec] = [
         supported_engines=("cloud",),
         provider="anthropic",
         requires_api_key=True,
-        metadata={"pricing_input": 15.00, "pricing_output": 75.00},
+        metadata={
+            "architecture": "proprietary",
+            "pricing_input": 15.00,
+            "pricing_output": 75.00,
+            "url": "https://docs.anthropic.com/en/docs/about-claude/models",
+        },
     ),
     ModelSpec(
         model_id="claude-opus-4-6",
@@ -232,7 +289,12 @@ BUILTIN_MODELS: List[ModelSpec] = [
         supported_engines=("cloud",),
         provider="anthropic",
         requires_api_key=True,
-        metadata={"pricing_input": 5.00, "pricing_output": 25.00},
+        metadata={
+            "architecture": "proprietary",
+            "pricing_input": 5.00,
+            "pricing_output": 25.00,
+            "url": "https://docs.anthropic.com/en/docs/about-claude/models",
+        },
     ),
     ModelSpec(
         model_id="claude-sonnet-4-6",
@@ -242,7 +304,12 @@ BUILTIN_MODELS: List[ModelSpec] = [
         supported_engines=("cloud",),
         provider="anthropic",
         requires_api_key=True,
-        metadata={"pricing_input": 3.00, "pricing_output": 15.00},
+        metadata={
+            "architecture": "proprietary",
+            "pricing_input": 3.00,
+            "pricing_output": 15.00,
+            "url": "https://docs.anthropic.com/en/docs/about-claude/models",
+        },
     ),
     ModelSpec(
         model_id="claude-haiku-4-5",
@@ -252,7 +319,12 @@ BUILTIN_MODELS: List[ModelSpec] = [
         supported_engines=("cloud",),
         provider="anthropic",
         requires_api_key=True,
-        metadata={"pricing_input": 1.00, "pricing_output": 5.00},
+        metadata={
+            "architecture": "proprietary",
+            "pricing_input": 1.00,
+            "pricing_output": 5.00,
+            "url": "https://docs.anthropic.com/en/docs/about-claude/models",
+        },
     ),
     # -----------------------------------------------------------------------
     # Cloud models — Google
@@ -265,7 +337,12 @@ BUILTIN_MODELS: List[ModelSpec] = [
         supported_engines=("cloud",),
         provider="google",
         requires_api_key=True,
-        metadata={"pricing_input": 1.25, "pricing_output": 10.00},
+        metadata={
+            "architecture": "proprietary",
+            "pricing_input": 1.25,
+            "pricing_output": 10.00,
+            "url": "https://ai.google.dev/gemini-api/docs/models#gemini-2.5-pro",
+        },
     ),
     ModelSpec(
         model_id="gemini-2.5-flash",
@@ -275,7 +352,12 @@ BUILTIN_MODELS: List[ModelSpec] = [
         supported_engines=("cloud",),
         provider="google",
         requires_api_key=True,
-        metadata={"pricing_input": 0.30, "pricing_output": 2.50},
+        metadata={
+            "architecture": "proprietary",
+            "pricing_input": 0.30,
+            "pricing_output": 2.50,
+            "url": "https://ai.google.dev/gemini-api/docs/models#gemini-2.5-flash",
+        },
     ),
     ModelSpec(
         model_id="gemini-3-pro",
@@ -285,7 +367,12 @@ BUILTIN_MODELS: List[ModelSpec] = [
         supported_engines=("cloud",),
         provider="google",
         requires_api_key=True,
-        metadata={"pricing_input": 2.00, "pricing_output": 12.00},
+        metadata={
+            "architecture": "proprietary",
+            "pricing_input": 2.00,
+            "pricing_output": 12.00,
+            "url": "https://ai.google.dev/gemini-api/docs/models",
+        },
     ),
     ModelSpec(
         model_id="gemini-3-flash",
@@ -295,7 +382,12 @@ BUILTIN_MODELS: List[ModelSpec] = [
         supported_engines=("cloud",),
         provider="google",
         requires_api_key=True,
-        metadata={"pricing_input": 0.50, "pricing_output": 3.00},
+        metadata={
+            "architecture": "proprietary",
+            "pricing_input": 0.50,
+            "pricing_output": 3.00,
+            "url": "https://ai.google.dev/gemini-api/docs/models",
+        },
     ),
 ]
 

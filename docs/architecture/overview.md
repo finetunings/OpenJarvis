@@ -1,21 +1,18 @@
 # Architecture Overview
 
-OpenJarvis is a research framework for studying on-device AI systems. Its architecture is organized around **four core abstractions** -- Intelligence, Engine, Agentic Logic, and Memory -- plus a cross-cutting **Learning** system that ties them together through trace-driven feedback.
+OpenJarvis is a research framework for studying on-device AI systems. Its architecture is organized around **five core abstractions** -- Intelligence, Engine, Agentic Logic, Memory, and Learning -- that work together through trace-driven feedback.
 
 ---
 
-## The Four Pillars + Learning
+## The Five Pillars
 
 ```mermaid
 graph TB
-    subgraph "Core Pillars"
+    subgraph "The Five Pillars"
         INT["Intelligence<br/><i>Model definition<br/>& catalog</i>"]
         ENG["Engine<br/><i>Inference runtime<br/>backends</i>"]
         AGT["Agentic Logic<br/><i>Agents, tools,<br/>orchestration</i>"]
         MEM["Memory<br/><i>Persistent searchable<br/>storage</i>"]
-    end
-
-    subgraph "Cross-cutting"
         LRN["Learning & Traces<br/><i>Router policies,<br/>trace recording,<br/>feedback loop</i>"]
     end
 
@@ -74,9 +71,9 @@ The Memory pillar provides **persistent, searchable storage** for documents and 
 
 The memory pipeline includes document ingestion, chunking, embedding generation, and context injection. When a user sends a query and `agent.context_from_memory` is enabled, relevant documents are retrieved and prepended to the prompt with source attribution.
 
-### Learning & Traces (Cross-cutting)
+### Learning & Traces
 
-The Learning system is a cross-cutting concern that connects all pillars through **trace-driven feedback**. Every agent interaction can produce a `Trace` capturing the full sequence of steps — routing decisions, memory retrieval, inference calls, tool invocations, and final responses. The `TraceAnalyzer` computes statistics from accumulated traces, and the `TraceDrivenPolicy` uses these statistics to learn which model/agent/tool combinations produce the best outcomes for different query types.
+The Learning system is the fifth pillar, connecting the other four through **trace-driven feedback**. Every agent interaction can produce a `Trace` capturing the full sequence of steps — routing decisions, memory retrieval, inference calls, tool invocations, and final responses. The `TraceAnalyzer` computes statistics from accumulated traces, and the `TraceDrivenPolicy` uses these statistics to learn which model/agent/tool combinations produce the best outcomes for different query types.
 
 The learning system is configured through nested sub-sections in `config.toml`: `[learning.routing]` controls the router policy (heuristic, learned, sft, grpo), `[learning.intelligence]` controls the model-level learning policy, `[learning.agent]` controls agent advisor and ICL updater policies, and `[learning.metrics]` sets the composite reward function weights.
 

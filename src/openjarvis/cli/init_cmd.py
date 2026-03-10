@@ -14,6 +14,7 @@ from openjarvis.core.config import (
     DEFAULT_CONFIG_PATH,
     detect_hardware,
     generate_default_toml,
+    generate_minimal_toml,
     recommend_engine,
     recommend_model,
 )
@@ -123,7 +124,13 @@ def _next_steps_text(engine: str, model: str = "") -> str:
     type=click.Path(exists=True),
     help="Path to config file to use.",
 )
-def init(force: bool, config: Optional[Path]) -> None:
+@click.option(
+    "--full",
+    "full_config",
+    is_flag=True,
+    help="Generate full reference config with all sections",
+)
+def init(force: bool, config: Optional[Path], full_config: bool = False) -> None:
     """Detect hardware and generate ~/.openjarvis/config.toml."""
     console = Console()
 
@@ -152,7 +159,10 @@ def init(force: bool, config: Optional[Path]) -> None:
     if config:
         toml_content = config.read_text()
     else:
-        toml_content = generate_default_toml(hw)
+        if full_config:
+            toml_content = generate_default_toml(hw)
+        else:
+            toml_content = generate_minimal_toml(hw)
 
     DEFAULT_CONFIG_DIR.mkdir(parents=True, exist_ok=True)
     if config:

@@ -74,3 +74,46 @@ class TestNextStepsMlx:
         assert "mlx_lm.server" in text
         assert "jarvis ask" in text
         assert "jarvis doctor" in text
+
+
+class TestMinimalConfig:
+    def test_init_generates_minimal_by_default(self, tmp_path: Path) -> None:
+        """Default jarvis init produces a short config."""
+        config_dir = tmp_path / ".openjarvis"
+        config_path = config_dir / "config.toml"
+        with (
+            mock.patch(
+                "openjarvis.cli.init_cmd.DEFAULT_CONFIG_DIR", config_dir
+            ),
+            mock.patch(
+                "openjarvis.cli.init_cmd.DEFAULT_CONFIG_PATH", config_path
+            ),
+        ):
+            result = CliRunner().invoke(cli, ["init"])
+        assert result.exit_code == 0
+        content = config_path.read_text()
+        # Minimal config should be short
+        lines = [ln for ln in content.splitlines() if ln.strip()]
+        assert len(lines) <= 30
+        # Should have the reference hint
+        assert "jarvis init --full" in content
+
+    def test_init_full_generates_verbose_config(self, tmp_path: Path) -> None:
+        """jarvis init --full produces the full reference config."""
+        config_dir = tmp_path / ".openjarvis"
+        config_path = config_dir / "config.toml"
+        with (
+            mock.patch(
+                "openjarvis.cli.init_cmd.DEFAULT_CONFIG_DIR", config_dir
+            ),
+            mock.patch(
+                "openjarvis.cli.init_cmd.DEFAULT_CONFIG_PATH", config_path
+            ),
+        ):
+            result = CliRunner().invoke(cli, ["init", "--full"])
+        assert result.exit_code == 0
+        content = config_path.read_text()
+        # Full config should have many sections
+        assert "[engine.ollama]" in content
+        assert "[server]" in content
+        assert "[security]" in content

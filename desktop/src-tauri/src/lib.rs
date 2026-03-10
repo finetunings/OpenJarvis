@@ -211,8 +211,8 @@ async fn boot_backend(backend: SharedBackend, status: SharedStatus) {
         s.detail = "Starting API server...".into();
     }
 
-    let jarvis_child = tokio::process::Command::new("jarvis")
-        .args(["serve", "--port", &JARVIS_PORT.to_string()])
+    let jarvis_child = tokio::process::Command::new("uv")
+        .args(["run", "jarvis", "serve", "--port", &JARVIS_PORT.to_string(), "--agent", "simple"])
         .stdout(std::process::Stdio::null())
         .stderr(std::process::Stdio::null())
         .spawn();
@@ -225,7 +225,7 @@ async fn boot_backend(backend: SharedBackend, status: SharedStatus) {
             let mut s = status.lock().await;
             s.error = Some(format!(
                 "Could not start jarvis server: {}. \
-                 Install with: pip install 'openjarvis[server]'",
+                 Make sure uv is installed (https://astral.sh/uv) and run: uv sync --extra server",
                 e
             ));
             return;
@@ -392,8 +392,10 @@ async fn fetch_models(api_url: String) -> Result<serde_json::Value, String> {
 
 #[tauri::command]
 async fn run_jarvis_command(args: Vec<String>) -> Result<String, String> {
-    let output = tokio::process::Command::new("jarvis")
-        .args(&args)
+    let mut cmd_args = vec!["run".to_string(), "jarvis".to_string()];
+    cmd_args.extend(args);
+    let output = tokio::process::Command::new("uv")
+        .args(&cmd_args)
         .output()
         .await
         .map_err(|e| format!("Failed to launch jarvis: {}", e))?;

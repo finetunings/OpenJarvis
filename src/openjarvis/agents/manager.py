@@ -12,6 +12,7 @@ import time
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+from uuid import uuid4
 
 _CREATE_AGENTS = """\
 CREATE TABLE IF NOT EXISTS managed_agents (
@@ -49,6 +50,17 @@ CREATE TABLE IF NOT EXISTS channel_bindings (
 );
 """
 
+_CREATE_CHECKPOINTS = """\
+CREATE TABLE IF NOT EXISTS agent_checkpoints (
+    id TEXT PRIMARY KEY,
+    agent_id TEXT NOT NULL REFERENCES managed_agents(id),
+    tick_id TEXT NOT NULL,
+    conversation_state TEXT NOT NULL DEFAULT '{}',
+    tool_state TEXT NOT NULL DEFAULT '{}',
+    created_at REAL NOT NULL
+);
+"""
+
 _SUMMARY_MAX = 2000
 
 
@@ -64,6 +76,7 @@ class AgentManager:
         self._conn.execute(_CREATE_AGENTS)
         self._conn.execute(_CREATE_TASKS)
         self._conn.execute(_CREATE_BINDINGS)
+        self._conn.executescript(_CREATE_CHECKPOINTS)
         self._conn.commit()
         # Schema migrations for runtime columns
         _MIGRATIONS = [
@@ -170,6 +183,80 @@ class AgentManager:
 
     def end_tick(self, agent_id: str) -> None:
         self._set_status(agent_id, "idle")
+
+    # ── Checkpoints ───────────────────────────────────────────────
+
+    _CHECKPOINT_RETENTION = 5
+
+    def save_checkpoint(
+        self,
+        agent_id: str,
+        tick_id: str,
+        conversation_state: dict,
+        tool_state: dict,
+    ) -> dict:
+        cp_id = uuid4().hex[:16]
+        now = time.time()
+        self._conn.execute(
+            "INSERT INTO agent_checkpoints"
+            " (id, agent_id, tick_id, conversation_state, tool_state, created_at)"
+            " VALUES (?, ?, ?, ?, ?, ?)",
+            (
+                cp_id,
+                agent_id,
+                tick_id,
+                json.dumps(conversation_state),
+                json.dumps(tool_state),
+                now,
+            ),
+        )
+        # Prune old checkpoints beyond retention limit
+        self._conn.execute(
+            "DELETE FROM agent_checkpoints WHERE agent_id = ? AND id NOT IN "
+            "(SELECT id FROM agent_checkpoints WHERE agent_id = ?"
+            " ORDER BY created_at DESC LIMIT ?)",
+            (agent_id, agent_id, self._CHECKPOINT_RETENTION),
+        )
+        self._conn.commit()
+        return {
+            "id": cp_id,
+            "agent_id": agent_id,
+            "tick_id": tick_id,
+            "created_at": now,
+        }
+
+    def list_checkpoints(self, agent_id: str) -> list:
+        rows = self._conn.execute(
+            "SELECT * FROM agent_checkpoints"
+            " WHERE agent_id = ? ORDER BY created_at DESC",
+            (agent_id,),
+        ).fetchall()
+        return [self._row_to_checkpoint(r) for r in rows]
+
+    def get_latest_checkpoint(self, agent_id: str) -> Optional[Dict[str, Any]]:
+        row = self._conn.execute(
+            "SELECT * FROM agent_checkpoints"
+            " WHERE agent_id = ? ORDER BY created_at DESC LIMIT 1",
+            (agent_id,),
+        ).fetchone()
+        return self._row_to_checkpoint(row) if row else None
+
+    def recover_agent(self, agent_id: str) -> Optional[Dict[str, Any]]:
+        checkpoint = self.get_latest_checkpoint(agent_id)
+        if checkpoint is not None:
+            self.update_agent(agent_id, status="idle")
+        return checkpoint
+
+    @staticmethod
+    def _row_to_checkpoint(row: sqlite3.Row) -> Dict[str, Any]:
+        return {
+            "id": row["id"],
+            "agent_id": row["agent_id"],
+            "tick_id": row["tick_id"],
+            "conversation_state": json.loads(row["conversation_state"]),
+            "tool_state": json.loads(row["tool_state"]),
+            "created_at": row["created_at"],
+        }
 
     # ── Summary memory ────────────────────────────────────────────
 

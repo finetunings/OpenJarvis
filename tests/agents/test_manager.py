@@ -163,6 +163,49 @@ class TestConcurrency:
             manager.start_tick(agent["id"])
 
 
+class TestCheckpoints:
+    def test_save_checkpoint(self, manager):
+        agent = manager.create_agent(name="test", agent_type="simple")
+        manager.save_checkpoint(
+            agent["id"],
+            tick_id="tick-001",
+            conversation_state={"messages": [{"role": "user", "content": "hello"}]},
+            tool_state={"web_search": {"last_query": "test"}},
+        )
+        checkpoints = manager.list_checkpoints(agent["id"])
+        assert len(checkpoints) == 1
+        assert checkpoints[0]["tick_id"] == "tick-001"
+
+    def test_get_latest_checkpoint(self, manager):
+        agent = manager.create_agent(name="test", agent_type="simple")
+        manager.save_checkpoint(agent["id"], "tick-001", {"v": 1}, {})
+        manager.save_checkpoint(agent["id"], "tick-002", {"v": 2}, {})
+
+        latest = manager.get_latest_checkpoint(agent["id"])
+        assert latest is not None
+        assert latest["tick_id"] == "tick-002"
+        assert latest["conversation_state"]["v"] == 2
+
+    def test_checkpoint_retention_max_5(self, manager):
+        agent = manager.create_agent(name="test", agent_type="simple")
+        for i in range(8):
+            manager.save_checkpoint(agent["id"], f"tick-{i:03d}", {"v": i}, {})
+
+        checkpoints = manager.list_checkpoints(agent["id"])
+        assert len(checkpoints) == 5
+        # Oldest should be tick-003 (0,1,2 pruned)
+        assert checkpoints[-1]["tick_id"] == "tick-003"
+
+    def test_recover_agent(self, manager):
+        agent = manager.create_agent(name="test", agent_type="simple")
+        manager.save_checkpoint(agent["id"], "tick-001", {"messages": []}, {})
+        manager.update_agent(agent["id"], status="error")
+
+        checkpoint = manager.recover_agent(agent["id"])
+        assert checkpoint is not None
+        assert manager.get_agent(agent["id"])["status"] == "idle"
+
+
 class TestSchemaAndThreading:
     def test_agent_has_runtime_columns(self, manager):
         """New columns from ALTER TABLE migration should exist."""

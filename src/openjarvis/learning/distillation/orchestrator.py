@@ -248,9 +248,7 @@ class DistillationOrchestrator:
 
         # Write session.json artifact
         artifact_path = session_dir / "session.json"
-        artifact_path.write_text(
-            session.model_dump_json(indent=2), encoding="utf-8"
-        )
+        artifact_path.write_text(session.model_dump_json(indent=2), encoding="utf-8")
 
         return session
 

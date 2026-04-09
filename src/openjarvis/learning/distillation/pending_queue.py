@@ -52,9 +52,7 @@ class PendingQueue:
                 logger.warning("Skipping corrupt pending file: %s", path)
         return results
 
-    def get(
-        self, session_id: str, edit_id: str
-    ) -> dict[str, Any] | None:
+    def get(self, session_id: str, edit_id: str) -> dict[str, Any] | None:
         """Return a specific pending edit, or None."""
         filename = f"{session_id}__{edit_id}.json"
         path = self._dir / filename

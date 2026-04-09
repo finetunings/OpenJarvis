@@ -48,21 +48,26 @@ def _make_diagnosis_result():
 def _make_mock_engine():
     engine = MagicMock()
     engine.generate.return_value = {
-        "content": json.dumps({
-            "edits": [
-                {
-                    "id": "edit-001",
-                    "pillar": "intelligence",
-                    "op": "set_model_for_query_class",
-                    "target": "routing.math",
-                    "payload": {"query_class": "math", "model": "qwen2.5-coder:14b"},
-                    "rationale": "Route math to bigger model",
-                    "expected_improvement": "c1",
-                    "risk_tier": "auto",
-                    "references": ["t1"],
-                }
-            ]
-        }),
+        "content": json.dumps(
+            {
+                "edits": [
+                    {
+                        "id": "edit-001",
+                        "pillar": "intelligence",
+                        "op": "set_model_for_query_class",
+                        "target": "routing.math",
+                        "payload": {
+                            "query_class": "math",
+                            "model": "qwen2.5-coder:14b",
+                        },
+                        "rationale": "Route math to bigger model",
+                        "expected_improvement": "c1",
+                        "risk_tier": "auto",
+                        "references": ["t1"],
+                    }
+                ]
+            }
+        ),
         "usage": {"total_tokens": 500},
         "cost_usd": 0.03,
         "finish_reason": "stop",

@@ -95,3 +95,56 @@ class SessionStatus(str, Enum):
     COMPLETED = "completed"
     FAILED = "failed"
     ROLLED_BACK = "rolled_back"
+
+
+# ---------------------------------------------------------------------------
+# Edit — atomic unit of change
+# ---------------------------------------------------------------------------
+
+
+from typing import Any  # noqa: E402  (kept with model definitions)
+
+from pydantic import BaseModel, Field  # noqa: E402
+
+
+class Edit(BaseModel):
+    """One atomic edit to the OpenJarvis harness.
+
+    Emitted by the LearningPlanner, consumed by an EditApplier. The teacher
+    proposes the op, target, payload, rationale, and references; the planner
+    overwrites ``risk_tier`` deterministically from the (pillar, op) lookup
+    table — the teacher cannot pick its own tier.
+
+    See spec §4.1.
+    """
+
+    id: str = Field(
+        ...,
+        description="UUID for this edit; also used as a footer in git commits.",
+    )
+    pillar: EditPillar = Field(..., description="Which OpenJarvis pillar is touched.")
+    op: EditOp = Field(..., description="The typed operation to perform.")
+    target: str = Field(
+        ...,
+        description="Dotted path to the target, e.g. 'agents.simple.system_prompt'.",
+    )
+    payload: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Op-specific arguments. Schema depends on op.",
+    )
+    rationale: str = Field(
+        ...,
+        description="Teacher's natural-language reason for this edit.",
+    )
+    expected_improvement: str = Field(
+        ...,
+        description="Which failure cluster id this edit is intended to address.",
+    )
+    risk_tier: EditRiskTier = Field(
+        ...,
+        description="Set by the planner from a (pillar, op) lookup table.",
+    )
+    references: list[str] = Field(
+        default_factory=list,
+        description="Trace ids or benchmark task ids that justify this edit.",
+    )

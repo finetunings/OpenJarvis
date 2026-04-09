@@ -104,3 +104,92 @@ class TestSessionStatus:
         assert SessionStatus.COMPLETED.value == "completed"
         assert SessionStatus.FAILED.value == "failed"
         assert SessionStatus.ROLLED_BACK.value == "rolled_back"
+
+
+# ---------------------------------------------------------------------------
+# Edit
+# ---------------------------------------------------------------------------
+
+
+class TestEdit:
+    """Tests for Edit pydantic model."""
+
+    def _valid_edit_kwargs(self) -> dict:
+        from openjarvis.learning.distillation.models import (
+            EditOp,
+            EditPillar,
+            EditRiskTier,
+        )
+
+        return {
+            "id": "11111111-2222-3333-4444-555555555555",
+            "pillar": EditPillar.INTELLIGENCE,
+            "op": EditOp.SET_MODEL_FOR_QUERY_CLASS,
+            "target": "learning.routing.policy_map.math",
+            "payload": {"query_class": "math", "model": "qwen2.5-coder:14b"},
+            "rationale": "Math queries are misrouted to qwen-3b",
+            "expected_improvement": "math_failures cluster",
+            "risk_tier": EditRiskTier.AUTO,
+            "references": ["trace-001", "trace-002"],
+        }
+
+    def test_constructs_with_valid_fields(self) -> None:
+        from openjarvis.learning.distillation.models import Edit
+
+        edit = Edit(**self._valid_edit_kwargs())
+
+        assert edit.id == "11111111-2222-3333-4444-555555555555"
+        assert edit.target == "learning.routing.policy_map.math"
+        assert edit.payload == {"query_class": "math", "model": "qwen2.5-coder:14b"}
+        assert edit.references == ["trace-001", "trace-002"]
+
+    def test_round_trip_via_json(self) -> None:
+        from openjarvis.learning.distillation.models import Edit
+
+        edit = Edit(**self._valid_edit_kwargs())
+        as_json = edit.model_dump_json()
+        restored = Edit.model_validate_json(as_json)
+
+        assert restored == edit
+
+    def test_pillar_must_be_valid_enum(self) -> None:
+        import pytest
+        from pydantic import ValidationError
+
+        from openjarvis.learning.distillation.models import Edit
+
+        kwargs = self._valid_edit_kwargs()
+        kwargs["pillar"] = "not_a_pillar"
+
+        with pytest.raises(ValidationError):
+            Edit(**kwargs)
+
+    def test_op_must_be_valid_enum(self) -> None:
+        import pytest
+        from pydantic import ValidationError
+
+        from openjarvis.learning.distillation.models import Edit
+
+        kwargs = self._valid_edit_kwargs()
+        kwargs["op"] = "not_an_op"
+
+        with pytest.raises(ValidationError):
+            Edit(**kwargs)
+
+    def test_payload_can_be_empty_dict(self) -> None:
+        from openjarvis.learning.distillation.models import Edit
+
+        kwargs = self._valid_edit_kwargs()
+        kwargs["payload"] = {}
+
+        edit = Edit(**kwargs)
+        assert edit.payload == {}
+
+    def test_references_default_empty_list(self) -> None:
+        from openjarvis.learning.distillation.models import Edit
+
+        kwargs = self._valid_edit_kwargs()
+        del kwargs["references"]
+
+        edit = Edit(**kwargs)
+        assert edit.references == []

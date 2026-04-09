@@ -205,9 +205,7 @@ class TestSessionStoreList:
             session = _make_session(session_id=f"s{i}")
             session = session.model_copy(
                 update={
-                    "started_at": datetime(
-                        2026, 4, 8, 3 + i, 0, 0, tzinfo=timezone.utc
-                    )
+                    "started_at": datetime(2026, 4, 8, 3 + i, 0, 0, tzinfo=timezone.utc)
                 }
             )
             store.save_session(session)
@@ -257,9 +255,7 @@ class TestEditOutcomes:
         assert {o.edit_id for o in listed} == {"edit-0", "edit-1", "edit-2"}
         store.close()
 
-    def test_outcomes_for_unknown_session_returns_empty(
-        self, tmp_path: Path
-    ) -> None:
+    def test_outcomes_for_unknown_session_returns_empty(self, tmp_path: Path) -> None:
         from openjarvis.learning.distillation.storage.session_store import (
             SessionStore,
         )

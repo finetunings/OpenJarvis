@@ -77,12 +77,9 @@ CREATE TABLE IF NOT EXISTS edit_outcomes (
 _CREATE_INDEXES = [
     "CREATE INDEX IF NOT EXISTS idx_sessions_started_at "
     "ON learning_sessions(started_at)",
-    "CREATE INDEX IF NOT EXISTS idx_sessions_status "
-    "ON learning_sessions(status)",
-    "CREATE INDEX IF NOT EXISTS idx_outcomes_session "
-    "ON edit_outcomes(session_id)",
-    "CREATE INDEX IF NOT EXISTS idx_outcomes_op "
-    "ON edit_outcomes(op)",
+    "CREATE INDEX IF NOT EXISTS idx_sessions_status ON learning_sessions(status)",
+    "CREATE INDEX IF NOT EXISTS idx_outcomes_session ON edit_outcomes(session_id)",
+    "CREATE INDEX IF NOT EXISTS idx_outcomes_op ON edit_outcomes(op)",
 ]
 
 _INSERT_SESSION = """\
@@ -217,9 +214,7 @@ class SessionStore:
         rows = self._conn.execute(sql, params).fetchall()
         return [self._row_to_session(r, with_outcomes=True) for r in rows]
 
-    def _row_to_session(
-        self, row: tuple, with_outcomes: bool
-    ) -> LearningSession:
+    def _row_to_session(self, row: tuple, with_outcomes: bool) -> LearningSession:
         session = LearningSession(
             id=row[0],
             parent_session_id=row[1],

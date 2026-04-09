@@ -84,9 +84,7 @@ class TestCheckpointStoreInit:
 class TestStageCommitDiscard:
     """Tests for begin_stage / commit_stage / discard_stage."""
 
-    def test_commit_stage_creates_commit_with_trailers(
-        self, tmp_path: Path
-    ) -> None:
+    def test_commit_stage_creates_commit_with_trailers(self, tmp_path: Path) -> None:
         from openjarvis.learning.distillation.checkpoint.store import (
             CheckpointStore,
         )
@@ -138,9 +136,7 @@ class TestStageCommitDiscard:
         # HEAD must equal the pre-stage sha.
         assert store.current_sha() == handle.pre_stage_sha
 
-    def test_begin_stage_refuses_dirty_working_tree(
-        self, tmp_path: Path
-    ) -> None:
+    def test_begin_stage_refuses_dirty_working_tree(self, tmp_path: Path) -> None:
         from openjarvis.learning.distillation.checkpoint.store import (
             CheckpointStore,
             DirtyWorkingTreeError,
@@ -175,9 +171,7 @@ class TestRevertSession:
 
         # Apply two commits tagged with the same session id.
         handle1 = store.begin_stage("edit-001")
-        (root / "agents" / "simple" / "system_prompt.md").write_text(
-            "version A\n"
-        )
+        (root / "agents" / "simple" / "system_prompt.md").write_text("version A\n")
         store.commit_stage(
             handle1,
             message="learning: edit-001 v A",
@@ -196,17 +190,13 @@ class TestRevertSession:
             risk_tier="auto",
         )
 
-        before_revert_log_count = len(
-            _git(root, "log", "--oneline").splitlines()
-        )
+        before_revert_log_count = len(_git(root, "log", "--oneline").splitlines())
 
         revert_shas = store.revert_session("session-XYZ")
         assert len(revert_shas) == 2
 
         # Two new commits added (the reverts), no history rewriting.
-        after_revert_log_count = len(
-            _git(root, "log", "--oneline").splitlines()
-        )
+        after_revert_log_count = len(_git(root, "log", "--oneline").splitlines())
         assert after_revert_log_count == before_revert_log_count + 2
 
         # Files restored to baseline.
@@ -215,9 +205,7 @@ class TestRevertSession:
         ).read_text() == "You are a helpful assistant.\n"
         assert (root / "tools" / "descriptions.toml").read_text() == "[web_search]\n"
 
-    def test_revert_session_with_no_commits_returns_empty(
-        self, tmp_path: Path
-    ) -> None:
+    def test_revert_session_with_no_commits_returns_empty(self, tmp_path: Path) -> None:
         from openjarvis.learning.distillation.checkpoint.store import (
             CheckpointStore,
         )

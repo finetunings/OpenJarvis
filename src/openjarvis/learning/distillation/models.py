@@ -81,9 +81,9 @@ class TriggerKind(str, Enum):
 class AutonomyMode(str, Enum):
     """How aggressively the orchestrator applies edits without review."""
 
-    AUTO = "auto"        # all tiers auto-apply, ignore review tier
-    TIERED = "tiered"    # default: respect per-edit risk tier
-    MANUAL = "manual"    # everything goes to review queue (dry-run mode)
+    AUTO = "auto"  # all tiers auto-apply, ignore review tier
+    TIERED = "tiered"  # default: respect per-edit risk tier
+    MANUAL = "manual"  # everything goes to review queue (dry-run mode)
 
 
 class SessionStatus(str, Enum):

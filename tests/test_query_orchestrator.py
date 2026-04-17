@@ -1,8 +1,4 @@
-"""Isolated QueryOrchestrator tests using a minimal fake system.
-
-Demonstrates the payoff of the JarvisSystem decomposition (issue #226):
-ask() can be exercised without building the full subsystem graph.
-"""
+"""Isolated QueryOrchestrator tests using a minimal fake system."""
 
 from __future__ import annotations
 
@@ -13,7 +9,7 @@ import pytest
 
 from openjarvis.core.config import JarvisConfig
 from openjarvis.core.events import EventBus
-from openjarvis.query_orchestrator import QueryOrchestrator
+from openjarvis.system import QueryOrchestrator
 
 
 class _FakeEngine:

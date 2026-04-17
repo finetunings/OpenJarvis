@@ -717,7 +717,7 @@ class TestSystemAskPassthrough:
             captured.update(kwargs)
             return {"content": "OK"}
 
-        from openjarvis.query_orchestrator import QueryOrchestrator
+        from openjarvis.system import QueryOrchestrator
 
         with patch.object(QueryOrchestrator, "_run_agent", patched_run_agent):
             real_system = JarvisSystem(
@@ -754,7 +754,7 @@ class TestSystemAskPassthrough:
             captured.update(kwargs)
             return {"content": "OK"}
 
-        from openjarvis.query_orchestrator import QueryOrchestrator
+        from openjarvis.system import QueryOrchestrator
 
         with patch.object(QueryOrchestrator, "_run_agent", patched_run_agent):
             real_system = JarvisSystem(

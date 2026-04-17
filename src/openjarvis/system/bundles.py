@@ -1,13 +1,4 @@
-"""Bounded-context bundles for JarvisSystem subsystems.
-
-Introduced as part of issue #226 — the JarvisSystem god-object decomposition.
-Bundles group cohesive subsystems together so code that needs a few related
-dependencies can accept a single bundle parameter instead of the full system.
-
-These are simple snapshot dataclasses: JarvisSystem exposes them via
-@property accessors that build a fresh snapshot from the underlying fields.
-They are not the source of truth — the flat fields on JarvisSystem are.
-"""
+"""Bundle dataclasses that group cohesive subsystems of JarvisSystem."""
 
 from __future__ import annotations
 

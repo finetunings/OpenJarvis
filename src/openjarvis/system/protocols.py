@@ -1,12 +1,4 @@
-"""Structural protocols for JarvisSystem subsystems.
-
-Part of issue #226 — lets tests substitute minimal fakes for JarvisSystem
-without inheriting from the concrete dataclass.
-
-Protocols are duck-typed: any object with matching attributes satisfies
-them. This means a test can do ``class Fake: ...`` with just the fields
-the code under test touches, and type checkers will accept it.
-"""
+"""Structural protocols for substituting fakes in place of JarvisSystem."""
 
 from __future__ import annotations
 

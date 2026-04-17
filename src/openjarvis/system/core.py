@@ -10,7 +10,7 @@ from openjarvis.core.config import JarvisConfig, load_config
 from openjarvis.core.events import EventBus, get_event_bus
 from openjarvis.core.types import Message, Role
 from openjarvis.engine._stubs import InferenceEngine
-from openjarvis.system_bundles import (
+from openjarvis.system.bundles import (
     AgentRuntime,
     Observability,
     Scheduling,
@@ -29,7 +29,6 @@ if TYPE_CHECKING:
     from openjarvis.mcp.client import MCPClient
     from openjarvis.mcp.server import MCPServer
     from openjarvis.operators.manager import OperatorManager
-    from openjarvis.query_orchestrator import QueryOrchestrator
     from openjarvis.sandbox.runner import ContainerRunner
     from openjarvis.scheduler.scheduler import TaskScheduler
     from openjarvis.scheduler.store import SchedulerStore
@@ -39,6 +38,7 @@ if TYPE_CHECKING:
     from openjarvis.sessions.session import SessionStore
     from openjarvis.skills.manager import SkillManager
     from openjarvis.speech._stubs import SpeechBackend
+    from openjarvis.system.orchestrator import QueryOrchestrator
     from openjarvis.telemetry.gpu_monitor import GpuMonitor
     from openjarvis.telemetry.store import TelemetryStore
     from openjarvis.tools.storage._stubs import MemoryBackend
@@ -87,15 +87,6 @@ class JarvisSystem:
     _learning_orchestrator: Optional[LearningOrchestrator] = None
     _mcp_clients: List[MCPClient] = field(default_factory=list)
 
-    # ------------------------------------------------------------------
-    # Bounded-context bundles (issue #226).
-    #
-    # These are read-only snapshot views of the flat fields above. They
-    # let code that needs a few related dependencies accept a bundle
-    # parameter instead of the whole system. Mutating a snapshot does
-    # NOT flow back to the system — use the flat fields for writes.
-    # ------------------------------------------------------------------
-
     @property
     def security(self) -> SecurityContext:
         return SecurityContext(
@@ -131,10 +122,9 @@ class JarvisSystem:
         )
 
     def _get_orchestrator(self) -> QueryOrchestrator:
-        """Return the cached QueryOrchestrator, creating it on first access."""
         orch = self.__dict__.get("_orchestrator")
         if orch is None:
-            from openjarvis.query_orchestrator import QueryOrchestrator
+            from openjarvis.system.orchestrator import QueryOrchestrator
 
             orch = QueryOrchestrator(self)
             self.__dict__["_orchestrator"] = orch
@@ -153,13 +143,6 @@ class JarvisSystem:
         operator_id: Optional[str] = None,
         prior_messages: Optional[List[Message]] = None,
     ) -> Dict[str, Any]:
-        """Execute a query through the system and return a result dict.
-
-        Behavior lives in :class:`openjarvis.query_orchestrator.QueryOrchestrator`;
-        this method is a thin delegate so tests can drive the orchestrator
-        directly with a Mock(spec=JarvisSystem) and without building the
-        full subsystem graph.
-        """
         return self._get_orchestrator().ask(
             query,
             context=context,
@@ -173,11 +156,9 @@ class JarvisSystem:
         )
 
     def _detect_agent_intent(self, query: str) -> Optional[str]:
-        """Deprecated alias — delegates to QueryOrchestrator."""
         return self._get_orchestrator()._detect_agent_intent(query)
 
     def _build_tools(self, tool_names: List[str]) -> List[BaseTool]:
-        """Deprecated alias — delegates to QueryOrchestrator."""
         return self._get_orchestrator()._build_tools(tool_names)
 
     def _run_agent(
@@ -193,7 +174,6 @@ class JarvisSystem:
         operator_id=None,
         prior_messages=None,
     ) -> Dict[str, Any]:
-        """Deprecated alias — delegates to QueryOrchestrator."""
         return self._get_orchestrator()._run_agent(
             query,
             messages,

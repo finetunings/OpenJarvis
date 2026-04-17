@@ -1,13 +1,4 @@
-"""Query orchestration — the behavioral core of JarvisSystem.ask().
-
-Extracted from JarvisSystem as part of issue #226 to decouple query
-execution (~400 lines of behavior) from the fully-wired system dataclass.
-The orchestrator holds a back-reference to JarvisSystem and reads the
-runtime state it needs; JarvisSystem.ask() is now a one-line delegate.
-
-Testing: construct with a Mock(spec=JarvisSystem) and drive ask() directly
-without materializing the full subsystem graph.
-"""
+"""Executes user queries through the engine or through an agent."""
 
 from __future__ import annotations
 
@@ -18,19 +9,12 @@ from openjarvis.core.types import Message, Role
 from openjarvis.tools._stubs import BaseTool
 
 if TYPE_CHECKING:
-    from openjarvis.system_protocols import OrchestratorDeps
+    from openjarvis.system.protocols import OrchestratorDeps
 
 logger = logging.getLogger(__name__)
 
 
 class QueryOrchestrator:
-    """Executes user queries through the engine or an agent.
-
-    Depends on an :class:`~openjarvis.system_protocols.OrchestratorDeps`
-    (structural) — tests can pass a minimal fake instead of a full
-    JarvisSystem.
-    """
-
     def __init__(self, system: OrchestratorDeps) -> None:
         self._system = system
 

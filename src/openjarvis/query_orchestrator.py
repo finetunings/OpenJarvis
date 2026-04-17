@@ -18,15 +18,20 @@ from openjarvis.core.types import Message, Role
 from openjarvis.tools._stubs import BaseTool
 
 if TYPE_CHECKING:
-    from openjarvis.system import JarvisSystem
+    from openjarvis.system_protocols import OrchestratorDeps
 
 logger = logging.getLogger(__name__)
 
 
 class QueryOrchestrator:
-    """Executes user queries through the engine or an agent."""
+    """Executes user queries through the engine or an agent.
 
-    def __init__(self, system: JarvisSystem) -> None:
+    Depends on an :class:`~openjarvis.system_protocols.OrchestratorDeps`
+    (structural) — tests can pass a minimal fake instead of a full
+    JarvisSystem.
+    """
+
+    def __init__(self, system: OrchestratorDeps) -> None:
         self._system = system
 
     def ask(

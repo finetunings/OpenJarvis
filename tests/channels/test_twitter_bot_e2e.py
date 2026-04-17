@@ -39,6 +39,8 @@ sys.path.pop(0)
 
 _classify_mention = twitter_bot._classify_mention
 _build_question_prompt = twitter_bot._build_question_prompt
+_build_question_grounded_prompt = twitter_bot._build_question_grounded_prompt
+_build_question_deferral_prompt = twitter_bot._build_question_deferral_prompt
 _build_bug_prompt = twitter_bot._build_bug_prompt
 _build_feature_prompt = twitter_bot._build_feature_prompt
 _build_praise_prompt = twitter_bot._build_praise_prompt
@@ -132,13 +134,26 @@ class TestClassifyMention:
 class TestPromptBuilders:
     """Verify prompt builders produce well-formed prompts with the right info."""
 
-    def test_question_prompt_contains_tools(self):
-        prompt = _build_question_prompt("alice", "123", "how do I install?")
-        assert "memory_search" in prompt
+    def test_question_deferral_prompt_has_channel_send(self):
+        """Deferral prompt (used when retrieval is empty/weak)."""
+        prompt = _build_question_deferral_prompt("alice", "123", "how do I install?")
         assert "channel_send" in prompt
         assert "alice" in prompt
         assert "123" in prompt
         assert "how do I install?" in prompt
+        # Deferral prompt explicitly tells the model NOT to guess
+        assert "do not guess" in prompt.lower() or "do not make up" in prompt.lower()
+
+    def test_question_grounded_prompt_embeds_context(self):
+        """Grounded prompt (used when retrieval score >= threshold)."""
+        context = "[1] hardware.md  —  Running Without a GPU\nUse llama.cpp for CPU."
+        prompt = _build_question_grounded_prompt(
+            "alice", "123", "can I run on cpu?", context, 0.71
+        )
+        assert "channel_send" in prompt
+        assert context in prompt
+        # Grounded prompt must instruct the model to answer ONLY from context
+        assert "only from facts in the context" in prompt.lower() or "only from the context" in prompt.lower()
 
     def test_bug_prompt_contains_github_url(self):
         prompt = _build_bug_prompt("bob", "456", "crash on startup")
@@ -172,7 +187,7 @@ class TestPromptBuilders:
         ]
         for prompt in prompts:
             assert "<=280 characters" in prompt
-            assert "all lowercase" in prompt
+            assert "lowercase prose" in prompt
 
     def test_bug_prompt_includes_from_twitter_label(self):
         prompt = _build_bug_prompt("user", "1", "crash")
@@ -430,20 +445,34 @@ class TestFullE2EFlow:
         return j
 
     def test_question_flow(self):
-        """Question mention → memory_search + channel_send tools requested."""
+        """Question mention → retrieval runs in Python, agent only needs channel_send.
+
+        After the dense-retrieval refactor, ``memory_search`` is no longer
+        a model-visible tool; retrieval happens out-of-band and the score
+        picks between grounded/deferral prompts. The only tool the agent
+        needs for a QUESTION is ``channel_send``.
+        """
         j = self._make_mock_jarvis(["check the docs at open-jarvis.github.io"])
         tweet = DEMO_TWEETS[0]
 
         mention_type = _classify_mention(tweet["text"])
         assert mention_type == "QUESTION"
 
-        prompt = _build_question_prompt(tweet["author"], tweet["id"], tweet["text"])
-        j.ask(prompt, agent="orchestrator", tools=["memory_search", "channel_send"], temperature=0.4)
+        prompt = _build_question_deferral_prompt(
+            tweet["author"], tweet["id"], tweet["text"]
+        )
+        j.ask(
+            prompt,
+            agent="orchestrator",
+            tools=["channel_send"],
+            temperature=0.4,
+        )
 
         j.ask.assert_called_once()
         call_kwargs = j.ask.call_args
-        assert "memory_search" in call_kwargs[1]["tools"]
         assert "channel_send" in call_kwargs[1]["tools"]
+        # memory_search is explicitly NOT passed — retrieval was already done
+        assert "memory_search" not in call_kwargs[1]["tools"]
         assert call_kwargs[1]["agent"] == "orchestrator"
 
     def test_bug_report_flow(self):
@@ -506,9 +535,13 @@ class TestFullE2EFlow:
         j.ask.assert_not_called()
 
     def test_all_demo_tweets_processed(self):
-        """Run through all demo tweets and verify correct classification + tool selection."""
+        """Run through all demo tweets and verify correct classification + tool selection.
+
+        Post dense-retrieval refactor: QUESTIONs no longer request
+        ``memory_search`` as a tool — retrieval is done in Python.
+        """
         expected = [
-            ("QUESTION", ["memory_search", "channel_send"]),
+            ("QUESTION", ["channel_send"]),
             ("BUG_REPORT", ["http_request", "channel_send"]),
             ("FEATURE_REQUEST", ["http_request", "channel_send"]),
             ("PRAISE", ["channel_send"]),
@@ -523,7 +556,7 @@ class TestFullE2EFlow:
                 continue
 
             if mention_type == "QUESTION":
-                tools = ["memory_search", "channel_send"]
+                tools = ["channel_send"]
             elif mention_type == "BUG_REPORT":
                 tools = ["http_request", "channel_send"]
             elif mention_type == "FEATURE_REQUEST":

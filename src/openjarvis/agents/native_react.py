@@ -10,6 +10,7 @@ import re
 from typing import Any, List, Optional
 
 from openjarvis.agents._stubs import AgentContext, AgentResult, ToolUsingAgent
+from openjarvis.agents.prompt_loader import load_system_prompt_override
 from openjarvis.core.events import EventBus
 from openjarvis.core.registry import AgentRegistry
 from openjarvis.core.types import Message, Role, ToolCall, ToolResult, _message_to_dict
@@ -111,7 +112,10 @@ class NativeReActAgent(ToolUsingAgent):
 
         # Build system prompt with rich tool descriptions
         tool_desc = build_tool_descriptions(self._tools)
-        system_prompt = REACT_SYSTEM_PROMPT.format(tool_descriptions=tool_desc)
+        prompt_template = (
+            load_system_prompt_override("native_react") or REACT_SYSTEM_PROMPT
+        )
+        system_prompt = prompt_template.format(tool_descriptions=tool_desc)
 
         messages = self._build_messages(input, context, system_prompt=system_prompt)
 

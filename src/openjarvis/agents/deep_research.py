@@ -10,6 +10,7 @@ from __future__ import annotations
 from typing import Any, List, Optional
 
 from openjarvis.agents._stubs import AgentContext, AgentResult, ToolUsingAgent
+from openjarvis.agents.prompt_loader import load_system_prompt_override
 from openjarvis.core.events import EventBus
 from openjarvis.core.registry import AgentRegistry
 from openjarvis.core.types import Message, Role, ToolCall, ToolResult
@@ -217,9 +218,10 @@ class DeepResearchAgent(ToolUsingAgent):
         self._emit_turn_start(input)
 
         # Build system prompt with current date/time injected
-        messages = self._build_messages(
-            input, context, system_prompt=_build_system_prompt()
+        system_prompt = (
+            load_system_prompt_override("deep_research") or _build_system_prompt()
         )
+        messages = self._build_messages(input, context, system_prompt=system_prompt)
 
         # Prepare OpenAI-format tool definitions for native function calling
         tools_openai = [t.to_openai_function() for t in self._tools]

@@ -19,6 +19,7 @@ import logging
 from typing import Any, List, Optional
 
 from openjarvis.agents._stubs import AgentContext, AgentResult, ToolUsingAgent
+from openjarvis.agents.prompt_loader import load_system_prompt_override
 from openjarvis.core.events import EventBus
 from openjarvis.core.registry import AgentRegistry
 from openjarvis.core.types import Message, Role, ToolCall, ToolResult, _message_to_dict
@@ -169,14 +170,19 @@ class MonitorOperativeAgent(ToolUsingAgent):
         self._emit_turn_start(input)
 
         # 1. Build system prompt with state context
+        #    Priority: constructor arg > file override > hardcoded default
         sys_parts: list[str] = []
         if self._system_prompt:
             sys_parts.append(self._system_prompt)
         else:
             tool_desc = self._build_tool_descriptions()
+            prompt_template = (
+                load_system_prompt_override("monitor_operative")
+                or MONITOR_OPERATIVE_SYSTEM_PROMPT
+            )
             try:
                 sys_parts.append(
-                    MONITOR_OPERATIVE_SYSTEM_PROMPT.format(
+                    prompt_template.format(
                         memory_extraction=self._memory_extraction,
                         observation_compression=self._observation_compression,
                         retrieval_strategy=self._retrieval_strategy,
@@ -185,7 +191,7 @@ class MonitorOperativeAgent(ToolUsingAgent):
                     ),
                 )
             except KeyError:
-                sys_parts.append(MONITOR_OPERATIVE_SYSTEM_PROMPT)
+                sys_parts.append(prompt_template)
 
         # 2. State recall from memory backend
         previous_state = self._recall_state()
